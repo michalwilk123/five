@@ -1,0 +1,16 @@
+<predicate>
+    <pattern>^SELECT ([ARGS]|[KWARGS])* [WHERE]</pattern>
+    <kwargs>
+        <kwarg v="name" t="name"/>
+    </kwargs>
+    <args>
+        <arg t="name"/>
+    </args>
+    <reduction>
+        if name := args.name:
+            print(name)
+
+    </reduction>
+    <predicate>
+    </predicate>
+</predicate>
