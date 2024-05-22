@@ -1,8 +1,7 @@
-import itertools
-from typing import Iterable, Callable
-import functools
 import collections
-import textwrap
+import functools
+import itertools
+from typing import Callable, Iterable
 
 BUILTIN_PATTERNS = {
     "vname": r"[A-Za-z]\w+",
@@ -31,8 +30,11 @@ def create_unique_symbol(symbol: str) -> str:
     return generated_symbol
 
 
-def convert_to_bool(text: str):
-    return text.lower() in ("t", "true", "1")
+def convert_to_bool(value: str | bool) -> bool:
+    if isinstance(value, bool):
+        return value
+
+    return value.lower() in ("t", "true", "1")
 
 
 def compose(item: any, functions_to_apply: Iterable[Callable[[any], any]]):

@@ -1,0 +1,19 @@
+[project]
+name = "five"
+version = "0.1.0"
+description = "The semantic system control versioning tool"
+authors = [
+    {name = "Michal Wilk", email = "michalwilk123@gmail.com"},
+]
+dependencies = []
+requires-python = ">=3.12"
+readme = "README.md"
+license = {text = "MIT"}
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+
+[tool.pdm]
+distribution = true

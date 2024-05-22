@@ -18,8 +18,8 @@ reverse matching it will look for most appropriate example and
 fill out the details that the user will propose
 """
 
-from core.parser import FlangParser
-from core.processors import FlangStandardProcessorToolchain
+# from core.parser import FlangParser
+# from core.processors import FlangStandardProcessorToolchain
 
 
 def main(filename):
