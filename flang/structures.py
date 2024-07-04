@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import atexit
 import dataclasses
+import io
+import pathlib
 import re
 import typing
-import pathlib
-import atexit
 from collections.abc import Sequence
+from functools import cached_property
 
 from flang.helpers import BUILTIN_PATTERNS, convert_to_bool
 
@@ -14,7 +16,7 @@ from flang.helpers import BUILTIN_PATTERNS, convert_to_bool
 class FlangConstruct:
     construct_name: str
     attributes: dict
-    children: list[str]
+    children: list[FlangConstruct]
     text: str | None
     location: str
 
@@ -27,22 +29,18 @@ class FlangConstruct:
         if value is None:
             return default
         return convert_to_bool(value)
-    
+
     @property
     def visible(self):
         return self.get_bool_attrib("visible", True)
-    
+
     @visible.setter
-    def visible(self, value:bool):
+    def visible(self, value: bool):
         self.attributes["visible"] = value
 
-    @property
+    @cached_property
     def pattern(self):
-        if hasattr(self, "__pattern"):
-            return self.__pattern
-
-        self.__pattern = re.compile(self.text.format(**BUILTIN_PATTERNS))
-        return self.__pattern
+        return re.compile(self.text.format(**BUILTIN_PATTERNS))
 
     @property
     def name(self) -> str | None:
@@ -80,9 +78,9 @@ class FlangObject:
 
 
 @dataclasses.dataclass
-class FlangStructuredText:
-    symbol: str | None
-    content: str | list[FlangStructuredText]
+class FlangTextMatchObject:
+    symbol: str
+    content: str | list[FlangTextMatchObject]
     visible_in_spec: bool = False
 
     def __len__(self):
@@ -90,10 +88,16 @@ class FlangStructuredText:
             return sum(map(len, self.content))
         return len(self.content)
 
-    
     def get_construct(self, flang_object: FlangObject) -> FlangConstruct:
         return flang_object.find_symbol(self.symbol)
-    
+
+    def get_raw_content(self):
+        return (
+            "".join(it.get_raw_content() for it in self.content)
+            if isinstance(self.content, list)
+            else self.content
+        )
+
     def to_representation(self):
         if isinstance(self.content, list):
             return (
@@ -105,6 +109,17 @@ class FlangStructuredText:
                 ],
             )
         return (self.symbol, self.content)
+
+
+@dataclasses.dataclass
+class FlangFileMatchObject:
+    symbol: str
+    filename: str
+    content: FlangTextMatchObject | list[FlangFileMatchObject]
+    visible_in_spec: bool = False
+
+    def __len__(self):
+        raise Exception("Cannot determine the length of file-like object")
 
 
 @dataclasses.dataclass
@@ -121,7 +136,7 @@ class IntermediateFileObject:
             self.content.close()
 
     @classmethod
-    def from_path(cls, path:str):
+    def from_path(cls, path: str):
         path_object = pathlib.Path(path)
 
         assert path_object.exists()
@@ -130,9 +145,70 @@ class IntermediateFileObject:
             content = [cls.from_path(child_path) for child_path in path_object.iterdir()]
         else:
             content = open(path_object)
-        
+
         return cls(content=content, path=path_object)
 
-    def write(self):
-        ...
+    def write(self): ...
 
+
+sanity_check = True
+
+
+class FlangInputReader:
+    def __init__(
+        self,
+        data: str | io.StringIO | list[IntermediateFileObject],
+        cursor: int | list | None = None,
+        previous: FlangInputReader | None = None,
+    ) -> None:
+        self._data = io.StringIO(data) if isinstance(data, str) else data
+
+        if cursor is None:
+            self._cursor = 0 if isinstance(data, (str, io.StringIO)) else []
+        else:
+            self._cursor = cursor.copy() if isinstance(cursor, list) else cursor
+
+        self._previous = previous
+
+    @staticmethod
+    def compare(in_1: FlangInputReader, in_2: FlangInputReader):
+        return 0
+
+    def read(self, size=None):
+        match self._data:
+            case io.StringIO():
+                self._data.seek(self._cursor)  # look-up correct scope of input stream
+                data = self._data.read() if size is None else self._data.read(size)
+                self._data.seek(self._cursor)  # do not modify the state
+                return data
+            case list():
+                return [self._data[i] for i in self._cursor]
+
+    def consume_data(self, data: FlangTextMatchObject | FlangFileMatchObject) -> None:
+        match data:
+            case FlangTextMatchObject():
+                if sanity_check:
+                    consumed_data = self.read(len(data))
+                    assert consumed_data == data.get_raw_content()
+                self._cursor += len(data)
+            case FlangFileMatchObject():
+                if sanity_check:
+                    assert all(item in self._data for item in data.content)
+
+                self._cursor += [
+                    i for i, item in enumerate(self._data) if item in data.content
+                ]
+
+                if sanity_check:
+                    assert len(self._cursor) == len(set(self._cursor))
+            case _:
+                raise Exception(f"Unknown data consumed: {type(data)}: {data}")
+
+    @property
+    def previous(self):
+        assert self._previous is not None
+        return self._previous
+
+    def copy(self) -> FlangInputReader:
+        new_version = FlangInputReader(self._data, cursor=self._cursor, previous=self)
+        return new_version

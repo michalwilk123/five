@@ -1,165 +1,175 @@
-from flang.exceptions import MatchNotFoundError, TextNotParsedError
+from functools import cmp_to_key
+
+from flang.exceptions import MatchNotFoundError, TextNotParsedError, UnknownConstructError
 from flang.helpers import create_unique_symbol, emit_function
-from flang.structures import FlangConstruct, FlangObject, FlangStructuredText, IntermediateFileObject
+from flang.structures import (
+    FlangConstruct,
+    FlangInputReader,
+    FlangObject,
+    FlangTextMatchObject,
+)
 
-class FlangTextProcessor:
-    def __init__(
-        self, flang_object: FlangObject, root: FlangConstruct=None, allow_partial_match: bool = False
-    ) -> any:
-        self.root = root or flang_object.root_construct
-        self.object = flang_object
-        self.allow_partial_match = allow_partial_match
 
-    def match(
-        self, construct: FlangConstruct, text: str, start_position=0 # może nie powinno przyjmować tekstu?
-    ) -> FlangStructuredText:
-        visible_in_spec = bool(construct.name)
-        match_object = None
+def match_single_core(
+    flang_object: FlangObject, construct: FlangConstruct, reader: FlangInputReader
+):
+    # input_stream = input_stream.save_checkpoint()
+    visible_in_spec = bool(construct.name)
 
-        match construct.construct_name:
-            case "component":
-                children = []
+    match construct.construct_name:
+        case "component":
+            matches = []
 
-                new_position = start_position
-                for child in self.object.iterate_children(construct.location):
-                    try:
-                        while True:
-                            match_object = self.match(child, text, new_position)
-                            new_position += len(match_object)
-                            children.append(match_object)
+            for child in flang_object.iterate_children(construct.location):
+                match_objects, reader = match_flang_construct(flang_object, child, reader)
+                matches += match_objects
 
-                            if not child.get_bool_attrib("multi"):
-                                break
-                    except MatchNotFoundError as e:
-                        construct_optional = child.get_bool_attrib("optional")
-                        cannot_find_more_matches = (
-                            child.get_bool_attrib("multi")
-                            and children
-                            and children[-1].symbol == child.location
-                        )
+            if flang_object.root == construct.location and reader.read():
+                print(f"Text left: {reader.read()}")
+                raise TextNotParsedError
 
-                        if construct_optional or cannot_find_more_matches:
-                            continue
+            return FlangTextMatchObject(
+                symbol=construct.location,
+                content=matches,
+                visible_in_spec=visible_in_spec,
+            )
+        case "choice":
+            matches = []
+            readers = []
+            for child in flang_object.iterate_children(construct.location):
+                try:
+                    match_objects, reader = match_flang_construct(
+                        flang_object, child, reader
+                    )
+                    matches += match_objects
+                    readers.append(reader)
+                    reader = reader.previous
+                except MatchNotFoundError:
+                    pass
 
-                        raise e
+            if not matches:
+                raise MatchNotFoundError
 
-                match_object = FlangStructuredText(
-                    symbol=construct.location,
-                    content=children,
-                    visible_in_spec=visible_in_spec,
-                )
+            max_reader = max(readers, key=cmp_to_key(FlangInputReader.compare))
+            return matches[readers.index(max_reader)]
 
-                if not self.allow_partial_match and self.object.root == construct.location and len(match_object) != len(text):
-                    raise TextNotParsedError
-                
-                return match_object
+        case "event":
+            name = construct.get_attrib("name", None) or create_unique_symbol(
+                "_flang_function"
+            )
+            args = construct.get_attrib("args", "").split(",")
+            body = construct.text
+            emit_function(name, args, body)
+        case _:
+            raise UnknownConstructError(construct.construct_name)
 
-            case "choice":
-                children = []
-                for child in self.object.iterate_children(construct.location):
-                    try:
-                        children.append(self.match(child, text, start_position))
-                    except MatchNotFoundError:
-                        continue
 
-                if not children:
-                    raise MatchNotFoundError
+def match_single_text(
+    flang_object: FlangObject, construct: FlangConstruct, reader: FlangInputReader
+):
+    visible_in_spec = bool(construct.name)
+    match_object = None
 
-                return max(children, key=len)
-            case "regex":
-                matched_text = construct.pattern.match(text, start_position)
-                if not matched_text:
-                    raise MatchNotFoundError
+    match construct.construct_name:
+        case "regex":
+            matched_text = construct.pattern.match(reader.read())
+            if not matched_text:
+                raise MatchNotFoundError
 
-                return FlangStructuredText(
-                    symbol=construct.location,
-                    content=matched_text.group(),
-                    visible_in_spec=visible_in_spec,
-                )
-            case "text":
-                if not text.startswith(construct.text, start_position):
-                    raise MatchNotFoundError
+            match_object = FlangTextMatchObject(
+                symbol=construct.location,
+                content=matched_text.group(),
+                visible_in_spec=visible_in_spec,
+            )
+            return match_object
+        case "text":
+            if not reader.read().startswith(construct.text):
+                raise MatchNotFoundError
 
-                return FlangStructuredText(
-                    symbol=construct.location,
-                    content=construct.text,
-                    visible_in_spec=visible_in_spec,
-                )
-            case "event":
-                name = construct.get_attrib("name", None) or create_unique_symbol(
-                    "_flang_function"
-                )
-                args = construct.get_attrib("args", "").split(",")
-                body = construct.text
-                emit_function(name, args, body)
-            case _:
-                raise RuntimeError(f"No such construct {construct.construct_name}")
+            match_object = FlangTextMatchObject(
+                symbol=construct.location,
+                content=construct.text,
+                visible_in_spec=visible_in_spec,
+            )
 
-    def _args_builder(self, args):
-        return []
+            return match_object
+        case _:
+            raise UnknownConstructError(construct.construct_name)
 
-    def generate(self, spec: FlangStructuredText) -> str:
-        construct = self.object.find_symbol(spec.symbol)
 
-        match construct.construct_name:
-            case "component":
-                return "".join(self.generate(child_match) for child_match in spec.content)
-            case "choice":
-                raise RuntimeError
-            case "regex":
-                return spec.content
-            case "text":
-                return spec.content
+def match_single_file(
+    flang_object: FlangObject, construct: FlangConstruct, reader: FlangInputReader
+):
+    visible_in_spec = bool(construct.name)
 
-        raise RuntimeError
+    match construct.construct_name:
+        case "file":
+            if not reader.read().startswith(construct.text):
+                raise MatchNotFoundError
 
-    def backward(self, spec: FlangStructuredText) -> str:
+            return FlangTextMatchObject(
+                symbol=construct.location,
+                content=construct.text,
+                visible_in_spec=visible_in_spec,
+            )
+        case _:
+            raise UnknownConstructError(construct.construct_name)
+
+
+def match_single(
+    flang_object: FlangObject, construct: FlangConstruct, reader: FlangInputReader
+):
+    matchers = (match_single_core, match_single_text, match_single_file)
+
+    for matcher in matchers:
+        try:
+            match_object = matcher(flang_object, construct, reader)
+        except UnknownConstructError:
+            continue
+        else:
+            break
+
+    return match_object
+
+
+def match_flang_construct(
+    flang_object: FlangObject, construct: FlangConstruct, reader: FlangInputReader
+):
+    reader = reader.copy()
+    matches = []
+    try:
+        match_object = match_single(flang_object, construct, reader)
+        matches.append(match_object)
+        reader.consume_data(match_object)
+    except MatchNotFoundError as e:
+        if not construct.get_bool_attrib("optional"):
+            raise MatchNotFoundError from e
+        else:
+            reader = reader.previous
+
+    while construct.get_bool_attrib("multi"):
+        reader = reader.copy()
+        try:
+            match_object = match_single(flang_object, construct, reader)
+            matches.append(match_object)
+            reader.consume_data(match_object)
+        except MatchNotFoundError as e:
+            reader = reader.previous
+            break
+
+    return matches, reader
+
+
+class FlangProjectProcessor:
+    def __init__(self, flang_object: FlangObject) -> None:
+        self.flang_object = flang_object
+
+    def backward(self, spec: FlangTextMatchObject) -> FlangInputReader:
         return self.generate(spec)
 
-    def forward(self, sample: str) -> FlangStructuredText:
-        return self.match(self.root, sample)
-
-class FlangFileProcessor:
-    def __init__(
-        self, flang_object: FlangObject, root: FlangConstruct=None, allow_partial_match: bool = False
-    ) -> any:
-        self.root = root or flang_object.root_construct
-        self.object = flang_object
-        self.allow_partial_match = allow_partial_match
-
-    def match(
-        self, construct: FlangConstruct, text: str, start_position=0
-    ) -> FlangStructuredText:
-        ...
-
-    def backward(self, spec: FlangStructuredText) -> IntermediateFileObject:
-        """
-        Powinno sie tutaj sprawdzic czy plik juz istnieje itd. ew go nadpisac
-        """
-        return self.generate(spec)
-
-    def forward(self, file: str | IntermediateFileObject) -> FlangStructuredText:
-        if isinstance(file, str):
-            file = IntermediateFileObject.from_path(file)
-
-        return self.match(self.root, file)
-
-class FlangCoreProcessor:
-    """
-    Implements core constructs
-    """
-    ...
-
-class FlangProjectProcessor(FlangCoreProcessor, FlangTextProcessor, FlangFileProcessor):
-    def match(self, *args, **kwargs):
-        klass = self.__class__
-
-        for base in klass.__bases__:
-            try:
-                match_object = base.match(self, *args, **kwargs)
-            except MatchNotFoundError:
-                continue
-            else:
-                break
-        
-        return match_object
+    def forward(self, sample: FlangInputReader) -> FlangTextMatchObject:
+        matched, _reader = match_flang_construct(
+            self.flang_object, self.flang_object.root_construct, sample
+        )
+        assert len(matched) == 1
+        return matched[0]

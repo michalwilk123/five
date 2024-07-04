@@ -6,7 +6,7 @@ from typing import Callable, Iterable
 BUILTIN_PATTERNS = {
     "vname": r"[A-Za-z]\w+",
     "number": r"-?(([1-9]+\d*)|0)(\.\d*)?",
-    "string": r"((?:\\)\"[^\"]*(?:\\)\")|((?:\\)'[^\']*(?:\\)')",
+    "string": r'(?<!\\)(?:\\{2})*"(?:(?<!\\)(?:\\{2})*\\"|[^"])+(?<!\\)(?:\\{2})*"',
 }
 
 global_anonymous_name_counter = collections.defaultdict(lambda: 0)

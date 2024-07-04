@@ -1,10 +1,10 @@
+import copy
 import os
 import xml.etree.ElementTree as ET
 
 from flang.exceptions import SymbolNotFoundError
 from flang.helpers import create_unique_symbol
-from flang.structures import FlangConstruct, FlangObject, FlangStructuredText
-import copy
+from flang.structures import FlangConstruct, FlangObject
 
 
 class FlangXMLParser:
@@ -27,7 +27,7 @@ class FlangXMLParser:
             try:
                 target = self.find_construct_by_path(target_location, location)
                 target = copy.deepcopy(target)
-                
+
                 if not target.visible:
                     target.visible = True
 

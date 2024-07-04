@@ -6,7 +6,13 @@ TEST_BASIC_TEMPLATE = """
 
 TEST_BASIC_SAMPLE = "hello world"
 TEST_BASIC_SAMPLE_FAILURE_1 = "goodbye world"
-TEST_BASIC_SAMPLE_FAILURE_2 = "hello my world"
+TEST_BASIC_SAMPLE_FAILURE_2 = "hello cruel world"
+TEST_CHOICE_NESTED_SAMPLE = r"""
+Lorem ipsum, dolor sit amet...
+end"""
+TEST_OPTIONAL_SAMPLE_1 = "this is a number: 123"
+TEST_OPTIONAL_SAMPLE_2 = 'this is a text: "some text"'
+TEST_OPTIONAL_SAMPLE_3 = "this is a text: 111"
 
 TEST_TEMPLATE_CHOICE = """
 <component name="import">
@@ -17,6 +23,55 @@ TEST_TEMPLATE_CHOICE = """
 THIS IS WRONG
 </text>
 </choice>
+</component>
+"""
+
+# Lorem ipsum dolor sit amet
+# this would be useful with combination of "use" construct
+# f.e.: choice of variable declaration or types or raw values
+TEST_TEMPLATE_CHOICE_NESTED = r"""
+<component name="nested">
+<choice name="all-pieces" multi="true">
+<choice name="text-pieces">
+<text value="ipsum"/>
+<text value="Lorem"/>
+<text name="wrong" value="wrong!"/>
+<text value="dolor"/>
+<text value="amet"/>
+<text value="sit"/>
+</choice>
+<choice name="my-regexes">
+<regex name="whitespace">\s</regex>
+<regex name="separators">[,.]</regex>
+<regex name="wrong">[:;%$]+</regex>
+<regex name="number">{number}</regex>
+</choice>
+<text name="wrong">wrong</text>
+</choice>
+<text value="end"/>
+</component>
+"""
+
+TEST_TEMPLATE_OPTIONAL = """
+<component name="opt">
+<text value="this is a "/>
+<component name="num" optional="true">
+<text value="number: "/><regex value="{number}"/>
+</component>
+<component name="txt" optional="true">
+<text value="text: "/><regex value="{string}"/>
+</component>
+</component>
+"""
+
+TEST_TEMPLATE_CHOICE_AND_MULTI = r"""
+<component name="test">
+<component name="test-multi" multi="true">
+<choice>
+</choice>
+<regex value="\s" />
+<text value="the end"/>
+</component>
 </component>
 """
 
@@ -31,6 +86,15 @@ TEST_TEMPLATE_USE = """
 </component>
 """
 
+"""
+Wiadomo ze jezeli chcialbys sparsowac cokolwiek to wszystko mozna owinac
+w regexy i sobie znacznie ulatwic sprawe.
+Zapominasz tylko po co tak naprawde istnieje ta klazura multi
+
+bardziej w tym chodzi o to aby okreslic ze zwracana jest lista jakis
+obiektow, np componentow ze zmatchowanym tekstem. Jakby musisz wciaz o tym
+pamietac
+"""
 TEST_TEMPLATE_MULTI = r"""
 <component name="import">
 <component name="header" multi="true">
@@ -74,13 +138,13 @@ TEST_TEMPLATE_FILE = r"""\
 </component>
 """
 
-DUMMY_TEST_TEMPLATE_EVENT = """
+DUMMY_TEST_TEMPLATE_EVENT = r"""
 <component name="code">
 <component name="import" multi="true">
-<text value="import "/><regex name="import_name" value="{vname}"/><text value="\\n"/>
+<text value="import "/><regex name="import_name" value="{vname}"/><text value="\n"/>
 </component>
 <component name="function-call" on-create=".">
-<event args="tree,component">
+<event args="tree">
 function_name = tree.get("name")
 tree.parent().get("import").insert(name=function_name)
 </event>
@@ -149,7 +213,7 @@ tree.parent().get("import").insert(name=function_name)
 #################################### END
 ##################################### END
 
-DUMMY_TEST_TEMPLATE_EVENT = """
+DUMMY_TEST_TEMPLATE_EVENT = r"""
 <component name="code">
 <component name="import">
 <text value="import "/><regex value="{vname}"/><text value="\\n"/>
@@ -168,7 +232,7 @@ print("hello world")
 SAMPLE_CHOICE = "AAAAAA"
 SPEC_EVENT = None
 
-DUMMY_TEST_TEMPLATE_EVENT = """
+DUMMY_TEST_TEMPLATE_EVENT = r"""
 <component name="code">
 <component name="import">
 <text value="import "/><regex value="{vname}"/><text value="\\n"/>
