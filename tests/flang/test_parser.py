@@ -3,7 +3,12 @@ import unittest
 from flang.exceptions import MatchNotFoundError, TextNotParsedError
 from flang.parser import FlangXMLParser
 from flang.processors import FlangProjectProcessor
-from flang.structures import FlangInputReader, FlangObject, FlangTextMatchObject
+from flang.structures import (
+    FlangInputReader,
+    FlangMatchObject,
+    FlangObject,
+    IntermediateFileObject,
+)
 
 from . import templates as tpl
 
@@ -13,11 +18,15 @@ class FlangParserTestCase(unittest.TestCase):
         self.parser = FlangXMLParser()
 
     def _parse_template(
-        self, template: str, sample: str
-    ) -> tuple[FlangObject, FlangTextMatchObject]:
+        self, template: str, sample: str, file: bool = False
+    ) -> tuple[FlangObject, FlangMatchObject]:
         flang_object = self.parser.parse_text(template)
         processor = FlangProjectProcessor(flang_object)
-        reader = FlangInputReader(sample)
+
+        if file:
+            reader = FlangInputReader.from_path(sample)
+        else:
+            reader = FlangInputReader(sample)
 
         structured_text = processor.forward(reader)
         return flang_object, structured_text
@@ -49,6 +58,11 @@ class FlangParserTestCase(unittest.TestCase):
             tpl.TEST_TEMPLATE_CHOICE_NESTED, tpl.TEST_CHOICE_NESTED_SAMPLE
         )
 
+    def test_multi_choice_combined(self):
+        self._parse_template(
+            tpl.TEST_TEMPLATE_CHOICE_AND_MULTI, tpl.TEST_CHOICE_AND_MULTI_SAMPLE
+        )
+
     def test_use(self):
         self._parse_template(tpl.TEST_TEMPLATE_USE, "foo")
 
@@ -62,8 +76,26 @@ class FlangParserTestCase(unittest.TestCase):
         with self.assertRaises(TextNotParsedError):
             self._parse_template(tpl.TEST_TEMPLATE_OPTIONAL, tpl.TEST_OPTIONAL_SAMPLE_3)
 
-    def test_file_simple(self): ...
+    def test_recursive(self):
+        # todo: parametrize?
+        self._parse_template(tpl.TEST_TEMPLATE_RECURSIVE, tpl.TEST_SAMPLE_RECURSIVE_1)
+        self._parse_template(tpl.TEST_TEMPLATE_RECURSIVE, tpl.TEST_SAMPLE_RECURSIVE_2)
+        self._parse_template(tpl.TEST_TEMPLATE_RECURSIVE, tpl.TEST_SAMPLE_RECURSIVE_3)
 
-    def test_file_directories(self): ...
+    def test_file_easy(self):
+        self._parse_template(
+            tpl.TEST_TEMPLATE_FILES_EASY, tpl.TEST_SAMPLE_FILES + "/easy", True
+        )
+
+    def test_file_xml(self):
+        self._parse_template(
+            tpl.TEST_TEMPLATE_FILES_XML, tpl.TEST_SAMPLE_FILES + "/xml", True
+        )
+
+    def test_file_medium(self):
+        ...
+        # self._parse_template(
+        #     tpl.TEST_TEMPLATE_FILES_XML, tpl.TEST_SAMPLE_FILES + "/medium", True
+        # )
 
     def test_file_hard(self): ...

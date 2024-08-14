@@ -1,0 +1,24 @@
+
+{
+    "symbol": file,
+    "filename": dupa
+    "content": [
+        {
+            "symbol": file,
+            "filename": bobra.txt
+            "content": {
+                "symbol": component,
+                "content": [
+                    {"symbol": text, content: "hello world"}
+                ]
+            }
+        }
+    ]
+}
+
+use
+module
+choice
+sequence
+regex
+text

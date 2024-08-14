@@ -1,9 +1,4 @@
-TEST_BASIC_TEMPLATE = """
-<component>
-    <text value="hello "/><regex name="subject" value="{vname}"/>
-</component>
-"""
-
+### SAMPLES
 TEST_BASIC_SAMPLE = "hello world"
 TEST_BASIC_SAMPLE_FAILURE_1 = "goodbye world"
 TEST_BASIC_SAMPLE_FAILURE_2 = "hello cruel world"
@@ -13,9 +8,55 @@ end"""
 TEST_OPTIONAL_SAMPLE_1 = "this is a number: 123"
 TEST_OPTIONAL_SAMPLE_2 = 'this is a text: "some text"'
 TEST_OPTIONAL_SAMPLE_3 = "this is a text: 111"
+TEST_CHOICE_AND_MULTI_SAMPLE = """\
+My name is Zoe.
+My name is Tom.
+My name is empty.
+My name is some, other, things.
+"""
+TEST_SAMPLE_MULTI = """\
+AAAAAAAAAAAA
+AAA
+AAAAAA
+variable: somevalue;
+variable: someothervalue;
+"""
+TEST_SAMPLE_RECURSIVE_1 = """\
+<html>
+foo
+</html>\
+"""
+TEST_SAMPLE_RECURSIVE_2 = """\
+<html>
+<body><strong>some bolded text</strong></body>
+</html>\
+"""
+TEST_SAMPLE_RECURSIVE_3 = """\
+<html>
+<head><link some="attribute">some link</link><link>some other link</link></head>
+<body>
+<script>console.log("hello")</script>
+some <em>fancy</em> text
+<div>
+<div>
+    nested
+</div>
+</div>
+</body>
+</html>\
+"""
 
+TEST_SAMPLE_FILES = "tests/flang/test_files"
+
+### TEMPLATES
+
+TEST_BASIC_TEMPLATE = """
+<sequence>
+    <text value="hello "/><regex name="subject" value="{vname}"/>
+</sequence>
+"""
 TEST_TEMPLATE_CHOICE = """
-<component name="import">
+<sequence name="import">
 <choice>
 <text name="text">AAA</text>
 <regex name="regex">{vname}</regex>
@@ -23,14 +64,13 @@ TEST_TEMPLATE_CHOICE = """
 THIS IS WRONG
 </text>
 </choice>
-</component>
+</sequence>
 """
 
-# Lorem ipsum dolor sit amet
 # this would be useful with combination of "use" construct
 # f.e.: choice of variable declaration or types or raw values
 TEST_TEMPLATE_CHOICE_NESTED = r"""
-<component name="nested">
+<sequence name="nested">
 <choice name="all-pieces" multi="true">
 <choice name="text-pieces">
 <text value="ipsum"/>
@@ -49,41 +89,46 @@ TEST_TEMPLATE_CHOICE_NESTED = r"""
 <text name="wrong">wrong</text>
 </choice>
 <text value="end"/>
-</component>
+</sequence>
 """
 
 TEST_TEMPLATE_OPTIONAL = """
-<component name="opt">
+<sequence name="opt">
 <text value="this is a "/>
-<component name="num" optional="true">
+<sequence name="num" optional="true">
 <text value="number: "/><regex value="{number}"/>
-</component>
-<component name="txt" optional="true">
+</sequence>
+<sequence name="txt" optional="true">
 <text value="text: "/><regex value="{string}"/>
-</component>
-</component>
+</sequence>
+</sequence>
 """
 
 TEST_TEMPLATE_CHOICE_AND_MULTI = r"""
-<component name="test">
-<component name="test-multi" multi="true">
-<choice>
+<sequence name="test" multi="true">
+<text value="My name is "/>
+<choice optional="true">
+<text value="Sam"/>
+<text value="Tom"/>
+<text value="Zoe"/>
+<sequence multi="true">
+<regex name="other" value="[a-z]+(, )?" multi="true"/>
+</sequence>
 </choice>
-<regex value="\s" />
-<text value="the end"/>
-</component>
-</component>
+<text value="."/>
+<regex value="\s"/>
+</sequence>
 """
 
 TEST_TEMPLATE_USE = """
-<component name="import">
-<component name="foo" visible="false">
+<sequence name="import">
+<sequence name="foo" visible="false">
 <text>foo</text>
-</component>
-<component name="bar">
+</sequence>
+<sequence name="bar">
 <use ref="..foo"/>
-</component>
-</component>
+</sequence>
+</sequence>
 """
 
 """
@@ -92,58 +137,64 @@ w regexy i sobie znacznie ulatwic sprawe.
 Zapominasz tylko po co tak naprawde istnieje ta klazura multi
 
 bardziej w tym chodzi o to aby okreslic ze zwracana jest lista jakis
-obiektow, np componentow ze zmatchowanym tekstem. Jakby musisz wciaz o tym
+obiektow, np sequenceow ze zmatchowanym tekstem. Jakby musisz wciaz o tym
 pamietac
 """
 TEST_TEMPLATE_MULTI = r"""
-<component name="import">
-<component name="header" multi="true">
+<sequence name="import">
+<sequence name="header" multi="true">
 <text multi="true">AAA</text>
 <regex>\s</regex>
-</component>
-<component name="variable" multi="true">
+</sequence>
+<sequence name="variable" multi="true">
 <text value="variable: "/><regex name="name" value="{vname}"/><regex value=";\n?"/>
-</component>
-</component>
+</sequence>
+</sequence>
 """
 
-TEST_SAMPLE_MULTI = """\
-AAAAAAAAAAAA
-AAA
-AAAAAA
-variable: somevalue;
-variable: someothervalue;
-"""
-
-TEST_TEMPLATE_FILE = r"""\
-<component name="text-file">
-<file type="dir" filename="{vname}_app" name="app">
-<component name="app-file" multi="true">
-<choice>
-<file name="css" filename="{vname}\.css">
-    <component name="assignment" multi="true">
-        <regex name="property" value="{vname}"/><text value=": "/>
-        <regex name="value" value="{vname}|{number}|{string}"/>
-    </component>
-</file>
-<file name="javascript" filename="{vname}\.js">
-<regex name="code" value=".*"/>
-</file>
-<file name="ignored" type="any" filename="\.gitignore|\.git">
-<regex name="code" value=".*"/>
-</file>
+TEST_TEMPLATE_RECURSIVE = r"""
+<choice name="xml-body" multi="true">
+    <regex name="wspace">\s+</regex>
+    <sequence name="xml-node" multi="true">
+        <regex name="open-tag" value="{xml_open_tag}"/>
+        <choice name="xml-content" multi="true">
+            <regex name="raw-content" value="[^{lt}{rt}]+"/>
+            <use ref="....xml-body"/>
+        </choice>
+        <regex name="close-tag" value="{xml_close_tag}"/>
+    </sequence>
 </choice>
-</component>
+"""
+
+TEST_TEMPLATE_FILES_EASY = r"""
+<file pattern="easy" variant="filename" name="html-project">
+<file multi="true" pattern="*.html" variant="glob">
+<sequence name="html">
+<text name="content" value="some text "/>
+<regex name="number" value="{number}"/>
+</sequence>
 </file>
-</component>
+</file>
+"""
+
+TEST_TEMPLATE_FILES_XML = r"""
+<file pattern="xml" variant="filename" name="html-project">
+<file multi="true" pattern="*.html" variant="glob">
+{template}
+</file>
+</file>
+""".format(
+    template=TEST_TEMPLATE_RECURSIVE
+)
+TEST_TEMPLATE_FILES_MEDIUM = r"""
 """
 
 DUMMY_TEST_TEMPLATE_EVENT = r"""
-<component name="code">
-<component name="import" multi="true">
+<sequence name="code">
+<sequence name="import" multi="true">
 <text value="import "/><regex name="import_name" value="{vname}"/><text value="\n"/>
-</component>
-<component name="function-call" on-create=".">
+</sequence>
+<sequence name="function-call" on-create=".">
 <event args="tree">
 function_name = tree.get("name")
 tree.parent().get("import").insert(name=function_name)
@@ -151,8 +202,8 @@ tree.parent().get("import").insert(name=function_name)
 <regex name="name" value="({vname}(\.{vname}))"/><text value="("/>
 <regex name="arguments" value="[^)]*"/>
 <text value=")"/>
-</component>
-</component>
+</sequence>
+</sequence>
 """
 
 # END
@@ -214,38 +265,38 @@ tree.parent().get("import").insert(name=function_name)
 ##################################### END
 
 DUMMY_TEST_TEMPLATE_EVENT = r"""
-<component name="code">
-<component name="import">
+<sequence name="code">
+<sequence name="import">
 <text value="import "/><regex value="{vname}"/><text value="\\n"/>
-</component>
-<component name="function-call" on-create=".">
+</sequence>
+<sequence name="function-call" on-create=".">
 <event args="tree">
 print("hello world")
 </event>
 <regex name="name" value="({vname}(\.{vname}))"/><text value="("/>
 <regex name="arguments" value="[^)]*"/>
 <text value=")"/>
-</component>
-</component>
+</sequence>
+</sequence>
 """
 
 SAMPLE_CHOICE = "AAAAAA"
 SPEC_EVENT = None
 
 DUMMY_TEST_TEMPLATE_EVENT = r"""
-<component name="code">
-<component name="import">
+<sequence name="code">
+<sequence name="import">
 <text value="import "/><regex value="{vname}"/><text value="\\n"/>
-</component>
-<component name="function-call" on-create=".">
+</sequence>
+<sequence name="function-call" on-create=".">
 <event args="tree">
 print("hello world")
 </event>
 <regex name="name" value="({vname}(\.{vname}))"/><text value="("/>
 <regex name="arguments" value="[^)]*"/>
 <text value=")"/>
-</component>
-</component>
+</sequence>
+</sequence>
 """
 
 

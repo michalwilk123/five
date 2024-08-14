@@ -1,14 +1,13 @@
 from __future__ import annotations
 
-import atexit
 import dataclasses
+import fnmatch
 import io
 import pathlib
 import re
-import typing
-from collections.abc import Sequence
 from functools import cached_property
 
+from flang.exceptions import SymbolNotFoundError
 from flang.helpers import BUILTIN_PATTERNS, convert_to_bool
 
 
@@ -76,12 +75,40 @@ class FlangObject:
     def root_construct(self) -> FlangConstruct:
         return self.find_symbol(self.root)
 
+    def find_construct_by_path(
+        self, reference_path: str, current_path: str = ""
+    ) -> FlangConstruct:
+        is_symbol_external = ":" in reference_path
+        is_symbol_relative = reference_path.startswith(".") and not is_symbol_external
 
+        if is_symbol_relative and not current_path:
+            raise RuntimeError
+
+        if is_symbol_external:
+            try:
+                return self.find_symbol(reference_path)
+            except KeyError as e:
+                raise SymbolNotFoundError from e
+        elif is_symbol_relative:
+            path_without_dots = reference_path.lstrip(".")
+            backward_steps = len(reference_path) - len(path_without_dots)
+
+            filename, local_path = current_path.split(":")
+            target_path = ".".join(
+                local_path.split(".")[:-backward_steps] + [path_without_dots]
+            )
+            full_target_path = "%s:%s" % (filename, target_path)
+            return self.find_construct_by_path(full_target_path)
+
+
+# dataclass, not typing.TypedDict because we need methods
 @dataclasses.dataclass
-class FlangTextMatchObject:
+class FlangMatchObject:
     symbol: str
-    content: str | list[FlangTextMatchObject]
+    construct: str
+    content: str | list[FlangMatchObject]
     visible_in_spec: bool = False
+    metadata: dict[str, str] = dataclasses.field(default_factory=dict)
 
     def __len__(self):
         if isinstance(self.content, list):
@@ -92,11 +119,16 @@ class FlangTextMatchObject:
         return flang_object.find_symbol(self.symbol)
 
     def get_raw_content(self):
-        return (
-            "".join(it.get_raw_content() for it in self.content)
-            if isinstance(self.content, list)
-            else self.content
-        )
+        if (
+            self.metadata.get("filename")
+            and pathlib.Path(self.metadata.get("filename")).is_dir()
+        ):
+            return [f.metadata.get("filename") for f in self.content]
+
+        if isinstance(self.content, list):
+            return "".join(it.get_raw_content() for it in self.content)
+
+        return self.content
 
     def to_representation(self):
         if isinstance(self.content, list):
@@ -111,44 +143,58 @@ class FlangTextMatchObject:
         return (self.symbol, self.content)
 
 
-@dataclasses.dataclass
-class FlangFileMatchObject:
-    symbol: str
-    filename: str
-    content: FlangTextMatchObject | list[FlangFileMatchObject]
-    visible_in_spec: bool = False
+# @dataclasses.dataclass
+# class FlangFileMatchObject:
+#     symbol: str
+#     filename: str
+#     content: FlangTextMatchObject | list[FlangTextMatchObject] | list[FlangFileMatchObject]
+#     visible_in_spec: bool = False
 
-    def __len__(self):
-        raise Exception("Cannot determine the length of file-like object")
+#     def __len__(self):
+#         raise Exception("Cannot determine the length of file-like object")
 
 
-@dataclasses.dataclass
 class IntermediateFileObject:
-    content: typing.IO[str] | Sequence[IntermediateFileObject]
-    path: pathlib.Path
+    """
+    Class that represents metadata of a file
+    """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(self, *args, **kwargs)
-        atexit.register(self.cleanup)
+    def __init__(self, path: str, content: list | None = None) -> None:
+        self.path = pathlib.Path(path)
+        assert self.path.exists()
+        self._content = content
 
-    def cleanup(self):
-        if not isinstance(self.content, Sequence) and not self.content.closed:
-            self.content.close()
+    @property
+    def content(self) -> str | list[IntermediateFileObject]:
+        if self._content is not None:
+            return self._content
 
-    @classmethod
-    def from_path(cls, path: str):
-        path_object = pathlib.Path(path)
-
-        assert path_object.exists()
-
-        if path_object.is_dir():
-            content = [cls.from_path(child_path) for child_path in path_object.iterdir()]
+        if self.path.is_dir():
+            return [IntermediateFileObject(str(file)) for file in self.path.iterdir()]
         else:
-            content = open(path_object)
+            with open(self.path) as f:
+                return f.read()
 
-        return cls(content=content, path=path_object)
+    def get_input_reader(self):
+        return FlangInputReader(self.content, metadata={"filename": self.path.name})
 
-    def write(self): ...
+    @staticmethod
+    def get_matched_files(
+        list_of_files: list[IntermediateFileObject], pattern: str, variant: str
+    ) -> list[IntermediateFileObject]:
+        assert variant in ("filename", "glob", "regex")
+
+        if variant == "glob":
+            pattern = fnmatch.translate(pattern)
+
+        if variant == "filename":
+            filenames = [item for item in list_of_files if item.path.name == pattern]
+        else:
+            filenames = [
+                item for item in list_of_files if re.match(pattern, item.path.name)
+            ]
+
+        return filenames
 
 
 sanity_check = True
@@ -160,18 +206,35 @@ class FlangInputReader:
         data: str | io.StringIO | list[IntermediateFileObject],
         cursor: int | list | None = None,
         previous: FlangInputReader | None = None,
+        metadata: dict | None = None,
     ) -> None:
+        assert isinstance(data, (str, io.StringIO, list))
+
+        # if isinstance(data, IntermediateFileObject):
+        #     assert data.path.is_dir()
+
         self._data = io.StringIO(data) if isinstance(data, str) else data
+        self.meta = metadata
 
         if cursor is None:
-            self._cursor = 0 if isinstance(data, (str, io.StringIO)) else []
+            if isinstance(data, (str, io.StringIO)):
+                self._cursor = 0
+            else:
+                self._cursor = list(range(len(data)))
         else:
             self._cursor = cursor.copy() if isinstance(cursor, list) else cursor
 
         self._previous = previous
 
+    @property
+    def is_file(self):
+        return isinstance(self._data, list)
+
     @staticmethod
     def compare(in_1: FlangInputReader, in_2: FlangInputReader):
+        import warnings
+
+        warnings.warn("NOT IMPLEMENTED!")
         return 0
 
     def read(self, size=None):
@@ -184,25 +247,26 @@ class FlangInputReader:
             case list():
                 return [self._data[i] for i in self._cursor]
 
-    def consume_data(self, data: FlangTextMatchObject | FlangFileMatchObject) -> None:
-        match data:
-            case FlangTextMatchObject():
-                if sanity_check:
-                    consumed_data = self.read(len(data))
-                    assert consumed_data == data.get_raw_content()
-                self._cursor += len(data)
-            case FlangFileMatchObject():
-                if sanity_check:
-                    assert all(item in self._data for item in data.content)
+    def consume_data(self, data: FlangMatchObject) -> None:
+        if isinstance(self._data, list):
+            filenames = [f.path.name for f in self._data]
 
-                self._cursor += [
-                    i for i, item in enumerate(self._data) if item in data.content
-                ]
+            if sanity_check:
+                assert data.metadata["filename"] in filenames
 
-                if sanity_check:
-                    assert len(self._cursor) == len(set(self._cursor))
-            case _:
-                raise Exception(f"Unknown data consumed: {type(data)}: {data}")
+            # for item in data.content:
+            #     self._cursor.remove(filenames.index(item.metadata["filename"]))
+            self._cursor.remove(filenames.index(data.metadata["filename"]))
+
+            if sanity_check:
+                assert len(self._cursor) == len(set(self._cursor))
+        elif isinstance(self._data, io.StringIO):
+            if sanity_check:
+                consumed_data = self.read(len(data))
+                assert consumed_data == data.get_raw_content(), data.construct
+            self._cursor += len(data)
+        else:
+            assert 0, "i dont know what to do %s" % self._data
 
     @property
     def previous(self):
@@ -210,5 +274,19 @@ class FlangInputReader:
         return self._previous
 
     def copy(self) -> FlangInputReader:
-        new_version = FlangInputReader(self._data, cursor=self._cursor, previous=self)
+        copied_cursor = (
+            self._cursor.copy() if isinstance(self._cursor, list) else self._cursor
+        )
+        new_version = FlangInputReader(
+            self._data, cursor=copied_cursor, previous=self, metadata=self.meta
+        )
         return new_version
+
+    @classmethod
+    def from_path(cls, path: str):
+        return cls(
+            [IntermediateFileObject(path)], metadata={"filename": pathlib.Path(path).name}
+        )
+
+
+class FlangTextReader: ...

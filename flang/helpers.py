@@ -3,10 +3,18 @@ import functools
 import itertools
 from typing import Callable, Iterable
 
+import flang.regex_lib as r
+
 BUILTIN_PATTERNS = {
-    "vname": r"[A-Za-z]\w+",
-    "number": r"-?(([1-9]+\d*)|0)(\.\d*)?",
-    "string": r'(?<!\\)(?:\\{2})*"(?:(?<!\\)(?:\\{2})*\\"|[^"])+(?<!\\)(?:\\{2})*"',
+    "vname": r.VNAME,
+    "number": r.NUMBER,
+    "string": r.STRING,
+    "c_function_call": r.C_FUNCTION_CALL,
+    "xml_open_tag": r.XML_OPEN_TAG,
+    "xml_close_tag": r.XML_CLOSE_TAG,
+    "xml_single_tag": r.XML_SINGLE_TAG,
+    "lt": "<",
+    "rt": ">",
 }
 
 global_anonymous_name_counter = collections.defaultdict(lambda: 0)
