@@ -1,4 +1,3 @@
-import copy
 from functools import cmp_to_key
 
 from flang.exceptions import (
@@ -12,18 +11,19 @@ from flang.structures import (
     FlangConstruct,
     FlangInputReader,
     FlangMatchObject,
-    FlangObject,
+    FlangProjectConstruct,
     IntermediateFileObject,
 )
 
 
 def match_single_core(
-    flang_object: FlangObject, construct: FlangConstruct, reader: FlangInputReader
+    flang_object: FlangProjectConstruct,
+    construct: FlangConstruct,
+    reader: FlangInputReader,
 ):
-    # input_stream = input_stream.save_checkpoint()
     visible_in_spec = bool(construct.name)
 
-    match construct.construct_name:
+    match construct.name:
         case "sequence":
             matches = []
 
@@ -33,7 +33,7 @@ def match_single_core(
 
             return FlangMatchObject(
                 symbol=construct.location,
-                construct=construct.construct_name,
+                construct=construct.name,
                 content=matches,
                 visible_in_spec=visible_in_spec,
             )
@@ -89,23 +89,24 @@ def match_single_core(
 
             return FlangMatchObject(
                 symbol=construct.location,
-                construct=construct.construct_name,
+                construct=construct.name,
                 content=matches,
                 visible_in_spec=visible_in_spec,
             )
         case _:
-            raise UnknownConstructError(construct.construct_name)
+            raise UnknownConstructError(construct.name)
 
 
 def match_single_text(
-    flang_object: FlangObject,
+    flang_object: FlangProjectConstruct,
     construct: FlangConstruct,
     reader: FlangInputReader,  # TODO: wyrzuc flang object
 ):
     visible_in_spec = bool(construct.name)
     match_object = None
+    # TODO: gdzieś tutaj powinno się robić łączenie
 
-    match construct.construct_name:
+    match construct.name:
         case "regex":
             matched_text = construct.pattern.match(reader.read())
 
@@ -119,7 +120,7 @@ def match_single_text(
 
             match_object = FlangMatchObject(
                 symbol=construct.location,
-                construct=construct.construct_name,
+                construct=construct.name,
                 content=matched_text.group(),
                 visible_in_spec=visible_in_spec,
             )
@@ -130,7 +131,7 @@ def match_single_text(
 
             match_object = FlangMatchObject(
                 symbol=construct.location,
-                construct=construct.construct_name,
+                construct=construct.name,
                 content=construct.text,
                 visible_in_spec=visible_in_spec,
             )
@@ -138,14 +139,16 @@ def match_single_text(
         case "connection":
             assert 0, "not implemented yet..."
         case _:
-            raise UnknownConstructError(construct.construct_name)
+            raise UnknownConstructError(construct.name)
 
 
 def match_single_file(
-    flang_object: FlangObject, construct: FlangConstruct, reader: FlangInputReader
+    flang_object: FlangProjectConstruct,
+    construct: FlangConstruct,
+    reader: FlangInputReader,
 ):
-    if construct.construct_name != "file":
-        raise UnknownConstructError(construct.construct_name)
+    if construct.name != "file":
+        raise UnknownConstructError(construct.name)
 
     visible_in_spec = bool(construct.name)
     current_files: list[IntermediateFileObject] = reader.read()
@@ -153,16 +156,12 @@ def match_single_file(
     pattern = construct.get_attrib("pattern")
     variant = construct.get_attrib("variant", "filename")
 
-    matched_files = IntermediateFileObject.get_matched_files(
+    matched_file = IntermediateFileObject.get_first_matched_file(
         current_files, pattern, variant
     )
 
-    if not matched_files:
+    if not matched_file:
         raise MatchNotFoundError
-
-    matched_file = matched_files[
-        0
-    ]  # this is ugly, fix this in future, get first matched file
 
     assert len(construct.children) == 1, "Files should contain only one construct"
     child = next(flang_object.iterate_children(construct.location))
@@ -170,8 +169,10 @@ def match_single_file(
 
     match_object = FlangMatchObject(
         symbol=construct.location,
-        construct=construct.construct_name,
-        content=match_flang_raw(flang_object, child, new_reader),
+        construct=construct.name,
+        content=match_flang_construct(
+            flang_object, child, new_reader, always_return_list=False, check=True
+        )[0],
         visible_in_spec=visible_in_spec,
         metadata={"filename": new_reader.meta["filename"]},
     )
@@ -180,7 +181,9 @@ def match_single_file(
 
 
 def match_single(
-    flang_object: FlangObject, construct: FlangConstruct, reader: FlangInputReader
+    flang_object: FlangProjectConstruct,
+    construct: FlangConstruct,
+    reader: FlangInputReader,
 ):
     matchers = (match_single_core, match_single_text, match_single_file)
 
@@ -196,9 +199,11 @@ def match_single(
 
 
 def match_flang_construct(
-    flang_object: FlangObject,
+    flang_object: FlangProjectConstruct,
     construct: FlangConstruct,
     reader: FlangInputReader,
+    always_return_list: bool = True,
+    check: bool = False,
 ):
     reader = reader.copy()
     matches = []
@@ -222,11 +227,21 @@ def match_flang_construct(
             reader = reader.previous
             break
 
-    return matches, reader
+    if check and reader.read():
+        print(f"Text left: {reader.read()}")
+        raise TextNotParsedError
+
+    if always_return_list or construct.get_bool_attrib("multi"):
+        return matches, reader
+
+    if check:
+        assert len(matches) == 1
+
+    return matches[0], reader
 
 
 def match_flang_raw(  # bad name
-    flang_object: FlangObject,
+    flang_object: FlangProjectConstruct,
     construct: FlangConstruct,
     reader: FlangInputReader,
     return_list: bool = False,
@@ -244,14 +259,17 @@ def match_flang_raw(  # bad name
 
 
 class FlangProjectProcessor:
-    def __init__(self, flang_object: FlangObject) -> None:
+    def __init__(self, flang_object: FlangProjectConstruct) -> None:
         self.flang_object = flang_object
 
     def backward(self, spec: FlangMatchObject) -> FlangInputReader:
         return self.generate(spec)
 
     def forward(self, sample: FlangInputReader) -> FlangMatchObject:
-
-        return match_flang_raw(
-            self.flang_object, self.flang_object.root_construct, sample
-        )
+        return match_flang_construct(
+            self.flang_object,
+            self.flang_object.root_construct,
+            sample,
+            always_return_list=False,
+            check=True,
+        )[0]

@@ -1,7 +1,5 @@
-import collections
 import functools
 import itertools
-from typing import Callable, Iterable
 
 import flang.regex_lib as r
 
@@ -16,8 +14,10 @@ BUILTIN_PATTERNS = {
     "lt": "<",
     "rt": ">",
 }
+NAMED_BUILTIN_PATTERNS = {
+    key: f"(?P<{key}>({value}))" for key, value in BUILTIN_PATTERNS.items()
+}
 
-global_anonymous_name_counter = collections.defaultdict(lambda: 0)
 global_emitted_functions = []
 
 
@@ -28,16 +28,6 @@ def interlace(*iterables):
                 yield item
 
 
-def create_unique_symbol(symbol: str) -> str:
-    global global_anonymous_name_counter
-    assert isinstance(symbol, str)
-
-    generated_symbol = f"{symbol}@{global_anonymous_name_counter[symbol]}"
-    global_anonymous_name_counter[symbol] += 1
-
-    return generated_symbol
-
-
 def convert_to_bool(value: str | bool) -> bool:
     if isinstance(value, bool):
         return value
@@ -45,7 +35,8 @@ def convert_to_bool(value: str | bool) -> bool:
     return value.lower() in ("t", "true", "1")
 
 
-def compose(item: any, functions_to_apply: Iterable[Callable[[any], any]]):
+# TODO unused
+def compose(item, functions_to_apply):
     """
     Reverse of the `reduce` function takes an item and a iterable of
     functions and applies them sequentially to the item and the result of each
@@ -54,6 +45,10 @@ def compose(item: any, functions_to_apply: Iterable[Callable[[any], any]]):
     return functools.reduce(
         lambda previous_result, f: f(previous_result), functions_to_apply, item
     )
+
+
+def kebab_to_snake_case(name: str):
+    return name.replace("-", "_")
 
 
 def emit_function(name: str, args: list[str], body: str):

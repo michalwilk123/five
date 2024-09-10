@@ -5,17 +5,20 @@ import fnmatch
 import io
 import pathlib
 import re
-from functools import cached_property
+from collections import defaultdict
+from typing import Callable, Generator, Literal
 
-from flang.exceptions import SymbolNotFoundError
+from flang.exceptions import SymbolNotFoundError, UnknownParentException
 from flang.helpers import BUILTIN_PATTERNS, convert_to_bool
+
+FlangEvent = Callable[[], None]
 
 
 @dataclasses.dataclass
 class FlangConstruct:
-    construct_name: str
+    name: str
     attributes: dict
-    children: list[FlangConstruct]
+    children: list[str]
     text: str | None
     location: str
 
@@ -29,28 +32,13 @@ class FlangConstruct:
             return default
         return convert_to_bool(value)
 
-    @property
-    def visible(self):
-        return self.get_bool_attrib("visible", True)
-
-    @visible.setter
-    def visible(self, value: bool):
-        self.attributes["visible"] = value
-
-    @cached_property
-    def pattern(self):
-        return re.compile(self.text.format(**BUILTIN_PATTERNS))
-
-    @property
-    def name(self) -> str | None:
-        return self.attributes.get("name")
-
 
 @dataclasses.dataclass
-class FlangObject:
+class FlangProjectConstruct:
     path: str
     root: str = ""
     symbol_table: dict[str, FlangConstruct] = dataclasses.field(default_factory=dict)
+    symbol_occurence_counter: dict[str, int] = dataclasses.field(default_factory=dict)
 
     def find_symbol(self, symbol: str) -> FlangConstruct:
         return self.symbol_table[symbol]
@@ -59,6 +47,22 @@ class FlangObject:
         if symbol in self.symbol_table and not override:
             raise RuntimeError(f"Symbol {symbol} already exists!")
         self.symbol_table[symbol] = constr
+
+    def generate_unique_symbol(self, element_identifier: str, parent_location: str):
+        location = (
+            f"{parent_location}.{element_identifier}"
+            if parent_location
+            else f"{self.path}:{element_identifier}"
+        )
+
+        if location not in self.symbol_table:
+            self.symbol_occurence_counter[location] = 0
+            return location
+
+        self.symbol_occurence_counter[location] += 1
+        location += f"@{self.symbol_occurence_counter[location]}"
+
+        return location
 
     def iterate_children(self, symbol: str):
         constr = self.find_symbol(symbol)
@@ -100,6 +104,8 @@ class FlangObject:
             full_target_path = "%s:%s" % (filename, target_path)
             return self.find_construct_by_path(full_target_path)
 
+        raise RuntimeError(f"Unknown path to constuct: {reference_path}")
+
 
 # dataclass, not typing.TypedDict because we need methods
 @dataclasses.dataclass
@@ -107,28 +113,37 @@ class FlangMatchObject:
     symbol: str
     construct: str
     content: str | list[FlangMatchObject]
-    visible_in_spec: bool = False
     metadata: dict[str, str] = dataclasses.field(default_factory=dict)
 
-    def __len__(self):
+    def __len__(self) -> int:
         if isinstance(self.content, list):
             return sum(map(len, self.content))
         return len(self.content)
 
-    def get_construct(self, flang_object: FlangObject) -> FlangConstruct:
-        return flang_object.find_symbol(self.symbol)
+    def get_construct(self, project_construct: FlangProjectConstruct) -> FlangConstruct:
+        return project_construct.find_symbol(self.symbol)
 
-    def get_raw_content(self):
-        if (
-            self.metadata.get("filename")
-            and pathlib.Path(self.metadata.get("filename")).is_dir()
-        ):
-            return [f.metadata.get("filename") for f in self.content]
+    def get_combined_text(self) -> str:
+        assert (
+            self.metadata.get("filename") is None
+            or pathlib.Path(self.metadata["filename"]).is_dir() is False
+        )
 
         if isinstance(self.content, list):
-            return "".join(it.get_raw_content() for it in self.content)
+            return "".join(it.get_combined_text() for it in self.content)
 
         return self.content
+
+    def get_raw_content(self) -> str | list[str]:
+        if (
+            self.metadata.get("filename")
+            and pathlib.Path(self.metadata["filename"]).is_dir()
+        ):
+            assert isinstance(self.content, list)
+
+            return [f.metadata["filename"] for f in self.content]
+
+        return self.get_combined_text()
 
     def to_representation(self):
         if isinstance(self.content, list):
@@ -142,16 +157,27 @@ class FlangMatchObject:
             )
         return (self.symbol, self.content)
 
+    @classmethod
+    def from_representation(cls, representation: tuple):
+        raise NotImplementedError
 
-# @dataclasses.dataclass
-# class FlangFileMatchObject:
-#     symbol: str
-#     filename: str
-#     content: FlangTextMatchObject | list[FlangTextMatchObject] | list[FlangFileMatchObject]
-#     visible_in_spec: bool = False
+    @staticmethod
+    def evaluate_match_tree(
+        match_object: FlangMatchObject,
+        evaluator_function: Callable[[FlangMatchObject], None],
+        traversal_order: Literal["parent", "child"] = "child",
+    ) -> None:
+        if traversal_order == "parent":
+            evaluator_function(match_object)
 
-#     def __len__(self):
-#         raise Exception("Cannot determine the length of file-like object")
+        if isinstance(match_object.content, list):
+            for item in match_object.content:
+                FlangMatchObject.evaluate_match_tree(
+                    item, evaluator_function, traversal_order
+                )
+
+        if traversal_order == "child":
+            evaluator_function(match_object)
 
 
 class IntermediateFileObject:
@@ -179,22 +205,24 @@ class IntermediateFileObject:
         return FlangInputReader(self.content, metadata={"filename": self.path.name})
 
     @staticmethod
-    def get_matched_files(
+    def get_first_matched_file(
         list_of_files: list[IntermediateFileObject], pattern: str, variant: str
-    ) -> list[IntermediateFileObject]:
+    ) -> IntermediateFileObject | None:
         assert variant in ("filename", "glob", "regex")
 
         if variant == "glob":
             pattern = fnmatch.translate(pattern)
 
-        if variant == "filename":
-            filenames = [item for item in list_of_files if item.path.name == pattern]
-        else:
-            filenames = [
-                item for item in list_of_files if re.match(pattern, item.path.name)
-            ]
+        def _is_pathname_matched(file_object):
+            if variant == "filename":
+                return file_object.path.name == pattern
 
-        return filenames
+            return re.match(pattern, file_object.path.name)
+
+        try:
+            return next(filter(_is_pathname_matched, list_of_files))
+        except StopIteration:
+            return None
 
 
 sanity_check = True
@@ -214,6 +242,7 @@ class FlangInputReader:
         #     assert data.path.is_dir()
 
         self._data = io.StringIO(data) if isinstance(data, str) else data
+        self._cursor: list[int] | int
         self.meta = metadata
 
         if cursor is None:
@@ -237,30 +266,34 @@ class FlangInputReader:
         warnings.warn("NOT IMPLEMENTED!")
         return 0
 
-    def read(self, size=None):
+    def read(self, size=None) -> str | list[IntermediateFileObject]:
         match self._data:
             case io.StringIO():
+                assert isinstance(self._cursor, int)
+
                 self._data.seek(self._cursor)  # look-up correct scope of input stream
                 data = self._data.read() if size is None else self._data.read(size)
                 self._data.seek(self._cursor)  # do not modify the state
                 return data
             case list():
+                assert isinstance(self._cursor, list)
+
                 return [self._data[i] for i in self._cursor]
 
+    def read_ensure_files(self): ...
+
     def consume_data(self, data: FlangMatchObject) -> None:
-        if isinstance(self._data, list):
+        if isinstance(self._data, list) and isinstance(self._cursor, list):
             filenames = [f.path.name for f in self._data]
 
             if sanity_check:
                 assert data.metadata["filename"] in filenames
 
-            # for item in data.content:
-            #     self._cursor.remove(filenames.index(item.metadata["filename"]))
             self._cursor.remove(filenames.index(data.metadata["filename"]))
 
             if sanity_check:
                 assert len(self._cursor) == len(set(self._cursor))
-        elif isinstance(self._data, io.StringIO):
+        elif isinstance(self._data, io.StringIO) and isinstance(self._cursor, int):
             if sanity_check:
                 consumed_data = self.read(len(data))
                 assert consumed_data == data.get_raw_content(), data.construct
@@ -289,4 +322,74 @@ class FlangInputReader:
         )
 
 
-class FlangTextReader: ...
+@dataclasses.dataclass
+class FlangLinkNode:
+    vertex: str | None
+    parent: str | None
+    children: list[FlangLinkNode] = dataclasses.field(default_factory=list)
+    is_leaf: bool = True
+
+    def search_for_child(self, symbol: str) -> FlangLinkNode | None:
+        if self.vertex is not None and self.vertex == symbol:
+            return self
+
+        if self.children:
+            for child in self.children:
+                if (node := child.search_for_child(symbol)) is not None:
+                    return node
+
+    def get_symbols(self, ensure_tree: bool = False) -> list[str]:
+        if self.vertex is None:
+            symbols = []
+        else:
+            symbols = [self.vertex]
+
+        if self.children:
+            for child in self.children:
+                symbols += child.get_symbols(ensure_tree=ensure_tree)
+
+            if ensure_tree and len(symbols) != len(set(symbols)):
+                raise RuntimeError("")
+
+        return symbols
+
+
+class FlangLinkGraph:
+    def __init__(self) -> None:
+        self.link_forest = FlangLinkNode(vertex=None, parent=None, children=[])
+
+    def add_relation(self, parent_symbol: str, child_symbol: str):
+        parent_node = self.link_forest.search_for_child(parent_symbol)
+
+        if parent_node is None:
+            raise UnknownParentException(
+                f"Could not find parent: {parent_node} for child: {child_symbol}"
+            )
+
+        child_node = self.link_forest.search_for_child(child_symbol)
+
+        if child_node is None:
+            child_node = FlangLinkNode(parent=parent_symbol, vertex=child_symbol)
+
+        parent_node.children.append(child_node)
+
+    def add_parent(self, parent_symbol: str):
+        assert (
+            self.link_forest.search_for_child(parent_symbol) is None
+        ), f"Node: {parent_symbol} already exists! {self.link_forest}"
+
+        self.link_forest.children.append(
+            FlangLinkNode(parent=None, vertex=parent_symbol, is_leaf=False)
+        )
+
+
+class FlangEventQueue:
+    def __init__(self) -> None:
+        self.function_bank: dict[int, list[FlangEvent]] = defaultdict(list)
+
+    def iterate_events(self) -> Generator[FlangEvent]:
+        sorted_keys = sorted(self.function_bank.keys())
+
+        for i in sorted_keys:
+            for event in self.function_bank[i]:
+                yield event

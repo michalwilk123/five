@@ -11,7 +11,7 @@ from flang.structures import (
     FlangConstruct,
     FlangInputReader,
     FlangMatchObject,
-    FlangObject,
+    FlangProjectConstruct,
     IntermediateFileObject,
 )
 
@@ -19,7 +19,7 @@ from flang.structures import (
 class FlangTextProcessor:
     def __init__(
         self,
-        flang_object: FlangObject,
+        flang_object: FlangProjectConstruct,
         root: FlangConstruct = None,
         allow_partial_match: bool = False,
     ) -> any:
@@ -36,7 +36,7 @@ class FlangTextProcessor:
         visible_in_spec = bool(construct.name)
         match_object = None
 
-        match construct.construct_name:
+        match construct.name:
             case "regex":
                 matched_text = construct.pattern.match(input_stream.read())
                 if not matched_text:
@@ -62,13 +62,13 @@ class FlangTextProcessor:
 
                 return match_object
             case _:
-                raise UnknownConstructError(construct.construct_name)
+                raise UnknownConstructError(construct.name)
 
 
 class FlangFileProcessor:
     def __init__(
         self,
-        flang_object: FlangObject,
+        flang_object: FlangProjectConstruct,
         root: FlangConstruct = None,
         allow_partial_match: bool = False,
     ) -> any:
@@ -82,7 +82,7 @@ class FlangFileProcessor:
         visible_in_spec = bool(construct.name)
         match_object = None
 
-        match construct.construct_name:
+        match construct.name:
             case "file":
                 if not input_stream.startswith(construct.text, start_position):
                     raise MatchNotFoundError
@@ -93,7 +93,7 @@ class FlangFileProcessor:
                     visible_in_spec=visible_in_spec,
                 )
             case _:
-                raise UnknownConstructError(construct.construct_name)
+                raise UnknownConstructError(construct.name)
 
     def backward(self, spec: FlangMatchObject) -> IntermediateFileObject:
         """
@@ -112,7 +112,7 @@ class FlangComponentIterator:
     def __init__(
         self,
         construct: FlangConstruct,
-        flang_object: FlangObject,
+        flang_object: FlangProjectConstruct,
         input_stream: FlangInputReader,
     ) -> None:
         self._construct = construct
@@ -178,7 +178,7 @@ class FlangCoreProcessor:
         visible_in_spec = bool(construct.name)
         match_object = None
 
-        match construct.construct_name:
+        match construct.name:
             case "component":
                 matches = []
 
@@ -220,7 +220,7 @@ class FlangCoreProcessor:
                 body = construct.text
                 emit_function(name, args, body)
             case _:
-                raise UnknownConstructError(construct.construct_name)
+                raise UnknownConstructError(construct.name)
 
 
 class FlangProjectProcessor(FlangCoreProcessor, FlangTextProcessor, FlangFileProcessor):
@@ -240,7 +240,7 @@ class FlangProjectProcessor(FlangCoreProcessor, FlangTextProcessor, FlangFilePro
     def generate(self, spec: FlangMatchObject) -> FlangInputReader:
         construct = self.object.find_symbol(spec.symbol)
 
-        match construct.construct_name:
+        match construct.name:
             case "component":
                 return "".join(self.generate(child_match) for child_match in spec.content)
             case "choice":

@@ -2,13 +2,8 @@ import unittest
 
 from flang.exceptions import MatchNotFoundError, TextNotParsedError
 from flang.parser import FlangXMLParser
-from flang.processors import FlangProjectProcessor
-from flang.structures import (
-    FlangInputReader,
-    FlangMatchObject,
-    FlangObject,
-    IntermediateFileObject,
-)
+from flang.processing import FlangProjectProcessor
+from flang.structures import FlangInputReader, FlangMatchObject, FlangProjectConstruct
 
 from . import templates as tpl
 
@@ -19,9 +14,9 @@ class FlangParserTestCase(unittest.TestCase):
 
     def _parse_template(
         self, template: str, sample: str, file: bool = False
-    ) -> tuple[FlangObject, FlangMatchObject]:
-        flang_object = self.parser.parse_text(template)
-        processor = FlangProjectProcessor(flang_object)
+    ) -> tuple[FlangProjectConstruct, FlangMatchObject | list[FlangMatchObject]]:
+        project_construct = self.parser.parse_text(template)
+        processor = FlangProjectProcessor(project_construct)
 
         if file:
             reader = FlangInputReader.from_path(sample)
@@ -29,7 +24,7 @@ class FlangParserTestCase(unittest.TestCase):
             reader = FlangInputReader(sample)
 
         structured_text = processor.forward(reader)
-        return flang_object, structured_text
+        return project_construct, structured_text
 
     def test_basic(self):
         self._parse_template(tpl.TEST_BASIC_TEMPLATE, tpl.TEST_BASIC_SAMPLE)
@@ -43,15 +38,23 @@ class FlangParserTestCase(unittest.TestCase):
             self._parse_template(tpl.TEST_BASIC_TEMPLATE, tpl.TEST_BASIC_SAMPLE_FAILURE_2)
 
     def test_choice(self):
-        flang_object, match_object = self._parse_template(tpl.TEST_TEMPLATE_CHOICE, "AAA")
-        constr = match_object.content[0].get_construct(flang_object)
-        self.assertEqual(constr.construct_name, "text")
+        project_construct, match_object = self._parse_template(
+            tpl.TEST_TEMPLATE_CHOICE, "AAA"
+        )
+        assert isinstance(match_object, FlangMatchObject)
+        constr = match_object.content[0]
+        assert isinstance(constr, FlangMatchObject), "TODO NIEPOTRZEBNE ASERCJE"
+        constr = constr.get_construct(project_construct)
+        self.assertEqual(constr.name, "text")
 
-        flang_object, match_object = self._parse_template(
+        project_construct, match_object = self._parse_template(
             tpl.TEST_TEMPLATE_CHOICE, "SOMEVALUE"
         )
-        constr = match_object.content[0].get_construct(flang_object)
-        self.assertEqual(constr.construct_name, "regex")
+        assert isinstance(match_object, FlangMatchObject)
+        constr = match_object.content[0]
+        assert isinstance(constr, FlangMatchObject), "TODO NIEPOTRZEBNE ASERCJE"
+        constr = constr.get_construct(project_construct)
+        self.assertEqual(constr.name, "regex")
 
     def test_choice_nested(self):
         self._parse_template(
@@ -81,6 +84,9 @@ class FlangParserTestCase(unittest.TestCase):
         self._parse_template(tpl.TEST_TEMPLATE_RECURSIVE, tpl.TEST_SAMPLE_RECURSIVE_1)
         self._parse_template(tpl.TEST_TEMPLATE_RECURSIVE, tpl.TEST_SAMPLE_RECURSIVE_2)
         self._parse_template(tpl.TEST_TEMPLATE_RECURSIVE, tpl.TEST_SAMPLE_RECURSIVE_3)
+
+    def test_linking(self):
+        self._parse_template(tpl.TEST_TEMPLATE_LINKING, tpl.TEST_SAMPLE_LINKING)
 
     def test_file_easy(self):
         self._parse_template(

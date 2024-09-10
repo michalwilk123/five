@@ -48,6 +48,15 @@ some <em>fancy</em> text
 
 TEST_SAMPLE_FILES = "tests/flang/test_files"
 
+TEST_SAMPLE_LINKING = """
+from math import sin
+from math import pi
+from math import cos
+
+sin(10)
+cos(pi)
+"""
+
 ### TEMPLATES
 
 TEST_BASIC_TEMPLATE = """
@@ -187,6 +196,44 @@ TEST_TEMPLATE_FILES_XML = r"""
     template=TEST_TEMPLATE_RECURSIVE
 )
 TEST_TEMPLATE_FILES_MEDIUM = r"""
+"""
+
+# this example tbh does not make real-world sense here
+TEST_TEMPLATE_LINKING = r"""
+<sequence name="code" multi="true">
+<choice>
+<sequence name="import">
+  <text value="from "/><regex name="module" value="{vname}"/>
+  <text value=" import "/><regex name="object" value="{vname}"
+    link-name="imported" link-from="keyword"/>
+  <use ref="..nl"/>
+</sequence>
+<regex name="nl" value="\s"/>
+<sequence name="function-call">
+    <regex name="reference" value="{vname}"/>
+    <text value="("/>
+    <regex name="argument" value="{vname}|{number}" 
+        optional="true" link-from="imported"/>
+    <sequence multi="true" optional="true">
+        <regex name="separator" value="\s*,\s*"/>
+        <use ref="..argument" optional="false"/>
+    </sequence>
+    <text value=")"/>
+    <use ref="..nl" optional="true"/>
+</sequence>
+</choice>
+</sequence>
+"""
+
+TEST_TEMPLATE_FUNCTION = r"""
+<sequence multi="true">
+<event name="print-message" alias="func">
+    print("hello")
+</event>
+<sequence event=".print-message">
+<text value="say"/><regex value="{string|vname|number}" name="value"/>
+</sequence>
+</sequence>
 """
 
 DUMMY_TEST_TEMPLATE_EVENT = r"""
