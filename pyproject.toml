@@ -17,3 +17,14 @@ build-backend = "pdm.backend"
 
 [tool.pdm]
 distribution = true
+
+[tool.isort]
+profile = "black"
+
+[tool.black]
+line-length = 90
+
+[tool.pdm.scripts]
+black = "black flang tests fenv"
+isort = "isort flang tests fenv"
+lint = {composite = ["black", "isort"]}
