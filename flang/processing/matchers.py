@@ -10,10 +10,14 @@ from flang.exceptions import (
 )
 from flang.helpers import BUILTIN_PATTERNS, NAMED_BUILTIN_PATTERNS, emit_function
 from flang.structures import (
+    BaseFlangInputReader,
+    FlangAbstractMatchObject,
     FlangConstruct,
-    FlangInputReader,
+    FlangFileInputReader,
     FlangMatchObject,
     FlangProjectConstruct,
+    FlangTextInputReader,
+    FlangTextMatchObject,
     IntermediateFileObject,
 )
 
@@ -32,8 +36,8 @@ class FileMatchNotFound(MatchNotFoundError): ...
 def _match_on_complex_construct(
     project_construct: FlangProjectConstruct,
     construct: FlangConstruct,
-    reader: FlangInputReader,
-) -> FlangMatchObject:
+    reader: BaseFlangInputReader,
+) -> FlangTextMatchObject:
     match construct.name:
         case "sequence":
             matches = []
@@ -51,9 +55,8 @@ def _match_on_complex_construct(
                     f"Could not match sequence of constructs: {construct.name or construct.location}"
                 ) from e
 
-            return FlangMatchObject(
-                symbol=construct.location,
-                construct=construct.name,
+            return FlangTextMatchObject(
+                identifier=construct.location,
                 content=matches,
             )
         case "choice":
@@ -65,7 +68,6 @@ def _match_on_complex_construct(
                     match_objects, reader = match_flang_construct(
                         project_construct, child, reader
                     )
-                    assert isinstance(match_objects, list), "TODO niepotrzebna asercja!"
 
                     matches += match_objects
                     readers.append(reader)
@@ -78,7 +80,7 @@ def _match_on_complex_construct(
                     f"Could not match any construct from: {construct.name or construct.location}"
                 )
 
-            max_reader = max(readers, key=cmp_to_key(FlangInputReader.compare))
+            max_reader = max(readers, key=lambda it: it.get_key())
             return matches[readers.index(max_reader)]
 
         case "event":
@@ -111,11 +113,9 @@ def _match_on_complex_construct(
             matches, reader = match_flang_construct(
                 project_construct, target_construct, reader
             )
-            assert isinstance(matches, list), "TODO niepotrzebna asercja!"
 
-            return FlangMatchObject(
-                symbol=construct.location,
-                construct=construct.name,
+            return FlangTextMatchObject(
+                identifier=construct.location,
                 content=matches,
             )
         case _:
@@ -123,16 +123,12 @@ def _match_on_complex_construct(
 
 
 def _match_on_text(
-    project_construct: FlangProjectConstruct,
+    _: FlangProjectConstruct,
     construct: FlangConstruct,
-    reader: FlangInputReader,
-) -> FlangMatchObject:
-    match_object = None
-    # TODO: gdzieś tutaj powinno się robić łączenie
+    reader: FlangTextInputReader,
+) -> FlangTextMatchObject:
     text_to_match = reader.read()
     construct_text = construct.get_attrib("value", construct.text)
-
-    #
 
     match construct.name:
         case "regex":
@@ -140,7 +136,6 @@ def _match_on_text(
 
             construct_pattern = construct_text.format(**BUILTIN_PATTERNS)
             matched_text = re.match(construct_pattern, text_to_match)
-            # matched_text = re.match(construct_pattern, reader.read())
 
             if not matched_text:
                 raise TextMatchNotFound(
@@ -152,12 +147,10 @@ def _match_on_text(
                     "We have matched an empty object which does not make any sense. Please fix the template to not match such text. Like what would you expect after matching nothing?"
                 )
 
-            match_object = FlangMatchObject(
-                symbol=construct.location,
-                construct=construct.name,
+            return FlangTextMatchObject(
+                identifier=construct.location,
                 content=matched_text.group(),
             )
-            return match_object
         case "text":
             assert isinstance(text_to_match, str) and isinstance(construct_text, str)
 
@@ -167,12 +160,10 @@ def _match_on_text(
                     f'text: "{reader.read()[:len(construct_text)]}"'
                 )
 
-            match_object = FlangMatchObject(
-                symbol=construct.location,
-                construct=construct.name,
+            return FlangTextMatchObject(
+                identifier=construct.location,
                 content=construct_text,
             )
-            return match_object
         case _:
             raise UnknownConstructError("Not text construct")
 
@@ -180,13 +171,14 @@ def _match_on_text(
 def _match_on_file(
     project_construct: FlangProjectConstruct,
     construct: FlangConstruct,
-    reader: FlangInputReader,
-) -> FlangMatchObject:
+    reader: BaseFlangInputReader,
+) -> FlangTextMatchObject:
     if construct.name != "file":
         raise UnknownConstructError("Not file construct")
 
+    assert isinstance(reader, FlangFileInputReader)
+
     current_files = reader.read()
-    assert isinstance(current_files, list), "TODO: Niepotrzebna asercja!"
 
     pattern = construct.get_attrib("pattern")
     variant = construct.get_attrib("variant", "filename")
@@ -201,30 +193,21 @@ def _match_on_file(
             f'files in directory: "{[f.path.name for f in current_files]}"'
         )
 
-    assert len(construct.children) == 1, "Files should contain only one construct"
     child = next(project_construct.iterate_children(construct.location))
-    new_reader = matched_file.get_input_reader()  # ugly
-    content = match_flang_construct(
-        project_construct, child, new_reader, always_return_list=False, check=True
-    )[0]
-    assert new_reader.meta and new_reader.meta["filename"], "TODO: NIEPOTRZEBNA ASERCJA"
+    sub_reader = matched_file.get_input_reader()
 
-    filename = new_reader.meta["filename"]  # ugly
-    match_object = FlangMatchObject(
-        symbol=construct.location,
-        construct=construct.name,
-        content=[content] if isinstance(content, FlangMatchObject) else content,  # ugly
-        metadata={"filename": filename},
+    content, _ = match_flang_construct(project_construct, child, sub_reader, check=True)
+
+    return FlangAbstractMatchObject(
+        identifier=construct.location, content=content, filename=matched_file.filename
     )
-
-    return match_object
 
 
 def _match_against_all_construct_variants(
     project_construct: FlangProjectConstruct,
     construct: FlangConstruct,
-    reader: FlangInputReader,
-) -> FlangMatchObject:
+    reader: BaseFlangInputReader,
+) -> FlangTextMatchObject:
     matchers = (_match_on_complex_construct, _match_on_text, _match_on_file)
     match_object = None
 
@@ -245,10 +228,9 @@ def _match_against_all_construct_variants(
 def match_flang_construct(
     project_construct: FlangProjectConstruct,
     construct: FlangConstruct,
-    reader: FlangInputReader,
-    always_return_list: bool = True,
+    reader: BaseFlangInputReader,
     check: bool = False,
-) -> tuple[list[FlangMatchObject] | FlangMatchObject, FlangInputReader]:
+) -> tuple[list[FlangMatchObject], BaseFlangInputReader]:
     reader = reader.copy()
     matches = []
 
@@ -282,10 +264,7 @@ def match_flang_construct(
     if check and reader.read():
         raise TextNotParsedError(f"Text left: {reader.read()}")
 
-    if always_return_list or construct.get_bool_attrib("multi"):
-        return matches, reader
-
-    if check:
+    if check and not construct.get_bool_attrib("multi"):
         assert len(matches) == 1
 
-    return matches[0], reader
+    return matches, reader

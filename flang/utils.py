@@ -1,14 +1,12 @@
 from flang.exceptions import UnknownConstructError
-from flang.structures import FlangConstruct
 
-__all__ = ["get_possible_construct_attributes", "validate_construct_attributes"]
+visible_construct_attributes = ["visible", "event-[0-9]+"]
+naming_attributes = ["name", "alias"]
+cardinality_attributes = ["optional", "multi"]
+linking_syntax = ["link-definition", "link-from", "range"]
 
 
 def get_possible_construct_attributes(construct_name: str):
-    visible_construct_attributes = ["visible", "event-[0-9]+"]
-    naming_attributes = ["name", "alias"]
-    cardinality_attributes = ["optional", "multi"]
-    linking_syntax = ["link-name", "link-from", "range"]
 
     match construct_name:
         case "sequence" | "choice":

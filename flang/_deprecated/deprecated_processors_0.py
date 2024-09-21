@@ -7,11 +7,11 @@ from flang.exceptions import (
     UnknownConstructError,
 )
 from flang.helpers import create_unique_symbol, emit_function
-from flang.structures import (
+from flang.structures_depr import (
+    DEPRECATED_FlangInputReader,
     FlangConstruct,
-    FlangInputReader,
-    FlangMatchObject,
     FlangProjectConstruct,
+    FlangTextMatchObject,
     IntermediateFileObject,
 )
 
@@ -30,9 +30,9 @@ class FlangTextProcessor:
     def match(
         self,
         construct: FlangConstruct,
-        input_stream: FlangInputReader,
+        input_stream: DEPRECATED_FlangInputReader,
         start_position=0,  # może nie powinno przyjmować tekstu?
-    ) -> FlangMatchObject:
+    ) -> FlangTextMatchObject:
         visible_in_spec = bool(construct.name)
         match_object = None
 
@@ -42,8 +42,8 @@ class FlangTextProcessor:
                 if not matched_text:
                     raise MatchNotFoundError
 
-                match_object = FlangMatchObject(
-                    symbol=construct.location,
+                match_object = FlangTextMatchObject(
+                    identifier=construct.location,
                     content=matched_text.group(),
                     visible_in_spec=visible_in_spec,
                 )
@@ -53,8 +53,8 @@ class FlangTextProcessor:
                 if not input_stream.read().startswith(construct.text):
                     raise MatchNotFoundError
 
-                match_object = FlangMatchObject(
-                    symbol=construct.location,
+                match_object = FlangTextMatchObject(
+                    identifier=construct.location,
                     content=construct.text,
                     visible_in_spec=visible_in_spec,
                 )
@@ -78,7 +78,7 @@ class FlangFileProcessor:
 
     def match(
         self, construct: FlangConstruct, input_stream: IntermediateFileObject | str
-    ) -> FlangMatchObject:
+    ) -> FlangTextMatchObject:
         visible_in_spec = bool(construct.name)
         match_object = None
 
@@ -87,21 +87,21 @@ class FlangFileProcessor:
                 if not input_stream.startswith(construct.text, start_position):
                     raise MatchNotFoundError
 
-                return FlangMatchObject(
-                    symbol=construct.location,
+                return FlangTextMatchObject(
+                    identifier=construct.location,
                     content=construct.text,
                     visible_in_spec=visible_in_spec,
                 )
             case _:
                 raise UnknownConstructError(construct.name)
 
-    def backward(self, spec: FlangMatchObject) -> IntermediateFileObject:
+    def backward(self, spec: FlangTextMatchObject) -> IntermediateFileObject:
         """
         Powinno sie tutaj sprawdzic czy plik juz istnieje itd. ew go nadpisac
         """
         return self.generate(spec)
 
-    def forward(self, file: str | IntermediateFileObject) -> FlangMatchObject:
+    def forward(self, file: str | IntermediateFileObject) -> FlangTextMatchObject:
         if isinstance(file, str):
             file = IntermediateFileObject.from_path(file)
 
@@ -113,7 +113,7 @@ class FlangComponentIterator:
         self,
         construct: FlangConstruct,
         flang_object: FlangProjectConstruct,
-        input_stream: FlangInputReader,
+        input_stream: DEPRECATED_FlangInputReader,
     ) -> None:
         self._construct = construct
         self._iterator: Iterable[str] = flang_object.iterate_children(
@@ -142,13 +142,15 @@ class FlangComponentIterator:
     def get_stream(self):
         return self._input_stream
 
-    def match_not_found(self, exc: MatchNotFoundError, matches: list[FlangMatchObject]):
+    def match_not_found(
+        self, exc: MatchNotFoundError, matches: list[FlangTextMatchObject]
+    ):
         assert self.current is not None
 
         cannot_find_more_matches = (
             self.current.get_bool_attrib("multi")
             and matches
-            and matches[-1].symbol == self.current.location
+            and matches[-1].identifier == self.current.location
         )
         construct_optional = self.current.get_bool_attrib("optional")
 
@@ -167,8 +169,8 @@ class FlangCoreProcessor:
     """
 
     def match(
-        self, construct: FlangConstruct, input_stream: FlangInputReader
-    ) -> tuple[FlangMatchObject]:
+        self, construct: FlangConstruct, input_stream: DEPRECATED_FlangInputReader
+    ) -> tuple[FlangTextMatchObject]:
         """
         INPUT STREAM SHOULD BE IMMUTABLE !!!
         It should work like the length like before and only be an extension
@@ -195,8 +197,8 @@ class FlangCoreProcessor:
                 ):
                     raise TextNotParsedError
 
-                return FlangMatchObject(
-                    symbol=construct.location,
+                return FlangTextMatchObject(
+                    identifier=construct.location,
                     content=matches,
                     visible_in_spec=visible_in_spec,
                 )
@@ -237,8 +239,8 @@ class FlangProjectProcessor(FlangCoreProcessor, FlangTextProcessor, FlangFilePro
 
         return match_object
 
-    def generate(self, spec: FlangMatchObject) -> FlangInputReader:
-        construct = self.object.find_symbol(spec.symbol)
+    def generate(self, spec: FlangTextMatchObject) -> DEPRECATED_FlangInputReader:
+        construct = self.object.find_symbol(spec.identifier)
 
         match construct.name:
             case "component":
@@ -252,8 +254,8 @@ class FlangProjectProcessor(FlangCoreProcessor, FlangTextProcessor, FlangFilePro
 
         raise RuntimeError
 
-    def backward(self, spec: FlangMatchObject) -> FlangInputReader:
+    def backward(self, spec: FlangTextMatchObject) -> DEPRECATED_FlangInputReader:
         return self.generate(spec)
 
-    def forward(self, sample: FlangInputReader) -> FlangMatchObject:
+    def forward(self, sample: DEPRECATED_FlangInputReader) -> FlangTextMatchObject:
         return self.match(self.root, sample)

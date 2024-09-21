@@ -7,11 +7,11 @@ from flang.exceptions import (
     UnknownConstructError,
 )
 from flang.helpers import create_unique_symbol, emit_function
-from flang.structures import (
+from flang.structures_depr import (
+    DEPRECATED_FlangInputReader,
     FlangConstruct,
-    FlangInputReader,
-    FlangMatchObject,
     FlangProjectConstruct,
+    FlangTextMatchObject,
     IntermediateFileObject,
 )
 
@@ -19,7 +19,7 @@ from flang.structures import (
 def match_single_core(
     flang_object: FlangProjectConstruct,
     construct: FlangConstruct,
-    reader: FlangInputReader,
+    reader: DEPRECATED_FlangInputReader,
 ):
     visible_in_spec = bool(construct.name)
 
@@ -31,8 +31,8 @@ def match_single_core(
                 match_objects, reader = match_flang_construct(flang_object, child, reader)
                 matches += match_objects
 
-            return FlangMatchObject(
-                symbol=construct.location,
+            return FlangTextMatchObject(
+                identifier=construct.location,
                 construct=construct.name,
                 content=matches,
                 visible_in_spec=visible_in_spec,
@@ -55,7 +55,7 @@ def match_single_core(
             if not matches:
                 raise MatchNotFoundError
 
-            max_reader = max(readers, key=cmp_to_key(FlangInputReader.compare))
+            max_reader = max(readers, key=cmp_to_key(DEPRECATED_FlangInputReader.compare))
             return matches[readers.index(max_reader)]
 
         case "event":
@@ -87,8 +87,8 @@ def match_single_core(
                 flang_object, target_construct, reader
             )
 
-            return FlangMatchObject(
-                symbol=construct.location,
+            return FlangTextMatchObject(
+                identifier=construct.location,
                 construct=construct.name,
                 content=matches,
                 visible_in_spec=visible_in_spec,
@@ -100,7 +100,7 @@ def match_single_core(
 def match_single_text(
     flang_object: FlangProjectConstruct,
     construct: FlangConstruct,
-    reader: FlangInputReader,  # TODO: wyrzuc flang object
+    reader: DEPRECATED_FlangInputReader,  # TODO: wyrzuc flang object
 ):
     visible_in_spec = bool(construct.name)
     match_object = None
@@ -118,8 +118,8 @@ def match_single_text(
                     "We have matched an empty object which does not make any sense. Please fix the template to not match such text. Like what would you expect after matching nothing?"
                 )
 
-            match_object = FlangMatchObject(
-                symbol=construct.location,
+            match_object = FlangTextMatchObject(
+                identifier=construct.location,
                 construct=construct.name,
                 content=matched_text.group(),
                 visible_in_spec=visible_in_spec,
@@ -129,8 +129,8 @@ def match_single_text(
             if not reader.read().startswith(construct.text):
                 raise MatchNotFoundError
 
-            match_object = FlangMatchObject(
-                symbol=construct.location,
+            match_object = FlangTextMatchObject(
+                identifier=construct.location,
                 construct=construct.name,
                 content=construct.text,
                 visible_in_spec=visible_in_spec,
@@ -145,7 +145,7 @@ def match_single_text(
 def match_single_file(
     flang_object: FlangProjectConstruct,
     construct: FlangConstruct,
-    reader: FlangInputReader,
+    reader: DEPRECATED_FlangInputReader,
 ):
     if construct.name != "file":
         raise UnknownConstructError(construct.name)
@@ -167,8 +167,8 @@ def match_single_file(
     child = next(flang_object.iterate_children(construct.location))
     new_reader = matched_file.get_input_reader()  # ugly
 
-    match_object = FlangMatchObject(
-        symbol=construct.location,
+    match_object = FlangTextMatchObject(
+        identifier=construct.location,
         construct=construct.name,
         content=match_flang_construct(
             flang_object, child, new_reader, always_return_list=False, check=True
@@ -183,7 +183,7 @@ def match_single_file(
 def match_single(
     flang_object: FlangProjectConstruct,
     construct: FlangConstruct,
-    reader: FlangInputReader,
+    reader: DEPRECATED_FlangInputReader,
 ):
     matchers = (match_single_core, match_single_text, match_single_file)
 
@@ -201,7 +201,7 @@ def match_single(
 def match_flang_construct(
     flang_object: FlangProjectConstruct,
     construct: FlangConstruct,
-    reader: FlangInputReader,
+    reader: DEPRECATED_FlangInputReader,
     always_return_list: bool = True,
     check: bool = False,
 ):
@@ -243,7 +243,7 @@ def match_flang_construct(
 def match_flang_raw(  # bad name
     flang_object: FlangProjectConstruct,
     construct: FlangConstruct,
-    reader: FlangInputReader,
+    reader: DEPRECATED_FlangInputReader,
     return_list: bool = False,
 ):
     matched, reader = match_flang_construct(flang_object, construct, reader)
@@ -262,10 +262,10 @@ class FlangProjectProcessor:
     def __init__(self, flang_object: FlangProjectConstruct) -> None:
         self.flang_object = flang_object
 
-    def backward(self, spec: FlangMatchObject) -> FlangInputReader:
+    def backward(self, spec: FlangTextMatchObject) -> DEPRECATED_FlangInputReader:
         return self.generate(spec)
 
-    def forward(self, sample: FlangInputReader) -> FlangMatchObject:
+    def forward(self, sample: DEPRECATED_FlangInputReader) -> FlangTextMatchObject:
         return match_flang_construct(
             self.flang_object,
             self.flang_object.root_construct,

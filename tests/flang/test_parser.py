@@ -3,7 +3,10 @@ import unittest
 from flang.exceptions import MatchNotFoundError, TextNotParsedError
 from flang.parser import FlangXMLParser
 from flang.processing import FlangProjectProcessor
-from flang.structures import FlangInputReader, FlangMatchObject, FlangProjectConstruct
+from flang.structures import (
+    FlangAbstractMatchObject,
+    FlangProjectConstruct,
+)
 
 from . import templates as tpl
 
@@ -14,16 +17,15 @@ class FlangParserTestCase(unittest.TestCase):
 
     def _parse_template(
         self, template: str, sample: str, file: bool = False
-    ) -> tuple[FlangProjectConstruct, FlangMatchObject | list[FlangMatchObject]]:
+    ) -> tuple[FlangProjectConstruct, list[FlangAbstractMatchObject]]:
         project_construct = self.parser.parse_text(template)
         processor = FlangProjectProcessor(project_construct)
 
         if file:
-            reader = FlangInputReader.from_path(sample)
+            structured_text = processor.forward_filename(sample)
         else:
-            reader = FlangInputReader(sample)
+            structured_text = processor.forward_string(sample)
 
-        structured_text = processor.forward(reader)
         return project_construct, structured_text
 
     def test_basic(self):
@@ -41,18 +43,15 @@ class FlangParserTestCase(unittest.TestCase):
         project_construct, match_object = self._parse_template(
             tpl.TEST_TEMPLATE_CHOICE, "AAA"
         )
-        assert isinstance(match_object, FlangMatchObject)
-        constr = match_object.content[0]
-        assert isinstance(constr, FlangMatchObject), "TODO NIEPOTRZEBNE ASERCJE"
+        constr = match_object[0].first_child.first_child
+
         constr = constr.get_construct(project_construct)
         self.assertEqual(constr.name, "text")
 
         project_construct, match_object = self._parse_template(
             tpl.TEST_TEMPLATE_CHOICE, "SOMEVALUE"
         )
-        assert isinstance(match_object, FlangMatchObject)
-        constr = match_object.content[0]
-        assert isinstance(constr, FlangMatchObject), "TODO NIEPOTRZEBNE ASERCJE"
+        constr = match_object[0].first_child.first_child
         constr = constr.get_construct(project_construct)
         self.assertEqual(constr.name, "regex")
 

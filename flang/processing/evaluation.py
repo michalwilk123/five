@@ -1,14 +1,36 @@
 from functools import partial
 
-from flang.structures import FlangMatchObject, FlangProjectConstruct
+from flang.structures import (
+    FlangLinkGraph,
+    FlangProjectConstruct,
+    FlangTextMatchObject,
+)
+from flang.utils import linking_syntax
 
 
-def _run_events(project_construct: FlangProjectConstruct, match_object: FlangMatchObject):
+def _run_events(
+    project_construct: FlangProjectConstruct, match_object: FlangTextMatchObject
+):
     construct = match_object.get_construct(project_construct)
 
 
-def _create_link_graph(
-    project_construct: FlangProjectConstruct, match_object: FlangMatchObject
+def _perform_linking_on_single_match(
+    project_construct: FlangProjectConstruct,
+    graph: FlangLinkGraph,
+    match_object: FlangTextMatchObject,
+) -> None:
+    # TODO can be easily cached
+    construct = project_construct.find_symbol(match_object.identifier)
+
+    if "link-definition" in construct.attributes:
+        graph.add_parent()
+
+    if "link-from" in construct.attributes:
+        graph.add_relation()
+
+
+def create_link_graph(
+    project_construct: FlangProjectConstruct, match_object: FlangTextMatchObject
 ):
     """
     links:
@@ -26,18 +48,17 @@ def _create_link_graph(
     features="hoisting"
     Complex reference link != referring (for example import statements)
     """
-    construct = match_object.get_construct(project_construct)
-
-    if construct.get_attrib("lalalal"):
-        ...
+    # root = match_object.get_construct(project_construct)
+    graph = FlangLinkGraph()
+    match_object.evaluate_match_tree(
+        partial(_perform_linking_on_single_match, project_construct, graph)
+    )
 
 
 def evaluate_match_object(
-    project_construct: FlangProjectConstruct, flang_match: FlangMatchObject
+    project_construct: FlangProjectConstruct, flang_match: FlangTextMatchObject
 ):
-    FlangMatchObject.evaluate_match_tree(
-        flang_match, partial(_create_link_graph, project_construct)
-    )
-    FlangMatchObject.evaluate_match_tree(
-        flang_match, partial(_run_events, project_construct)
-    )
+    # perform linking
+    link_graph = create_link_graph(project_construct, flang_match)
+
+    _run_events(project_construct, flang_match)

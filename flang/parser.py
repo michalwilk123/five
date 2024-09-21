@@ -21,7 +21,7 @@ class FlangXMLParser:
         validate_attributes: bool,
         location: str = "",
     ) -> FlangConstruct:
-        location = flang_object.generate_unique_symbol(
+        location = flang_object.generate_symbol_for_construct(
             element.attrib.get("name") or element.tag, location
         )
 
