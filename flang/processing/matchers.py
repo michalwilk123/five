@@ -56,7 +56,7 @@ def _match_on_complex_construct(
                 ) from e
 
             return FlangTextMatchObject(
-                identifier=construct.location,
+                identifier=project_construct.generate_symbol_for_match_object(construct),
                 content=matches,
             )
         case "choice":
@@ -115,7 +115,7 @@ def _match_on_complex_construct(
             )
 
             return FlangTextMatchObject(
-                identifier=construct.location,
+                identifier=project_construct.generate_symbol_for_match_object(construct),
                 content=matches,
             )
         case _:
@@ -123,7 +123,7 @@ def _match_on_complex_construct(
 
 
 def _match_on_text(
-    _: FlangProjectConstruct,
+    project_construct: FlangProjectConstruct,
     construct: FlangConstruct,
     reader: FlangTextInputReader,
 ) -> FlangTextMatchObject:
@@ -148,7 +148,7 @@ def _match_on_text(
                 )
 
             return FlangTextMatchObject(
-                identifier=construct.location,
+                identifier=project_construct.generate_symbol_for_match_object(construct),
                 content=matched_text.group(),
             )
         case "text":
@@ -161,7 +161,7 @@ def _match_on_text(
                 )
 
             return FlangTextMatchObject(
-                identifier=construct.location,
+                identifier=project_construct.generate_symbol_for_match_object(construct),
                 content=construct_text,
             )
         case _:
@@ -199,7 +199,9 @@ def _match_on_file(
     content, _ = match_flang_construct(project_construct, child, sub_reader, check=True)
 
     return FlangAbstractMatchObject(
-        identifier=construct.location, content=content, filename=matched_file.filename
+        identifier=project_construct.generate_symbol_for_match_object(construct),
+        content=content,
+        filename=matched_file.filename,
     )
 
 

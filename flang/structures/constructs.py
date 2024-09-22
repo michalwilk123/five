@@ -46,25 +46,42 @@ class FlangProjectConstruct:  # TODO: Maybe should be called a FlangMatchingRunt
             raise RuntimeError(f"Symbol {symbol} already exists!")
         self.symbol_table[symbol] = constr
 
-    def generate_symbol_for_match_object(self, construct_symbol: str): ...
+    def _get_occurence_value(self, key: str) -> int:
+        if key not in self.symbol_occurence_counter:
+            self.symbol_occurence_counter[key] = 0
+            return 0
+
+        self.symbol_occurence_counter[key] += 1
+        return self.symbol_occurence_counter[key]
+
+    def _generate_symbol_for_match_object(self, construct_location: str) -> str:
+        occurence_counter_symbol = f"MatchObject({construct_location})"
+        occurence_no = self._get_occurence_value(occurence_counter_symbol)
+        return "{}[{}]".format(construct_location, occurence_no)
+
+    def generate_symbol_for_match_object(self, construct: FlangConstruct) -> str:
+        return self._generate_symbol_for_match_object(construct.location)
 
     def generate_symbol_for_construct(
-        self, element_identifier: str, parent_location: str
-    ):
+        self, element_identifier: str, parent_location: str, allow_duplicates: bool
+    ) -> str:
         location = (
             f"{parent_location}.{element_identifier}"
             if parent_location
             else f"{self.path}:{element_identifier}"
         )
 
-        if location not in self.symbol_table:
-            self.symbol_occurence_counter[location] = 0
+        if allow_duplicates == False:
+            if location in self.symbol_occurence_counter:
+                raise RuntimeError(
+                    f"There cannot be more than one object named {location} in parent object. Please rename one of objects"
+                )
+
             return location
 
-        self.symbol_occurence_counter[location] += 1
-        location += f"@{self.symbol_occurence_counter[location]}"
+        occurence_value = self._get_occurence_value(location)
 
-        return location
+        return "{}@{}".format(location, occurence_value)
 
     def iterate_children(self, symbol: str):
         constr = self.find_symbol(symbol)

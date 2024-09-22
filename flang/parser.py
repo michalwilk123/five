@@ -21,15 +21,19 @@ class FlangXMLParser:
         validate_attributes: bool,
         location: str = "",
     ) -> FlangConstruct:
-        location = flang_object.generate_symbol_for_construct(
-            element.attrib.get("name") or element.tag, location
-        )
+        if element_name := element.attrib.get("name"):
+            location = flang_object.generate_symbol_for_construct(
+                element_name, location, allow_duplicates=False
+            )
+        else:
+            location = flang_object.generate_symbol_for_construct(
+                element.tag, location, allow_duplicates=True
+            )
 
         if validate_attributes:
+            possible_attributes = get_possible_construct_attributes(element.tag)
             not_validated_attributes = [
-                key
-                for key in element.attrib
-                if key not in get_possible_construct_attributes(element.tag)
+                key for key in element.attrib if key not in possible_attributes
             ]
             if not_validated_attributes:
                 raise UnknownAttributeException(

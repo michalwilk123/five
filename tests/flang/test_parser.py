@@ -3,10 +3,7 @@ import unittest
 from flang.exceptions import MatchNotFoundError, TextNotParsedError
 from flang.parser import FlangXMLParser
 from flang.processing import FlangProjectProcessor
-from flang.structures import (
-    FlangAbstractMatchObject,
-    FlangProjectConstruct,
-)
+from flang.structures import FlangAbstractMatchObject, FlangProjectConstruct
 
 from . import templates as tpl
 
@@ -18,7 +15,7 @@ class FlangParserTestCase(unittest.TestCase):
     def _parse_template(
         self, template: str, sample: str, file: bool = False
     ) -> tuple[FlangProjectConstruct, list[FlangAbstractMatchObject]]:
-        project_construct = self.parser.parse_text(template)
+        project_construct = self.parser.parse_text(template, validate_attributes=True)
         processor = FlangProjectProcessor(project_construct)
 
         if file:

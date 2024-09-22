@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import pathlib
+import re
 from typing import Callable, Literal
 
 from .constructs import FlangConstruct, FlangProjectConstruct
@@ -35,8 +36,14 @@ class FlangTextMatchObject(FlangMatchObject):
             return sum(map(len, self.content))
         return len(self.content)
 
+    @staticmethod
+    def get_construct_name_from_spec_name(identifier: str) -> str:
+        return re.sub(r"\[\d+\]$", "", identifier)
+
     def get_construct(self, project_construct: FlangProjectConstruct) -> FlangConstruct:
-        return project_construct.find_symbol(self.identifier)
+        return project_construct.find_symbol(
+            self.get_construct_name_from_spec_name(self.identifier)
+        )
 
     def get_combined_text(self) -> str:
         assert (

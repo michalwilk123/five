@@ -1,10 +1,6 @@
 from functools import partial
 
-from flang.structures import (
-    FlangLinkGraph,
-    FlangProjectConstruct,
-    FlangTextMatchObject,
-)
+from flang.structures import FlangLinkGraph, FlangProjectConstruct, FlangTextMatchObject
 from flang.utils import linking_syntax
 
 

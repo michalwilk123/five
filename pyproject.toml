@@ -14,9 +14,14 @@ license = {text = "MIT"}
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
-
 [tool.pdm]
 distribution = true
+
+[tool.pdm.dev-dependencies]
+lint = [
+    "black>=24.8.0",
+    "isort>=5.13.2",
+]
 
 [tool.isort]
 profile = "black"

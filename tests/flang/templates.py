@@ -205,7 +205,7 @@ TEST_TEMPLATE_LINKING = r"""
 <sequence name="import">
   <text value="from "/><regex name="module" value="{vname}"/>
   <text value=" import "/><regex name="object" value="{vname}"
-    link-name="imported" link-from="keyword"/>
+    link-definition="imported" link-from="keyword"/>
   <use ref="..nl"/>
 </sequence>
 <regex name="nl" value="\s"/>
