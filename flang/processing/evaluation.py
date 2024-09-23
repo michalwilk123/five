@@ -1,18 +1,18 @@
 from functools import partial
 
-from flang.structures import FlangAbstractMatchObject, FlangMatchObject,FlangProjectRuntime
+from flang.structures import (
+    FlangMatchObject,
+    FlangProjectRuntime,
+    PossibleRootFlangMatch,
+)
 
 
-def _run_events(
-    project_construct: FlangProjectRuntime, match_object: FlangMatchObject
-):
-    construct = match_object.get_construct(project_construct)
+def _run_events(project_construct: FlangProjectRuntime, match_object: FlangMatchObject):
+    # construct = match_object.get_construct(project_construct)
+    ...
 
 
-
-def create_link_graph(
-    project_construct: FlangProjectRuntime, match_object: FlangAbstractMatchObject
-):
+def create_link_graph(project_construct: FlangProjectRuntime, match_object):
     """
     links:
 
@@ -34,12 +34,10 @@ def create_link_graph(
 
 
 def evaluate_match_object(
-    project_construct: FlangProjectRuntime, flang_match: FlangAbstractMatchObject
+    project_construct: FlangProjectRuntime, flang_match: PossibleRootFlangMatch
 ):
     # perform linking
     # link_graph = create_link_graph(project_construct, flang_match)
     # graph = FlangLinkGraph.from_match_object(project_construct, flang_match)
     # _run_events(project_construct, flang_match)
-    # project_construct.initialize_link_graph(flang_match)
-    ...
-
+    project_construct.initialize_link_graph(flang_match)  # TODO: continue this

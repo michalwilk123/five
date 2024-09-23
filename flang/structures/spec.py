@@ -3,9 +3,8 @@ from __future__ import annotations
 import dataclasses
 import pathlib
 import re
-from typing import Callable, Literal
+from typing import Any, Callable, Literal, Sequence
 
-# from .runtime import FlangProjectRuntime
 from flang.helpers import convert_to_bool
 
 
@@ -30,7 +29,8 @@ class FlangConstruct:
 
 @dataclasses.dataclass
 class FlangMatchObject:
-    identifier: str
+    identifier: ...
+    content: ...
 
     @property
     def first_child(self) -> FlangMatchObject:
@@ -48,55 +48,20 @@ class FlangMatchObject:
 
         if isinstance(self.content, list):
             for item in self.content:
-                item.apply_function(
-                    evaluator_function, traversal_order
-                )
+                item.apply_function(evaluator_function, traversal_order)
 
         if traversal_order == "depth-first":
             evaluator_function(self)
 
     def get_raw_content(self) -> str | list[str]:
         raise NotImplementedError
-    
+
     @property
     def construct_name(self) -> str:
         return re.sub(r"\[\d+\]$", "", self.identifier)
 
-
-@dataclasses.dataclass
-class FlangAbstractMatchObject(FlangMatchObject):
-    content: list[FlangTextMatchObject] | list[FlangAbstractMatchObject]
-    filename: str | None
-
-    def __len__(self) -> int:
-        return sum(map(len, self.content))
-
-    def get_raw_content(self) -> str | list[str]:
-        if pathlib.Path(self.filename).is_dir():
-            assert isinstance(self.content, list[FlangAbstractMatchObject])
-            return [f.filename for f in self.content]
-
-        assert isinstance(self.content, list[FlangTextMatchObject])
-
-        return "".join(it.get_raw_content() for it in self.content)
-        
-
-# dataclass, not typing.TypedDict because we need methods
-@dataclasses.dataclass
-class FlangTextMatchObject(FlangMatchObject):
-    content: str | list[FlangTextMatchObject]
-    metadata: dict[str, str] = dataclasses.field(default_factory=dict)
-
-    def __len__(self) -> int:
-        if isinstance(self.content, list):
-            return sum(map(len, self.content))
-        return len(self.content)
-
-    def get_raw_content(self) -> str:
-        if isinstance(self.content, list):
-            return "".join(it.get_raw_content() for it in self.content)
-
-        return self.content
+    def __len__(self):
+        raise NotImplementedError
 
     def to_representation(self):
         if isinstance(self.content, list):
@@ -113,3 +78,62 @@ class FlangTextMatchObject(FlangMatchObject):
     @classmethod
     def from_representation(cls, representation: tuple):
         raise NotImplementedError
+
+
+@dataclasses.dataclass
+class FlangDirectoryMatchObject(FlangMatchObject):
+    identifier: str
+    content: list[FlangFlatFileMatchObject]
+    filename: str
+
+    def __len__(self) -> int:
+        return sum(map(len, self.content))
+
+    def get_raw_content(self) -> str | list[str]:
+        assert pathlib.Path(self.filename).is_dir()
+        return [f.filename for f in self.content]
+
+
+@dataclasses.dataclass
+class FlangTextMatchObject(FlangMatchObject):
+    identifier: str
+    content: str | list[FlangTextMatchObject]
+
+    def __len__(self) -> int:
+        if isinstance(self.content, list):
+            return sum(map(len, self.content))
+        return len(self.content)
+
+    def get_raw_content(self) -> str:
+        if isinstance(self.content, list):
+            return "".join(it.get_raw_content() for it in self.content)
+
+        return self.content
+
+
+@dataclasses.dataclass
+class FlangFlatFileMatchObject(FlangTextMatchObject):
+    filename: str
+
+
+"""
+kw_only=True is added because we override the old field and add a default value
+"""
+
+
+@dataclasses.dataclass(kw_only=True)
+class FlangAbstractMatchObject(FlangMatchObject):
+    content: list[FlangMatchObject]
+    identifier: None = None
+
+    def apply_function(
+        self,
+        evaluator_function: Callable[[FlangMatchObject], None],
+        traversal_order: Literal["breadth-first", "depth-first"] = "breadth-first",
+    ) -> None:
+        for item in self.content:
+            item.apply_function(evaluator_function, traversal_order)
+
+
+FlangFileMatch = FlangDirectoryMatchObject | FlangFlatFileMatchObject
+PossibleRootFlangMatch = FlangFileMatch | FlangAbstractMatchObject

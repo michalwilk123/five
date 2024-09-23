@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import dataclasses
 from collections import defaultdict
-from typing import Callable, Generator
-from .spec import FlangAbstractMatchObject, FlangMatchObject
+
 # from .constructs import FlangProjectRuntime
 from functools import partial
+from typing import Callable, Generator
 
 from flang.exceptions import UnknownParentException
 

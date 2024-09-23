@@ -1,7 +1,10 @@
-from .spec import FlangConstruct, FlangMatchObject, FlangAbstractMatchObject
-from .events import FlangLinkNode
-from flang.exceptions import SymbolNotFoundError
 import re
+
+from flang.exceptions import SymbolNotFoundError
+
+from .events import FlangLinkNode
+from .spec import FlangConstruct, FlangMatchObject, PossibleRootFlangMatch
+
 
 class FlangProjectRuntime:
     # TODO: maybe should be in separate file?
@@ -113,19 +116,20 @@ class FlangProjectRuntime:
         return self.find_symbol(
             self.get_construct_name_from_spec_name(match_object.construct_name)
         )
-    
-    def initialize_link_graph(self, root: FlangAbstractMatchObject) -> None:
+
+    def initialize_link_graph(self, root: PossibleRootFlangMatch) -> None:
         # TODO can be easily cached
         self.link_forest = FlangLinkNode(vertex=None, parent=None, children=[])
 
+        def _build_graph(match_object: FlangMatchObject):
+            ...
+            # print("hello!")
+            # construct = self.get_construct_from_spec(match_object)
 
-        def _build_graph(match_object:FlangMatchObject):
-            construct = self.get_construct_from_spec(match_object)
+            # if "link-definition" in construct.attributes:
+            #     self.link_forest.add_parent_node(match_object.identifier)
 
-            if "link-definition" in construct.attributes:
-                self.link_forest.add_parent_node(match_object.identifier)
+            # if "link-from" in construct.attributes:
+            #     self.link_forest.add_relation(match_object.identifier)
 
-            if "link-from" in construct.attributes:
-                self.link_forest.add_relation(match_object.identifier)
-        
         root.apply_function(_build_graph)

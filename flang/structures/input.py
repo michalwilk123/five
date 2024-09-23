@@ -6,15 +6,15 @@ import io
 import pathlib
 import re
 
-from .spec import FlangAbstractMatchObject, FlangMatchObject, FlangTextMatchObject
+from .spec import FlangTextMatchObject
 
 
 class IntermediateFileObject:
     def __init__(self, path: str, content: list | None = None) -> None:
-        assert (path := pathlib.Path(path)).exists()
-
-        self.path = path
+        self.path = pathlib.Path(path)
         self._content = content
+
+        assert self.path.exists()
 
     @property
     def content(self) -> str | list[IntermediateFileObject]:
@@ -31,10 +31,12 @@ class IntermediateFileObject:
     def filename(self) -> str:
         return self.path.name
 
-    def get_input_reader(self) -> FlangFileInputReader:
+    def get_input_reader(self) -> FlangFileInputReader | FlangTextInputReader:
         if self.path.is_dir():
+            assert isinstance(self.content, list)
             return FlangFileInputReader(self.content, filename=self.path.name)
 
+        assert isinstance(self.content, str)
         return FlangTextInputReader(self.content)
 
     @staticmethod
@@ -71,16 +73,17 @@ class BaseFlangInputReader(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def consume_data(self, data: FlangMatchObject) -> None:
+    def consume_data(self, data) -> None:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def copy(self) -> FlangTextInputReader:
-        return FlangTextInputReader(self._data, cursor=self._cursor, previous=self)
+    def copy(self) -> BaseFlangInputReader:
+        raise NotImplementedError
 
     @property
-    def previous(self):
-        return self._previous
+    @abc.abstractmethod
+    def previous(self) -> BaseFlangInputReader:
+        raise NotImplementedError
 
 
 class FlangTextInputReader(BaseFlangInputReader):
@@ -115,6 +118,11 @@ class FlangTextInputReader(BaseFlangInputReader):
     def copy(self) -> FlangTextInputReader:
         return FlangTextInputReader(self._data, cursor=self._cursor, previous=self)
 
+    @property
+    def previous(self) -> FlangTextInputReader:
+        assert self._previous is not None
+        return self._previous
+
 
 class FlangFileInputReader(BaseFlangInputReader):
     def __init__(
@@ -138,9 +146,9 @@ class FlangFileInputReader(BaseFlangInputReader):
         warnings.warn("NOT IMPLEMENTED!")
         return 0
 
-    def consume_data(self, match_object: FlangAbstractMatchObject) -> None:
+    def consume_data(self, data: FlangFileInputReader) -> None:
         filenames = [f.path.name for f in self._data]
-        self._cursor.remove(filenames.index(match_object.filename))
+        self._cursor.remove(filenames.index(data.filename))
 
         if sanity_check:
             assert len(self._cursor) == len(set(self._cursor))
@@ -149,3 +157,8 @@ class FlangFileInputReader(BaseFlangInputReader):
         return FlangFileInputReader(
             self._data, filename=self.filename, cursor=self._cursor.copy(), previous=self
         )
+
+    @property
+    def previous(self) -> FlangFileInputReader:
+        assert self._previous is not None
+        return self._previous

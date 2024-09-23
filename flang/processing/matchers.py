@@ -11,12 +11,13 @@ from flang.exceptions import (
 from flang.helpers import BUILTIN_PATTERNS, NAMED_BUILTIN_PATTERNS, emit_function
 from flang.structures import (
     BaseFlangInputReader,
-    FlangAbstractMatchObject,
     FlangConstruct,
+    FlangDirectoryMatchObject,
     FlangFileInputReader,
+    FlangFileMatch,
+    FlangFlatFileMatchObject,
     FlangMatchObject,
     FlangProjectRuntime,
-    FlangTextInputReader,
     FlangTextMatchObject,
     IntermediateFileObject,
 )
@@ -116,7 +117,7 @@ def _match_on_complex_construct(
 
             return FlangTextMatchObject(
                 identifier=project_construct.generate_symbol_for_match_object(construct),
-                content=matches,
+                content=matches,  # type: ignore TODO: fix this
             )
         case _:
             raise UnknownConstructError("Not complex construct")
@@ -125,7 +126,7 @@ def _match_on_complex_construct(
 def _match_on_text(
     project_construct: FlangProjectRuntime,
     construct: FlangConstruct,
-    reader: FlangTextInputReader,
+    reader: BaseFlangInputReader,
 ) -> FlangTextMatchObject:
     text_to_match = reader.read()
     construct_text = construct.get_attrib("value", construct.text)
@@ -172,7 +173,7 @@ def _match_on_file(
     project_construct: FlangProjectRuntime,
     construct: FlangConstruct,
     reader: BaseFlangInputReader,
-) -> FlangTextMatchObject:
+) -> FlangFileMatch:
     if construct.name != "file":
         raise UnknownConstructError("Not file construct")
 
@@ -198,9 +199,16 @@ def _match_on_file(
 
     content, _ = match_flang_construct(project_construct, child, sub_reader, check=True)
 
-    return FlangAbstractMatchObject(
+    if isinstance(sub_reader, FlangFileInputReader):
+        return FlangDirectoryMatchObject(
+            identifier=project_construct.generate_symbol_for_match_object(construct),
+            content=content,  # type: ignore TODO: napraw to
+            filename=matched_file.filename,
+        )
+
+    return FlangFlatFileMatchObject(
         identifier=project_construct.generate_symbol_for_match_object(construct),
-        content=content,
+        content=content,  # type: ignore TODO: napraw to
         filename=matched_file.filename,
     )
 
@@ -209,7 +217,7 @@ def _match_against_all_construct_variants(
     project_construct: FlangProjectRuntime,
     construct: FlangConstruct,
     reader: BaseFlangInputReader,
-) -> FlangTextMatchObject:
+) -> FlangMatchObject:
     matchers = (_match_on_complex_construct, _match_on_text, _match_on_file)
     match_object = None
 
