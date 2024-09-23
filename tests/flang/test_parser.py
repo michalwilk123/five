@@ -3,7 +3,7 @@ import unittest
 from flang.exceptions import MatchNotFoundError, TextNotParsedError
 from flang.parser import FlangXMLParser
 from flang.processing import FlangProjectProcessor
-from flang.structures import FlangAbstractMatchObject, FlangProjectConstruct
+from flang.structures import FlangAbstractMatchObject, FlangProjectRuntime
 
 from . import templates as tpl
 
@@ -14,7 +14,7 @@ class FlangParserTestCase(unittest.TestCase):
 
     def _parse_template(
         self, template: str, sample: str, file: bool = False
-    ) -> tuple[FlangProjectConstruct, list[FlangAbstractMatchObject]]:
+    ) -> tuple[FlangProjectRuntime, list[FlangAbstractMatchObject]]:
         project_construct = self.parser.parse_text(template, validate_attributes=True)
         processor = FlangProjectProcessor(project_construct)
 
@@ -40,16 +40,16 @@ class FlangParserTestCase(unittest.TestCase):
         project_construct, match_object = self._parse_template(
             tpl.TEST_TEMPLATE_CHOICE, "AAA"
         )
-        constr = match_object[0].first_child.first_child
+        match_object = match_object.first_child.first_child
 
-        constr = constr.get_construct(project_construct)
+        constr = project_construct.get_construct_from_spec(match_object)
         self.assertEqual(constr.name, "text")
 
         project_construct, match_object = self._parse_template(
             tpl.TEST_TEMPLATE_CHOICE, "SOMEVALUE"
         )
-        constr = match_object[0].first_child.first_child
-        constr = constr.get_construct(project_construct)
+        match_object = match_object.first_child.first_child
+        constr = project_construct.get_construct_from_spec(match_object)
         self.assertEqual(constr.name, "regex")
 
     def test_choice_nested(self):

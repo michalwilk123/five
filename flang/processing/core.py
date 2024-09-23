@@ -2,7 +2,7 @@ from flang.structures import (
     BaseFlangInputReader,
     FlangAbstractMatchObject,
     FlangFileInputReader,
-    FlangProjectConstruct,
+    FlangProjectRuntime,
     FlangTextInputReader,
     IntermediateFileObject,
 )
@@ -13,8 +13,8 @@ from .matchers import match_flang_construct
 
 
 class FlangProjectProcessor:
-    def __init__(self, project_construct: FlangProjectConstruct) -> None:
-        self.project_construct: FlangProjectConstruct = project_construct
+    def __init__(self, project_construct: FlangProjectRuntime) -> None:
+        self.project_construct: FlangProjectRuntime = project_construct
 
     def backward(self, spec: FlangAbstractMatchObject) -> BaseFlangInputReader:
         return generate_flang_construct(spec)
@@ -27,16 +27,24 @@ class FlangProjectProcessor:
             check=True,
         )
         is_empty_match = match_object == []
-        is_a_file_match = isinstance(match_object[0], FlangAbstractMatchObject)
+
+        if self.project_construct.root_construct.name == "file":
+            assert (
+                len(match_object) == 1
+            ), "When matching a file tree, we should only return one file (root) as the result"
+            match_object = match_object[0]
+
+        is_a_file_match = isinstance(match_object, FlangAbstractMatchObject)
 
         if is_empty_match or is_a_file_match:
             return match_object
 
-        return [
-            FlangAbstractMatchObject(
-                identifier="_root", content=match_object, filename=None
-            )
-        ]
+        match_object = FlangAbstractMatchObject(
+            identifier="_root", content=match_object, filename=None
+        )
+        evaluate_match_object(self.project_construct, match_object)
+
+        return match_object
 
     def forward_string(self, sample: str) -> list[FlangAbstractMatchObject]:
         reader = FlangTextInputReader(sample)

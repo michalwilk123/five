@@ -5,7 +5,27 @@ import pathlib
 import re
 from typing import Callable, Literal
 
-from .constructs import FlangConstruct, FlangProjectConstruct
+# from .runtime import FlangProjectRuntime
+from flang.helpers import convert_to_bool
+
+
+@dataclasses.dataclass
+class FlangConstruct:
+    name: str
+    attributes: dict
+    children: list[str]
+    text: str | None
+    location: str
+
+    def get_attrib(self, key: str, default=None):
+        return self.attributes.get(key, default)
+
+    def get_bool_attrib(self, key: str, default=False):
+        value = self.attributes.get(key)
+
+        if value is None:
+            return default
+        return convert_to_bool(value)
 
 
 @dataclasses.dataclass
@@ -18,12 +38,48 @@ class FlangMatchObject:
         child = self.content[0]
         return child
 
+    def apply_function(
+        self,
+        evaluator_function: Callable[[FlangMatchObject], None],
+        traversal_order: Literal["breadth-first", "depth-first"] = "breadth-first",
+    ) -> None:
+        if traversal_order == "breadth-first":
+            evaluator_function(self)
+
+        if isinstance(self.content, list):
+            for item in self.content:
+                item.apply_function(
+                    evaluator_function, traversal_order
+                )
+
+        if traversal_order == "depth-first":
+            evaluator_function(self)
+
+    def get_raw_content(self) -> str | list[str]:
+        raise NotImplementedError
+    
+    @property
+    def construct_name(self) -> str:
+        return re.sub(r"\[\d+\]$", "", self.identifier)
+
 
 @dataclasses.dataclass
 class FlangAbstractMatchObject(FlangMatchObject):
     content: list[FlangTextMatchObject] | list[FlangAbstractMatchObject]
     filename: str | None
 
+    def __len__(self) -> int:
+        return sum(map(len, self.content))
+
+    def get_raw_content(self) -> str | list[str]:
+        if pathlib.Path(self.filename).is_dir():
+            assert isinstance(self.content, list[FlangAbstractMatchObject])
+            return [f.filename for f in self.content]
+
+        assert isinstance(self.content, list[FlangTextMatchObject])
+
+        return "".join(it.get_raw_content() for it in self.content)
+        
 
 # dataclass, not typing.TypedDict because we need methods
 @dataclasses.dataclass
@@ -36,36 +92,11 @@ class FlangTextMatchObject(FlangMatchObject):
             return sum(map(len, self.content))
         return len(self.content)
 
-    @staticmethod
-    def get_construct_name_from_spec_name(identifier: str) -> str:
-        return re.sub(r"\[\d+\]$", "", identifier)
-
-    def get_construct(self, project_construct: FlangProjectConstruct) -> FlangConstruct:
-        return project_construct.find_symbol(
-            self.get_construct_name_from_spec_name(self.identifier)
-        )
-
-    def get_combined_text(self) -> str:
-        assert (
-            self.metadata.get("filename") is None
-            or pathlib.Path(self.metadata["filename"]).is_dir() is False
-        )
-
+    def get_raw_content(self) -> str:
         if isinstance(self.content, list):
-            return "".join(it.get_combined_text() for it in self.content)
+            return "".join(it.get_raw_content() for it in self.content)
 
         return self.content
-
-    def get_raw_content(self) -> str | list[str]:
-        if (
-            self.metadata.get("filename")
-            and pathlib.Path(self.metadata["filename"]).is_dir()
-        ):
-            assert isinstance(self.content, list)
-
-            return [f.metadata["filename"] for f in self.content]
-
-        return self.get_combined_text()
 
     def to_representation(self):
         if isinstance(self.content, list):
@@ -82,20 +113,3 @@ class FlangTextMatchObject(FlangMatchObject):
     @classmethod
     def from_representation(cls, representation: tuple):
         raise NotImplementedError
-
-    def evaluate_match_tree(
-        self,
-        evaluator_function: Callable[[FlangTextMatchObject], None],
-        traversal_order: Literal["parent", "child"] = "child",
-    ) -> None:
-        if traversal_order == "parent":
-            evaluator_function(self)
-
-        if isinstance(self.content, list):
-            for item in self.content:
-                FlangTextMatchObject.evaluate_match_tree(
-                    item, evaluator_function, traversal_order
-                )
-
-        if traversal_order == "child":
-            evaluator_function(self)

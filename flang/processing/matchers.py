@@ -15,7 +15,7 @@ from flang.structures import (
     FlangConstruct,
     FlangFileInputReader,
     FlangMatchObject,
-    FlangProjectConstruct,
+    FlangProjectRuntime,
     FlangTextInputReader,
     FlangTextMatchObject,
     IntermediateFileObject,
@@ -34,7 +34,7 @@ class FileMatchNotFound(MatchNotFoundError): ...
 
 
 def _match_on_complex_construct(
-    project_construct: FlangProjectConstruct,
+    project_construct: FlangProjectRuntime,
     construct: FlangConstruct,
     reader: BaseFlangInputReader,
 ) -> FlangTextMatchObject:
@@ -123,7 +123,7 @@ def _match_on_complex_construct(
 
 
 def _match_on_text(
-    project_construct: FlangProjectConstruct,
+    project_construct: FlangProjectRuntime,
     construct: FlangConstruct,
     reader: FlangTextInputReader,
 ) -> FlangTextMatchObject:
@@ -169,7 +169,7 @@ def _match_on_text(
 
 
 def _match_on_file(
-    project_construct: FlangProjectConstruct,
+    project_construct: FlangProjectRuntime,
     construct: FlangConstruct,
     reader: BaseFlangInputReader,
 ) -> FlangTextMatchObject:
@@ -206,7 +206,7 @@ def _match_on_file(
 
 
 def _match_against_all_construct_variants(
-    project_construct: FlangProjectConstruct,
+    project_construct: FlangProjectRuntime,
     construct: FlangConstruct,
     reader: BaseFlangInputReader,
 ) -> FlangTextMatchObject:
@@ -228,7 +228,7 @@ def _match_against_all_construct_variants(
 
 
 def match_flang_construct(
-    project_construct: FlangProjectConstruct,
+    project_construct: FlangProjectRuntime,
     construct: FlangConstruct,
     reader: BaseFlangInputReader,
     check: bool = False,

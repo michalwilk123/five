@@ -3,6 +3,9 @@ from __future__ import annotations
 import dataclasses
 from collections import defaultdict
 from typing import Callable, Generator
+from .spec import FlangAbstractMatchObject, FlangMatchObject
+# from .constructs import FlangProjectRuntime
+from functools import partial
 
 from flang.exceptions import UnknownParentException
 
@@ -40,32 +43,27 @@ class FlangLinkNode:
 
         return symbols
 
-
-class FlangLinkGraph:
-    def __init__(self) -> None:
-        self.link_forest = FlangLinkNode(vertex=None, parent=None, children=[])
-
     def add_relation(self, parent_symbol: str, child_symbol: str):
-        parent_node = self.link_forest.search_for_child(parent_symbol)
+        parent_node = self.search_for_child(parent_symbol)
 
         if parent_node is None:
             raise UnknownParentException(
                 f"Could not find parent: {parent_node} for child: {child_symbol}"
             )
 
-        child_node = self.link_forest.search_for_child(child_symbol)
+        child_node = self.search_for_child(child_symbol)
 
         if child_node is None:
             child_node = FlangLinkNode(parent=parent_symbol, vertex=child_symbol)
 
         parent_node.children.append(child_node)
 
-    def add_parent(self, parent_symbol: str):
+    def add_parent_node(self, parent_symbol: str):
         assert (
-            self.link_forest.search_for_child(parent_symbol) is None
-        ), f"Node: {parent_symbol} already exists! {self.link_forest}"
+            self.search_for_child(parent_symbol) is None
+        ), f"Node: {parent_symbol} already exists! {self}"
 
-        self.link_forest.children.append(
+        self.children.append(
             FlangLinkNode(parent=None, vertex=parent_symbol, is_leaf=False)
         )
 

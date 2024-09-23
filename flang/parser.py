@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 from flang.exceptions import UnknownAttributeException
 
 # from flang.helpers import create_unique_symbol
-from flang.structures import FlangConstruct, FlangProjectConstruct
+from flang.structures import FlangConstruct, FlangProjectRuntime
 from flang.utils import get_possible_construct_attributes
 
 
@@ -17,7 +17,7 @@ class FlangXMLParser:
     def _build_tree(
         self,
         element: ET.Element,
-        flang_object: FlangProjectConstruct,
+        flang_object: FlangProjectRuntime,
         validate_attributes: bool,
         location: str = "",
     ) -> FlangConstruct:
@@ -68,11 +68,11 @@ class FlangXMLParser:
 
     def parse_text(
         self, text: str, path: str = "", validate_attributes: bool = False
-    ) -> FlangProjectConstruct:
+    ) -> FlangProjectRuntime:
         path = path or os.getcwd()
 
         processed_xml = ET.fromstring(text)
-        flang_object = FlangProjectConstruct(path=path)
+        flang_object = FlangProjectRuntime(path=path)
         construct = self._build_tree(processed_xml, flang_object, validate_attributes)
         flang_object.root = construct.location
 

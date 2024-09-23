@@ -33,3 +33,4 @@ line-length = 90
 black = "black flang tests fenv"
 isort = "isort flang tests fenv"
 lint = {composite = ["black", "isort"]}
+test = "python -m unittest"
