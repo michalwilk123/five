@@ -3,7 +3,7 @@ from __future__ import annotations
 import dataclasses
 import pathlib
 import re
-from typing import Any, Callable, Literal, Sequence
+from typing import Callable, Literal
 
 from flang.helpers import convert_to_bool
 
@@ -40,25 +40,30 @@ class FlangMatchObject:
 
     def apply_function(
         self,
-        evaluator_function: Callable[[FlangMatchObject], None],
-        traversal_order: Literal["breadth-first", "depth-first"] = "breadth-first",
+        *,
+        enter_function: Callable[[FlangMatchObject], None] | None = None,
+        exit_function: Callable[[FlangMatchObject], None] | None = None,
     ) -> None:
-        if traversal_order == "breadth-first":
-            evaluator_function(self)
+        if exit_function is not None:
+            exit_function(self)
 
         if isinstance(self.content, list):
             for item in self.content:
-                item.apply_function(evaluator_function, traversal_order)
+                item.apply_function(enter_function=enter_function, exit_function=exit_function)
 
-        if traversal_order == "depth-first":
-            evaluator_function(self)
+        if enter_function is not None:
+            enter_function(self)
 
     def get_raw_content(self) -> str | list[str]:
         raise NotImplementedError
+    
+    @staticmethod
+    def get_construct_name_from_spec_name(identifier:str) -> str:
+        return re.sub(r"\[\d+\]$", "", identifier)
 
     @property
     def construct_name(self) -> str:
-        return re.sub(r"\[\d+\]$", "", self.identifier)
+        return self.get_construct_name_from_spec_name(self.identifier)
 
     def __len__(self):
         raise NotImplementedError
@@ -93,34 +98,35 @@ class FlangDirectoryMatchObject(FlangMatchObject):
         assert pathlib.Path(self.filename).is_dir()
         return [f.filename for f in self.content]
 
-
 @dataclasses.dataclass
 class FlangTextMatchObject(FlangMatchObject):
     identifier: str
-    content: str | list[FlangTextMatchObject]
+    content: str
 
     def __len__(self) -> int:
-        if isinstance(self.content, list):
-            return sum(map(len, self.content))
         return len(self.content)
 
     def get_raw_content(self) -> str:
-        if isinstance(self.content, list):
-            return "".join(it.get_raw_content() for it in self.content)
-
         return self.content
+
+@dataclasses.dataclass
+class FlangComplexMatchObject(FlangMatchObject):
+    identifier: str
+    content: list[FlangTextMatchObject | FlangComplexMatchObject]
+
+    def __len__(self) -> int:
+        return sum(map(len, self.content))
+
+    def get_raw_content(self) -> str:
+        return "".join(it.get_raw_content() for it in self.content)
 
 
 @dataclasses.dataclass
-class FlangFlatFileMatchObject(FlangTextMatchObject):
+class FlangFlatFileMatchObject(FlangComplexMatchObject):
     filename: str
 
 
-"""
-kw_only=True is added because we override the old field and add a default value
-"""
-
-
+# kw_only=True is added because we override the old field and add a default value
 @dataclasses.dataclass(kw_only=True)
 class FlangAbstractMatchObject(FlangMatchObject):
     content: list[FlangMatchObject]
@@ -128,11 +134,15 @@ class FlangAbstractMatchObject(FlangMatchObject):
 
     def apply_function(
         self,
-        evaluator_function: Callable[[FlangMatchObject], None],
-        traversal_order: Literal["breadth-first", "depth-first"] = "breadth-first",
+        *,
+        enter_function: Callable[[FlangMatchObject], None] | None = None,
+        exit_function: Callable[[FlangMatchObject], None] | None = None,
     ) -> None:
+        """
+        Since this match represents match that does not exist, we do not run functions when parsing it
+        """
         for item in self.content:
-            item.apply_function(evaluator_function, traversal_order)
+            item.apply_function(enter_function=enter_function, exit_function=exit_function)
 
 
 FlangFileMatch = FlangDirectoryMatchObject | FlangFlatFileMatchObject

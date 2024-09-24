@@ -1,9 +1,15 @@
 import re
 
 from flang.exceptions import SymbolNotFoundError
+import collections
+from .events import FlangLink
+from .spec import FlangConstruct, FlangMatchObject, PossibleRootFlangMatch, FlangTextMatchObject
+from enum import Enum,auto
 
-from .events import FlangLinkNode
-from .spec import FlangConstruct, FlangMatchObject, PossibleRootFlangMatch
+
+class LinkVariant(Enum):
+    DEFINITION = auto()
+    REFERENCE = auto()
 
 
 class FlangProjectRuntime:
@@ -19,7 +25,7 @@ class FlangProjectRuntime:
         self.root = ""
         self.symbol_table: dict[str, FlangConstruct] = {}
         self.symbol_occurence_counter: dict[str, int] = {}
-        self.link_forest = None
+        self.links: list[FlangLink] = []
 
     def find_symbol(self, symbol: str) -> FlangConstruct:
         return self.symbol_table[symbol]
@@ -108,28 +114,58 @@ class FlangProjectRuntime:
 
         raise RuntimeError(f"Unknown path to constuct: {reference_path}")
 
-    @staticmethod
-    def get_construct_name_from_spec_name(identifier: str) -> str:
-        return re.sub(r"\[\d+\]$", "", identifier)
-
     def get_construct_from_spec(self, match_object: FlangMatchObject) -> FlangConstruct:
-        return self.find_symbol(
-            self.get_construct_name_from_spec_name(match_object.construct_name)
-        )
+        return self.find_symbol(match_object.construct_name)
 
-    def initialize_link_graph(self, root: PossibleRootFlangMatch) -> None:
-        # TODO can be easily cached
-        self.link_forest = FlangLinkNode(vertex=None, parent=None, children=[])
+    def _match_source_links_with_targets(self, match_object:PossibleRootFlangMatch, symbols):
 
-        def _build_graph(match_object: FlangMatchObject):
+        for variant, symbol in symbols:
             ...
-            # print("hello!")
-            # construct = self.get_construct_from_spec(match_object)
 
-            # if "link-definition" in construct.attributes:
-            #     self.link_forest.add_parent_node(match_object.identifier)
+        # FlangMatchObject.get_construct_name_from_spec_name(source_symbol)
 
-            # if "link-from" in construct.attributes:
-            #     self.link_forest.add_relation(match_object.identifier)
+    def initialize_linking(self, root: PossibleRootFlangMatch) -> None:
+        # TODO can be easily cached
+        symbols = []
+        das = collections.defaultdict(list)
 
-        root.apply_function(_build_graph)
+        def _create_symbols(match_object: FlangMatchObject):
+            construct = self.get_construct_from_spec(match_object)
+
+            # if declaration := construct.get_attrib("link-definition"):
+            #     assert isinstance(match_object, FlangTextMatchObject)
+
+            #     key = f"{match_object.content}:{declaration}"
+            #     das[key].append()
+
+            #     symbols.append(
+            #         (LinkVariant.DEFINITION, match_object.identifier)
+            #     )
+            
+            # if construct.get_attrib("link-from"):
+            #     symbols.append(
+            #         (LinkVariant.REFERENCE, match_object.identifier)
+            #     )
+
+        def _cleanup_symbols(match_object: FlangMatchObject):
+            construct = self.get_construct_from_spec(match_object)
+
+            # if declaration := construct.get_attrib("link-definition"):
+            #     assert isinstance(match_object, FlangTextMatchObject)
+
+            #     key = f"{match_object.content}:{declaration}"
+            #     das[key].append()
+
+            #     symbols.append(
+            #         (LinkVariant.DEFINITION, match_object.identifier)
+            #     )
+
+        # if we'd want hoisting we should implement breadth first search. For now we use only DFS
+        root.apply_function(enter_function=_create_symbols, exit_function=_cleanup_symbols)
+
+        # for symbol in symbols:
+        self._match_source_links_with_targets(root, symbols)
+    
+
+def inilinkin(project_runtime: FlangProjectRuntime, root: PossibleRootFlangMatch):
+    ...

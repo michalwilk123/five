@@ -22,6 +22,8 @@ class FlangParserTestCase(unittest.TestCase):
             structured_text = processor.forward_filename(sample)
         else:
             structured_text = processor.forward_string(sample)
+        
+        assert structured_text is not None
 
         return project_construct, structured_text
 

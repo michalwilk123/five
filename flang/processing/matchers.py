@@ -1,5 +1,4 @@
 import re
-from functools import cmp_to_key
 
 from flang.exceptions import (
     MatchNotFoundError,
@@ -20,6 +19,7 @@ from flang.structures import (
     FlangProjectRuntime,
     FlangTextMatchObject,
     IntermediateFileObject,
+    FlangComplexMatchObject
 )
 
 __all__ = ["match_flang_construct"]
@@ -38,7 +38,7 @@ def _match_on_complex_construct(
     project_construct: FlangProjectRuntime,
     construct: FlangConstruct,
     reader: BaseFlangInputReader,
-) -> FlangTextMatchObject:
+) -> FlangMatchObject:
     match construct.name:
         case "sequence":
             matches = []
@@ -48,7 +48,6 @@ def _match_on_complex_construct(
                     match_objects, reader = match_flang_construct(
                         project_construct, child, reader
                     )
-                    assert isinstance(match_objects, list), "TODO niepotrzebna asercja!"
 
                     matches += match_objects
             except MatchNotFoundError as e:
@@ -56,7 +55,7 @@ def _match_on_complex_construct(
                     f"Could not match sequence of constructs: {construct.name or construct.location}"
                 ) from e
 
-            return FlangTextMatchObject(
+            return FlangComplexMatchObject(
                 identifier=project_construct.generate_symbol_for_match_object(construct),
                 content=matches,
             )
@@ -111,14 +110,7 @@ def _match_on_complex_construct(
                     "na kilka plikow"
                 )
 
-            matches, reader = match_flang_construct(
-                project_construct, target_construct, reader
-            )
-
-            return FlangTextMatchObject(
-                identifier=project_construct.generate_symbol_for_match_object(construct),
-                content=matches,  # type: ignore TODO: fix this
-            )
+            return _match_against_all_construct_variants(project_construct, target_construct, reader)
         case _:
             raise UnknownConstructError("Not complex construct")
 

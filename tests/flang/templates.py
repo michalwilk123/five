@@ -201,11 +201,11 @@ TEST_TEMPLATE_FILES_MEDIUM = r"""
 # this example tbh does not make real-world sense here
 TEST_TEMPLATE_LINKING = r"""
 <sequence name="code" multi="true">
-<choice>
+<choice name="code-parts">
 <sequence name="import">
   <text value="from "/><regex name="module" value="{vname}"/>
   <text value=" import "/><regex name="object" value="{vname}"
-    link-definition="imported" link-from="keyword"/>
+    link-definition="imported" scope="..code-parts"/>
   <use ref="..nl"/>
 </sequence>
 <regex name="nl" value="\s"/>

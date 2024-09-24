@@ -40,4 +40,4 @@ def evaluate_match_object(
     # link_graph = create_link_graph(project_construct, flang_match)
     # graph = FlangLinkGraph.from_match_object(project_construct, flang_match)
     # _run_events(project_construct, flang_match)
-    project_construct.initialize_link_graph(flang_match)  # TODO: continue this
+    project_construct.initialize_linking(flang_match)  # TODO: continue this
