@@ -1,34 +1,26 @@
+from flang.runtime import ProjectParsingRuntime
 from flang.structures import (
     BaseFlangInputReader,
     FlangAbstractMatchObject,
     FlangFileInputReader,
     FlangFileMatch,
     FlangMatchObject,
-    FlangProjectRuntime,
     FlangTextInputReader,
     IntermediateFileObject,
     PossibleRootFlangMatch,
 )
 
-from .evaluation import evaluate_match_object
-from .generators import generate_flang_construct
-from .matchers import match_flang_construct
 
-
-class FlangProjectProcessor:
-    def __init__(self, project_construct: FlangProjectRuntime) -> None:
-        self.project_construct: FlangProjectRuntime = project_construct
+class FlangProjectAnalyzer:
+    def __init__(self, project_construct: ProjectParsingRuntime) -> None:
+        self.project_construct: ProjectParsingRuntime = project_construct
 
     def backward(self, spec: FlangMatchObject) -> BaseFlangInputReader:
-        return generate_flang_construct(spec)
+        raise NotImplementedError
+        return
 
-    def _forward(self, sample: BaseFlangInputReader) -> PossibleRootFlangMatch | None:
-        match_objects, _ = match_flang_construct(
-            self.project_construct,
-            self.project_construct.root_construct,
-            sample,
-            check=True,
-        )
+    def _forward(self, reader: BaseFlangInputReader) -> PossibleRootFlangMatch | None:
+        match_objects, _ = self.project_construct.match(reader)
 
         if self.project_construct.root_construct.name == "file":
             assert (
@@ -46,13 +38,13 @@ class FlangProjectProcessor:
 
         return match_object
 
-    def forward(self, sample: BaseFlangInputReader) -> PossibleRootFlangMatch | None:
-        match_object = self._forward(sample)
+    def forward(self, reader: BaseFlangInputReader) -> PossibleRootFlangMatch | None:
+        match_object = self._forward(reader)
 
         if match_object is None:
             return None
 
-        evaluate_match_object(self.project_construct, match_object)
+        # evaluate_match_object(self.project_construct, match_object)
 
         return match_object
 

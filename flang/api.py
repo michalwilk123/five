@@ -1,8 +1,8 @@
 from types import SimpleNamespace
 
-from flang.helpers import kebab_to_snake_case
 from flang.structures import FlangConstruct
-from flang.utils import get_possible_construct_attributes
+from flang.utils.attributes import get_possible_construct_attributes
+from flang.utils.common import kebab_to_snake_case
 
 
 def build_construct_api(construct: FlangConstruct) -> object:

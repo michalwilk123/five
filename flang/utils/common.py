@@ -1,16 +1,24 @@
 import functools
 import itertools
 
-import flang.regex_lib as r
+VNAME = r"[A-Za-z]\w*"
+INTEGER = r"[0-9]|([1-9][0-9]+)"
+NUMBER = r"-?(([1-9]+\d*)|0)(\.\d*)?"
+STRING = r'(?<!\\)(?:\\{2})*"(?:(?<!\\)(?:\\{2})*\\"|[^"])+(?<!\\)(?:\\{2})*"'
+C_FUNCTION_CALL = rf"{VNAME}\({VNAME}(,\s*)?\)"
+XML_ATTR = rf'{VNAME}="[^"\n]*"'
+XML_OPEN_TAG = rf"<{VNAME}(\s*{XML_ATTR})*>"
+XML_CLOSE_TAG = rf"</{VNAME}>"
+XML_SINGLE_TAG = rf"<{VNAME}(\s*{XML_ATTR})*\s*/>"
 
 BUILTIN_PATTERNS = {
-    "vname": r.VNAME,
-    "number": r.NUMBER,
-    "string": r.STRING,
-    "c_function_call": r.C_FUNCTION_CALL,
-    "xml_open_tag": r.XML_OPEN_TAG,
-    "xml_close_tag": r.XML_CLOSE_TAG,
-    "xml_single_tag": r.XML_SINGLE_TAG,
+    "vname": VNAME,
+    "number": NUMBER,
+    "string": STRING,
+    "c_function_call": C_FUNCTION_CALL,
+    "xml_open_tag": XML_OPEN_TAG,
+    "xml_close_tag": XML_CLOSE_TAG,
+    "xml_single_tag": XML_SINGLE_TAG,
     "lt": "<",
     "rt": ">",
 }

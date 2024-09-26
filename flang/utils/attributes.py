@@ -1,4 +1,4 @@
-from flang.exceptions import UnknownConstructError
+from flang.utils.exceptions import UnknownConstructError
 
 visible_construct_attributes = ["visible", "event-[0-9]+"]
 naming_attributes = ["name", "alias"]

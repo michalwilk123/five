@@ -1,10 +1,10 @@
-from flang.helpers import convert_to_bool
-from flang.structures import FlangConstruct, FlangProjectRuntime
+from flang.runtime import FlangConstruct, ProjectParsingRuntime
+from flang.utils.common import convert_to_bool
 
 
 class FenvShell:
     def __init__(
-        self, flang_object: FlangProjectRuntime, root: FlangConstruct | None = None
+        self, flang_object: ProjectParsingRuntime, root: FlangConstruct | None = None
     ) -> None:
         self.root = root or flang_object.root_construct
         self.flang_object = flang_object

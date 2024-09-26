@@ -1,18 +1,18 @@
 from itertools import chain
 from typing import Iterable
 
-from flang.exceptions import (
-    MatchNotFoundError,
-    TextNotParsedError,
-    UnknownConstructError,
-)
-from flang.helpers import create_unique_symbol, emit_function
-from flang.structures_depr import (
+from flang._deprecated.structures_depr import (
     DEPRECATED_FlangInputReader,
     FlangConstruct,
     FlangProjectConstruct,
     FlangTextMatchObject,
     IntermediateFileObject,
+)
+from flang.utils.common import create_unique_symbol, emit_function
+from flang.utils.exceptions import (
+    MatchNotFoundError,
+    TextNotParsedError,
+    UnknownConstructError,
 )
 
 

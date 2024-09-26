@@ -9,8 +9,8 @@ import re
 from collections import defaultdict
 from typing import Callable, Generator, Literal
 
-from flang.exceptions import SymbolNotFoundError, UnknownParentException
-from flang.helpers import BUILTIN_PATTERNS, convert_to_bool
+from flang.utils.common import BUILTIN_PATTERNS, convert_to_bool
+from flang.utils.exceptions import SymbolNotFoundError, UnknownParentException
 
 FlangEvent = Callable[[], None]
 

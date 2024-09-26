@@ -3,9 +3,8 @@ from __future__ import annotations
 import dataclasses
 import pathlib
 import re
-from typing import Callable, Literal
 
-from flang.helpers import convert_to_bool
+from flang.utils.common import convert_to_bool
 
 
 @dataclasses.dataclass
@@ -38,27 +37,11 @@ class FlangMatchObject:
         child = self.content[0]
         return child
 
-    def apply_function(
-        self,
-        *,
-        enter_function: Callable[[FlangMatchObject], None] | None = None,
-        exit_function: Callable[[FlangMatchObject], None] | None = None,
-    ) -> None:
-        if exit_function is not None:
-            exit_function(self)
-
-        if isinstance(self.content, list):
-            for item in self.content:
-                item.apply_function(enter_function=enter_function, exit_function=exit_function)
-
-        if enter_function is not None:
-            enter_function(self)
-
     def get_raw_content(self) -> str | list[str]:
         raise NotImplementedError
-    
+
     @staticmethod
-    def get_construct_name_from_spec_name(identifier:str) -> str:
+    def get_construct_name_from_spec_name(identifier: str) -> str:
         return re.sub(r"\[\d+\]$", "", identifier)
 
     @property
@@ -98,6 +81,7 @@ class FlangDirectoryMatchObject(FlangMatchObject):
         assert pathlib.Path(self.filename).is_dir()
         return [f.filename for f in self.content]
 
+
 @dataclasses.dataclass
 class FlangTextMatchObject(FlangMatchObject):
     identifier: str
@@ -108,6 +92,7 @@ class FlangTextMatchObject(FlangMatchObject):
 
     def get_raw_content(self) -> str:
         return self.content
+
 
 @dataclasses.dataclass
 class FlangComplexMatchObject(FlangMatchObject):
@@ -131,18 +116,6 @@ class FlangFlatFileMatchObject(FlangComplexMatchObject):
 class FlangAbstractMatchObject(FlangMatchObject):
     content: list[FlangMatchObject]
     identifier: None = None
-
-    def apply_function(
-        self,
-        *,
-        enter_function: Callable[[FlangMatchObject], None] | None = None,
-        exit_function: Callable[[FlangMatchObject], None] | None = None,
-    ) -> None:
-        """
-        Since this match represents match that does not exist, we do not run functions when parsing it
-        """
-        for item in self.content:
-            item.apply_function(enter_function=enter_function, exit_function=exit_function)
 
 
 FlangFileMatch = FlangDirectoryMatchObject | FlangFlatFileMatchObject
