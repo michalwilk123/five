@@ -1,3 +1,4 @@
+from .events import ScopeTree
 from .input import *
 from .spec import *
 
@@ -10,4 +11,5 @@ __all__ = [
     "FlangTextMatchObject",
     "FlangMatchObject",
     "FlangConstruct",
+    "ScopeTree",
 ]

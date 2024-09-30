@@ -1,9 +1,9 @@
 from flang.utils.exceptions import UnknownConstructError
 
-visible_construct_attributes = ["visible", "event-[0-9]+"]
+visible_construct_attributes = ["visible", "execute-[0-9]+"]
 naming_attributes = ["name", "alias"]
 cardinality_attributes = ["optional", "multi"]
-linking_syntax = ["link-definition", "link-from", "scope"]
+linking_syntax = ["link-definition", "link-from", "scope-start", "scope-end"]
 
 
 def get_possible_construct_attributes(construct_name: str):

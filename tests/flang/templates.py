@@ -230,7 +230,7 @@ TEST_TEMPLATE_FUNCTION = r"""
 <event name="print-message" alias="func">
     print("hello")
 </event>
-<sequence event=".print-message">
+<sequence execute-1=".print-message">
 <text value="say"/><regex value="{string|vname|number}" name="value"/>
 </sequence>
 </sequence>

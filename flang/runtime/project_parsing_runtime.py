@@ -28,7 +28,7 @@ from ..structures import (
 )
 
 
-class LinkVariant(Enum):
+class LinkVariant(Enum):  # TODO: not needed anymore?
     DEFINITION = auto()
     REFERENCE = auto()
 

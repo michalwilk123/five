@@ -9,7 +9,7 @@ from flang.utils.exceptions import MatchNotFoundError, TextNotParsedError
 from . import templates as tpl
 
 
-class FlangParserTestCase(unittest.TestCase):
+class ParserTestCase(unittest.TestCase):
     def setUp(self) -> None:
         self.parser = FlangXMLParser()
 

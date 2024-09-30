@@ -1,4 +1,4 @@
-from flang.runtime import ProjectParsingRuntime
+from flang.runtime import ProjectParsingRuntime, SpecEvaluationRuntime
 from flang.structures import (
     BaseFlangInputReader,
     FlangAbstractMatchObject,
@@ -14,10 +14,10 @@ from flang.structures import (
 class FlangProjectAnalyzer:
     def __init__(self, project_construct: ProjectParsingRuntime) -> None:
         self.project_construct: ProjectParsingRuntime = project_construct
+        self.spec_evaluation_runtime = SpecEvaluationRuntime(self.project_construct)
 
     def backward(self, spec: FlangMatchObject) -> BaseFlangInputReader:
         raise NotImplementedError
-        return
 
     def _forward(self, reader: BaseFlangInputReader) -> PossibleRootFlangMatch | None:
         match_objects, _ = self.project_construct.match(reader)
@@ -44,6 +44,8 @@ class FlangProjectAnalyzer:
         if match_object is None:
             return None
 
+        self.spec_evaluation_runtime.collect_events(match_object)
+        self.spec_evaluation_runtime.execute_events()
         # evaluate_match_object(self.project_construct, match_object)
 
         return match_object
