@@ -22,42 +22,41 @@ class ScopeTree:
             )
         }
 
-    @classmethod
-    def _from_dict(
-        cls, source_dictionary: dict, parent: ScopeTree | None
-    ) -> list[ScopeTree]:
-        nodes = []
+    def add_nodes_from_dict(
+        self, source_dictionary: dict, parent: ScopeTree | None
+    ) -> None:
+        if parent is None:
+            parent = self
 
         for symbol, children in source_dictionary.items():
-            node = cls(symbol, parent=parent)
+            node = self.add_node(parent.symbol, symbol)
             if children:
-                children_nodes = cls._from_dict(children, parent=node)
-                node.children = children_nodes
-
-            nodes.append(node)
-        return nodes
+                self.add_nodes_from_dict(children, parent=node)
 
     @classmethod
     def from_dict(cls, source_dictionary: dict) -> ScopeTree:
-        tree = cls._from_dict(source_dictionary, None)
-        assert len(tree) == 1
-        return tree[0]
-    
-    def in_(self, parent_id:str, node_id:str, scope_end_node_id:str | None=None) -> bool:
-        assert (parent := self.get_(parent_id)), f"Unknown parent node: {parent_id}"
-        assert self.get_(node_id), f"Unknown node to search: {node_id}"
+        root_symbol = next(iter(source_dictionary.keys()))
+        tree = cls(root_symbol, parent=None)
+        tree.add_nodes_from_dict(source_dictionary[root_symbol], None)
+        return tree
 
-        if not parent.get_(node_id):
-            False
+    def contains(self, node_id: str, scope_end_node_id: str | None = None) -> bool:
+        if not self.get_(node_id):
+            return False
 
         if scope_end_node_id:
-            assert (scope_end_node := self.get_(scope_end_node_id)), f"Unknown end of scope node: {scope_end_node_id}"
+            assert (
+                scope_end_node := self.get_(scope_end_node_id)
+            ), f"Unknown end of scope node: {scope_end_node_id}"
             if scope_end_node.get_(node_id):
                 return False
-        
+
         return True
-    
+
     def get_(self, node_id: str) -> ScopeTree | None:
+        if self.symbol == node_id:
+            return self
+
         return self._cache.get(node_id)
 
     def add_node(self, parent_id: str, node_id: str) -> ScopeTree:

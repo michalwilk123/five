@@ -1,5 +1,5 @@
 from flang.runtime import ProjectParsingRuntime, SpecEvaluationRuntime
-from flang.structures import (
+from flang.structures import (  # may import InteractiveFlangObject soon
     BaseFlangInputReader,
     FlangAbstractMatchObject,
     FlangFileInputReader,
@@ -7,19 +7,18 @@ from flang.structures import (
     FlangMatchObject,
     FlangTextInputReader,
     IntermediateFileObject,
-    PossibleRootFlangMatch,
+    RootFlangMatchObject,
 )
 
 
 class FlangProjectAnalyzer:
     def __init__(self, project_construct: ProjectParsingRuntime) -> None:
         self.project_construct: ProjectParsingRuntime = project_construct
-        self.spec_evaluation_runtime = SpecEvaluationRuntime(self.project_construct)
 
     def backward(self, spec: FlangMatchObject) -> BaseFlangInputReader:
         raise NotImplementedError
 
-    def _forward(self, reader: BaseFlangInputReader) -> PossibleRootFlangMatch | None:
+    def _forward(self, reader: BaseFlangInputReader) -> RootFlangMatchObject | None:
         match_objects, _ = self.project_construct.match(reader)
 
         if self.project_construct.root_construct.name == "file":
@@ -38,23 +37,24 @@ class FlangProjectAnalyzer:
 
         return match_object
 
-    def forward(self, reader: BaseFlangInputReader) -> PossibleRootFlangMatch | None:
+    def forward(self, reader: BaseFlangInputReader) -> RootFlangMatchObject | None:
         match_object = self._forward(reader)
 
         if match_object is None:
             return None
 
-        self.spec_evaluation_runtime.collect_events(match_object)
-        self.spec_evaluation_runtime.execute_events()
-        # evaluate_match_object(self.project_construct, match_object)
+        spec_evaluation_runtime = SpecEvaluationRuntime(
+            self.project_construct, match_object
+        )
+        spec_evaluation_runtime.execute_events()
 
         return match_object
 
-    def forward_string(self, sample: str) -> PossibleRootFlangMatch | None:
+    def forward_string(self, sample: str) -> RootFlangMatchObject | None:
         reader = FlangTextInputReader(sample)
         return self.forward(reader)
 
-    def forward_filename(self, path: str) -> PossibleRootFlangMatch | None:
+    def forward_filename(self, path: str) -> RootFlangMatchObject | None:
         file_object = IntermediateFileObject(path)
         reader = FlangFileInputReader([file_object], filename=file_object.filename)
         return self.forward(reader)

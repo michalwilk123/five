@@ -1,5 +1,4 @@
 import re
-from enum import Enum, auto
 
 from flang.structures.input import BaseFlangInputReader, IntermediateFileObject
 from flang.structures.spec import (
@@ -8,7 +7,10 @@ from flang.structures.spec import (
     FlangFileMatch,
     FlangFlatFileMatchObject,
 )
-from flang.utils.common import BUILTIN_PATTERNS
+from flang.utils.common import (
+    BUILTIN_PATTERNS,
+    resolve_location_relative_path_to_absolute,
+)
 from flang.utils.exceptions import (
     ComplexMatchNotFound,
     FileMatchNotFound,
@@ -21,16 +23,12 @@ from flang.utils.exceptions import (
 )
 
 from ..structures import (
+    FlangAbstractMatchObject,
     FlangConstruct,
     FlangFileInputReader,
     FlangMatchObject,
     FlangTextMatchObject,
 )
-
-
-class LinkVariant(Enum):  # TODO: not needed anymore?
-    DEFINITION = auto()
-    REFERENCE = auto()
 
 
 class ProjectParsingRuntime:
@@ -116,12 +114,9 @@ class ProjectParsingRuntime:
             except KeyError as e:
                 raise SymbolNotFoundError from e
         elif is_symbol_relative:
-            path_without_dots = reference_path.lstrip(".")
-            backward_steps = len(reference_path) - len(path_without_dots)
-
             filename, local_path = current_path.split(":")
-            target_path = ".".join(
-                local_path.split(".")[:-backward_steps] + [path_without_dots]
+            target_path = resolve_location_relative_path_to_absolute(
+                reference_path, local_path
             )
             full_target_path = "%s:%s" % (filename, target_path)
             return self.find_construct_by_path(full_target_path)
@@ -372,4 +367,8 @@ class ProjectParsingRuntime:
         )
 
     def get_construct_from_spec(self, match_object: FlangMatchObject) -> FlangConstruct:
+        if isinstance(match_object, FlangAbstractMatchObject):
+            # TODO: maybe should return some like buildin object?
+            ...
+
         return self.find_symbol(match_object.construct_name)

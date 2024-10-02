@@ -29,6 +29,15 @@ NAMED_BUILTIN_PATTERNS = {
 global_emitted_functions = []
 
 
+def resolve_location_relative_path_to_absolute(relative_path, current_path):
+    path_without_dots = relative_path.lstrip(".")
+    backward_steps = len(relative_path) - len(path_without_dots)
+    target_path = ".".join(
+        current_path.split(".")[:-backward_steps] + [path_without_dots]
+    )
+    return target_path
+
+
 def interlace(*iterables):
     for items_to_yield in itertools.zip_longest(*iterables):
         for item in items_to_yield:

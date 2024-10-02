@@ -3,6 +3,7 @@ from __future__ import annotations
 import dataclasses
 import pathlib
 import re
+from typing import Literal
 
 from flang.utils.common import convert_to_bool
 
@@ -28,7 +29,7 @@ class FlangConstruct:
 
 @dataclasses.dataclass
 class FlangMatchObject:
-    identifier: ...
+    identifier: str
     content: ...
 
     @property
@@ -115,8 +116,8 @@ class FlangFlatFileMatchObject(FlangComplexMatchObject):
 @dataclasses.dataclass(kw_only=True)
 class FlangAbstractMatchObject(FlangMatchObject):
     content: list[FlangMatchObject]
-    identifier: None = None
+    identifier: Literal["__abstract_match__"] = "__abstract_match__"
 
 
 FlangFileMatch = FlangDirectoryMatchObject | FlangFlatFileMatchObject
-PossibleRootFlangMatch = FlangFileMatch | FlangAbstractMatchObject
+RootFlangMatchObject = FlangFileMatch | FlangAbstractMatchObject

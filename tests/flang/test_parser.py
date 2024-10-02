@@ -3,7 +3,7 @@ import unittest
 from flang.handlers import FlangProjectAnalyzer
 from flang.parsers import FlangXMLParser
 from flang.runtime import ProjectParsingRuntime
-from flang.structures import PossibleRootFlangMatch
+from flang.structures import RootFlangMatchObject
 from flang.utils.exceptions import MatchNotFoundError, TextNotParsedError
 
 from . import templates as tpl
@@ -15,18 +15,18 @@ class ParserTestCase(unittest.TestCase):
 
     def _parse_template(
         self, template: str, sample: str, file: bool = False
-    ) -> tuple[ProjectParsingRuntime, PossibleRootFlangMatch]:
+    ) -> tuple[ProjectParsingRuntime, RootFlangMatchObject]:
         project_construct = self.parser.parse_text(template, validate_attributes=True)
         processor = FlangProjectAnalyzer(project_construct)
 
         if file:
-            structured_text = processor.forward_filename(sample)
+            match_object = processor.forward_filename(sample)
         else:
-            structured_text = processor.forward_string(sample)
+            match_object = processor.forward_string(sample)
 
-        assert structured_text is not None
+        assert match_object is not None
 
-        return project_construct, structured_text
+        return processor, match_object
 
     def test_basic(self):
         self._parse_template(tpl.TEST_BASIC_TEMPLATE, tpl.TEST_BASIC_SAMPLE)
@@ -40,19 +40,17 @@ class ParserTestCase(unittest.TestCase):
             self._parse_template(tpl.TEST_BASIC_TEMPLATE, tpl.TEST_BASIC_SAMPLE_FAILURE_2)
 
     def test_choice(self):
-        project_construct, match_object = self._parse_template(
-            tpl.TEST_TEMPLATE_CHOICE, "AAA"
-        )
+        processor, match_object = self._parse_template(tpl.TEST_TEMPLATE_CHOICE, "AAA")
         match_object = match_object.first_child.first_child
 
-        constr = project_construct.get_construct_from_spec(match_object)
+        constr = processor.project_construct.get_construct_from_spec(match_object)
         self.assertEqual(constr.name, "text")
 
-        project_construct, match_object = self._parse_template(
+        processor, match_object = self._parse_template(
             tpl.TEST_TEMPLATE_CHOICE, "SOMEVALUE"
         )
         match_object = match_object.first_child.first_child
-        constr = project_construct.get_construct_from_spec(match_object)
+        constr = processor.project_construct.get_construct_from_spec(match_object)
         self.assertEqual(constr.name, "regex")
 
     def test_choice_nested(self):
@@ -85,7 +83,9 @@ class ParserTestCase(unittest.TestCase):
         self._parse_template(tpl.TEST_TEMPLATE_RECURSIVE, tpl.TEST_SAMPLE_RECURSIVE_3)
 
     def test_linking(self):
-        self._parse_template(tpl.TEST_TEMPLATE_LINKING, tpl.TEST_SAMPLE_LINKING)
+        self._parse_template(
+            tpl.TEST_TEMPLATE_LINKING, tpl.TEST_SAMPLE_LINKING
+        )
 
     def test_file_easy(self):
         self._parse_template(

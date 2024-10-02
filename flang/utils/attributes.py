@@ -3,7 +3,7 @@ from flang.utils.exceptions import UnknownConstructError
 visible_construct_attributes = ["visible", "execute-[0-9]+"]
 naming_attributes = ["name", "alias"]
 cardinality_attributes = ["optional", "multi"]
-linking_syntax = ["link-definition", "link-from", "scope-start", "scope-end"]
+linking_syntax = ["link-name", "refers-to-link", "scope-start", "scope-end", "hoisting"]
 
 
 def get_possible_construct_attributes(construct_name: str):
@@ -40,6 +40,3 @@ def get_possible_construct_attributes(construct_name: str):
             )
 
     raise UnknownConstructError
-
-
-def validate_construct_attributes(): ...
