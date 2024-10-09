@@ -6,7 +6,7 @@ import io
 import pathlib
 import re
 
-from .spec import FlangTextMatchObject
+from .spec_deprecated import FlangTextMatchObject
 
 
 class IntermediateFileObject:

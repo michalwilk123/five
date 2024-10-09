@@ -34,7 +34,9 @@ class UnknownAttributeException(Exception): ...
 
 # events
 
+
 class EventError(Exception): ...
+
 
 class UnknownLinkNameError(Exception): ...
 

@@ -83,9 +83,7 @@ class ParserTestCase(unittest.TestCase):
         self._parse_template(tpl.TEST_TEMPLATE_RECURSIVE, tpl.TEST_SAMPLE_RECURSIVE_3)
 
     def test_linking(self):
-        self._parse_template(
-            tpl.TEST_TEMPLATE_LINKING, tpl.TEST_SAMPLE_LINKING
-        )
+        self._parse_template(tpl.TEST_TEMPLATE_LINKING, tpl.TEST_SAMPLE_LINKING)
 
     def test_file_easy(self):
         self._parse_template(

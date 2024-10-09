@@ -8,11 +8,12 @@ from flang.structures import (
     RootFlangMatchObject,
     ScopeTree,
 )
+from flang.utils.common import resolve_location_relative_path_to_absolute
 from flang.utils.exceptions import (
+    EventError,
     LinkOutOfScopeError,
     UnknownLinkDeclarationError,
     UnknownLinkNameError,
-    EventError,
 )
 
 from .project_parsing_runtime import ProjectParsingRuntime
@@ -30,14 +31,15 @@ class EventQueue:
 
         self.bank[priority].append((anchor, event))
 
-
     def execute_all(self):
         for priority in sorted(self.bank, reverse=True):
             for anchor, event in self.bank[priority]:
                 try:
                     event()
                 except Exception as e:
-                    raise EventError(f"Event from {anchor} named {event} caused an exception") from e
+                    raise EventError(
+                        f"Event from {anchor} named {event} caused an exception"
+                    ) from e
 
     def _forward(self): ...
 
@@ -110,7 +112,7 @@ class SpecEvaluationRuntime:
 
         self._collect_events()
 
-    def _find_scope(self, scope_from): 
+    def _find_scope(self, scope_from, direction):
         ###### TODO: <----- TUTAJ SKONCZYLES
         pass
 
@@ -118,21 +120,24 @@ class SpecEvaluationRuntime:
         self, location, link_name, declaration, scope_start, scope_end=None
     ) -> bool:
         def _link_declaration_fn():
-            self.link_storage.declare(location, link_name, declaration, scope_start, scope_end)
+            self.link_storage.declare(
+                location, link_name, declaration, scope_start, scope_end
+            )
 
         self.event_queue.add_event(location, event=_link_declaration_fn, priority=5)
 
-    def _add_link_reference(
-        self, location, link_name, declaration, hoisting
-    ) -> bool:
+    def _add_link_reference(self, location, link_name, declaration, hoisting) -> bool:
 
         def _link_reference_fn():
             import warnings
+
             warnings.warn("Implement scope-finding!")
             # self.link_storage.connect(location, link_name, declaration)
-            pass # TODO: for this to work, we need self._find_scope to be finished
+            pass  # TODO: for this to work, we need self._find_scope to be finished
 
-        self.event_queue.add_event(location, event=_link_reference_fn, priority=6 if hoisting else 5)
+        self.event_queue.add_event(
+            location, event=_link_reference_fn, priority=6 if hoisting else 5
+        )
 
     def _add_link_event(self, spec: FlangMatchObject, link_storage) -> bool:
         construct = self.project_runtime.get_construct_from_spec(spec)
@@ -141,11 +146,20 @@ class SpecEvaluationRuntime:
             assert isinstance(spec, FlangTextMatchObject)
 
             link_name = construct.attributes["link-name"]
+            # filename, local_path = construct.location
 
             if scope_start := construct.get_bool_attrib("scope-start"):
+                # target_path = resolve_location_relative_path_to_absolute(
+                #     scope_start, local_path
+                # )
+                # target_construct_path = "%s:%s" % (filename, target_path)
                 scope_start = self._find_scope(scope_start)
 
             if scope_end := construct.get_attrib("scope-end"):
+                # target_path = resolve_location_relative_path_to_absolute(
+                #     scope_start, local_path
+                # )
+                # target_construct_path = "%s:%s" % (filename, target_path)
                 scope_end = self._find_scope(scope_end)
 
             self._add_link_declaration(

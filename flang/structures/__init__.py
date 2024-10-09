@@ -1,6 +1,7 @@
+from .common import *
 from .events import ScopeTree
 from .input import *
-from .spec import *
+from .spec_deprecated import *
 
 __all__ = [
     "BaseFlangInputReader",
@@ -12,4 +13,5 @@ __all__ = [
     "FlangMatchObject",
     "FlangConstruct",
     "ScopeTree",
+    "SearchableTree",
 ]

@@ -1,7 +1,7 @@
 import re
 
 from flang.structures.input import BaseFlangInputReader, IntermediateFileObject
-from flang.structures.spec import (
+from flang.structures.spec_deprecated import (
     FlangComplexMatchObject,
     FlangDirectoryMatchObject,
     FlangFileMatch,

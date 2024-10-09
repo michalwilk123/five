@@ -4,36 +4,36 @@ import dataclasses
 import pathlib
 import re
 from typing import Literal
-from .common import SearchableTree
 
 from flang.utils.common import convert_to_bool
 
 
 @dataclasses.dataclass
-class NewFlangConstruct(SearchableTree):
-    type: str
+class FlangConstruct:
+    name: str
     attributes: dict
+    children: list[str]
     text: str | None
+    location: str
 
     def get_attrib(self, key: str, default=None):
         return self.attributes.get(key, default)
 
     def get_bool_attrib(self, key: str, default=False):
-        return convert_to_bool(self.attributes.get(key, default))
+        value = self.attributes.get(key)
 
-class FlangFileMatchMixin:
-    ...
-
-class FlangComplexMatchMixin:
-    ...
+        if value is None:
+            return default
+        return convert_to_bool(value)
 
 @dataclasses.dataclass
-class BaseFlangMatchObject(SearchableTree):
+class FlangMatchObject:
     identifier: str
+    content: ...
     # TODO: This should have reference to the construct file
 
     @property
-    def first_child(self) -> BaseFlangMatchObject:
+    def first_child(self) -> FlangMatchObject:
         assert isinstance(self.content, list) and len(self.content) > 0
         child = self.content[0]
         return child
@@ -49,7 +49,7 @@ class BaseFlangMatchObject(SearchableTree):
     def construct_name(self) -> str:
         return self.get_construct_name_from_spec_name(self.identifier)
 
-    def size(self):
+    def __len__(self):
         raise NotImplementedError
 
     def to_representation(self):
@@ -70,12 +70,12 @@ class BaseFlangMatchObject(SearchableTree):
 
 
 @dataclasses.dataclass
-class FlangDirectoryMatchObject(BaseFlangMatchObject):
+class FlangDirectoryMatchObject(FlangMatchObject):
     identifier: str
     content: list[FlangFlatFileMatchObject]
     filename: str
 
-    def size(self) -> int:
+    def __len__(self) -> int:
         # len does not make sense
         return sum(map(len, self.content))
 
@@ -85,11 +85,11 @@ class FlangDirectoryMatchObject(BaseFlangMatchObject):
 
 
 @dataclasses.dataclass
-class FlangTextMatchObject(BaseFlangMatchObject):
+class FlangTextMatchObject(FlangMatchObject):
     identifier: str
     content: str
 
-    def size(self) -> int:
+    def __len__(self) -> int:
         return len(self.content)
 
     def get_raw_content(self) -> str:
@@ -97,11 +97,11 @@ class FlangTextMatchObject(BaseFlangMatchObject):
 
 
 @dataclasses.dataclass
-class FlangComplexMatchObject(BaseFlangMatchObject):
+class FlangComplexMatchObject(FlangMatchObject):
     identifier: str
-    content: list[BaseFlangMatchObject]
+    content: list[FlangTextMatchObject | FlangComplexMatchObject]
 
-    def size(self) -> int:
+    def __len__(self) -> int:
         return sum(map(len, self.content))
 
     def get_raw_content(self) -> str:
@@ -115,8 +115,8 @@ class FlangFlatFileMatchObject(FlangComplexMatchObject):
 
 # kw_only=True is added because we override the old field and add a default value
 @dataclasses.dataclass(kw_only=True)
-class FlangAbstractMatchObject(BaseFlangMatchObject):
-    content: list[BaseFlangMatchObject]
+class FlangAbstractMatchObject(FlangMatchObject):
+    content: list[FlangMatchObject]
     identifier: Literal["__abstract_match__"] = "__abstract_match__"
 
 

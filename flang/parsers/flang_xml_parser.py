@@ -68,6 +68,7 @@ class FlangXMLParser:
         self, text: str, path: str = "", validate_attributes: bool = False
     ) -> ProjectParsingRuntime:
         path = path or os.getcwd()
+        path = path.replace("/", ".")
 
         processed_xml = ET.fromstring(text)
         flang_object = ProjectParsingRuntime(path=path)
