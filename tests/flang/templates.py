@@ -131,7 +131,7 @@ TEST_TEMPLATE_CHOICE_AND_MULTI = r"""
 
 TEST_TEMPLATE_USE = """
 <sequence name="import">
-<sequence name="foo" visible="false">
+<sequence name="foo" hidden="true">
 <text>foo</text>
 </sequence>
 <sequence name="bar">
@@ -205,7 +205,7 @@ TEST_TEMPLATE_LINKING = r"""
 <sequence name="import">
   <text value="from "/><regex name="module" value="{vname}"/>
   <text value=" import "/><regex name="object" value="{vname}"
-    link-definition="imported" scope="..code-parts"/>
+    link-name="imported" scope-start="..code-parts"/>
   <use ref="..nl"/>
 </sequence>
 <regex name="nl" value="\s"/>
@@ -213,7 +213,7 @@ TEST_TEMPLATE_LINKING = r"""
     <regex name="reference" value="{vname}"/>
     <text value="("/>
     <regex name="argument" value="{vname}|{number}" 
-        optional="true" link-from="imported"/>
+        optional="true" refers-to-link="imported"/>
     <sequence multi="true" optional="true">
         <regex name="separator" value="\s*,\s*"/>
         <use ref="..argument" optional="false"/>
@@ -230,7 +230,7 @@ TEST_TEMPLATE_FUNCTION = r"""
 <event name="print-message" alias="func">
     print("hello")
 </event>
-<sequence event=".print-message">
+<sequence execute-1=".print-message">
 <text value="say"/><regex value="{string|vname|number}" name="value"/>
 </sequence>
 </sequence>

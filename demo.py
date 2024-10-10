@@ -1,5 +1,5 @@
 from fenv.shell import FenvShell
-from flang.parsers.flang_xml_parser import FlangXMLParser
+from flang.parsers.xml import FlangXMLParser
 
 TEST_TEMPLATE = r"""
 <component name="import">
