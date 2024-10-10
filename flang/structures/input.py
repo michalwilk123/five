@@ -6,7 +6,7 @@ import io
 import pathlib
 import re
 
-from .spec_deprecated import FlangTextMatchObject
+from .spec import UserASTTextNode
 
 
 class IntermediateFileObject:
@@ -109,11 +109,13 @@ class FlangTextInputReader(BaseFlangInputReader):
         warnings.warn("NOT IMPLEMENTED!")
         return 0
 
-    def consume_data(self, data: FlangTextMatchObject) -> None:
+    def consume_data(self, data: UserASTTextNode) -> None:
         if sanity_check:
-            consumed_data = self.read(len(data))
-            assert consumed_data == data.get_raw_content()
-        self._cursor += len(data)
+            consumed_data = self.read(data.size())
+            assert consumed_data == data.get_raw_content(), "{} {}".format(
+                consumed_data, data.get_raw_content()
+            )
+        self._cursor += data.size()
 
     def copy(self) -> FlangTextInputReader:
         return FlangTextInputReader(self._data, cursor=self._cursor, previous=self)

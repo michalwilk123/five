@@ -1,1 +1,1 @@
-from ..core import FlangProjectAnalyzer
+# from ..core import UserGeneratedAnalyzer

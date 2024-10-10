@@ -1,32 +1,26 @@
 import unittest
 
-from flang.handlers import FlangProjectAnalyzer
-from flang.parsers import FlangXMLParser
-from flang.runtime import ProjectParsingRuntime
-from flang.structures import RootFlangMatchObject
+from flang.core import InteractiveFlangObject
+from flang.parsers.xml import parse_text
+from flang.structures import BaseUserAST, FlangAST
 from flang.utils.exceptions import MatchNotFoundError, TextNotParsedError
 
 from . import templates as tpl
 
 
 class ParserTestCase(unittest.TestCase):
-    def setUp(self) -> None:
-        self.parser = FlangXMLParser()
-
     def _parse_template(
         self, template: str, sample: str, file: bool = False
-    ) -> tuple[ProjectParsingRuntime, RootFlangMatchObject]:
-        project_construct = self.parser.parse_text(template, validate_attributes=True)
-        processor = FlangProjectAnalyzer(project_construct)
+    ) -> InteractiveFlangObject:
+        flang_ast = parse_text(template, validate_attributes=True)
+        builder = (
+            InteractiveFlangObject.from_filename
+            if file
+            else InteractiveFlangObject.from_string
+        )
+        interactive_object = builder(flang_ast, sample)
 
-        if file:
-            match_object = processor.forward_filename(sample)
-        else:
-            match_object = processor.forward_string(sample)
-
-        assert match_object is not None
-
-        return processor, match_object
+        return interactive_object
 
     def test_basic(self):
         self._parse_template(tpl.TEST_BASIC_TEMPLATE, tpl.TEST_BASIC_SAMPLE)
@@ -40,18 +34,22 @@ class ParserTestCase(unittest.TestCase):
             self._parse_template(tpl.TEST_BASIC_TEMPLATE, tpl.TEST_BASIC_SAMPLE_FAILURE_2)
 
     def test_choice(self):
-        processor, match_object = self._parse_template(tpl.TEST_TEMPLATE_CHOICE, "AAA")
-        match_object = match_object.first_child.first_child
+        interactive_object = self._parse_template(tpl.TEST_TEMPLATE_CHOICE, "AAA")
+        user_ast_node: BaseUserAST = interactive_object.user_ast.first_child.first_child
 
-        constr = processor.project_construct.get_construct_from_spec(match_object)
-        self.assertEqual(constr.name, "text")
-
-        processor, match_object = self._parse_template(
-            tpl.TEST_TEMPLATE_CHOICE, "SOMEVALUE"
+        flang_ast_node: FlangAST = interactive_object.flang_ast.full_search(
+            user_ast_node.flang_ast_path
         )
-        match_object = match_object.first_child.first_child
-        constr = processor.project_construct.get_construct_from_spec(match_object)
-        self.assertEqual(constr.name, "regex")
+        self.assertEqual(flang_ast_node.type, "text")
+
+        interactive_object = self._parse_template(tpl.TEST_TEMPLATE_CHOICE, "SOMEVALUE")
+        interactive_object = self._parse_template(tpl.TEST_TEMPLATE_CHOICE, "AAA")
+        user_ast_node: BaseUserAST = interactive_object.user_ast.first_child.first_child
+
+        flang_ast_node: FlangAST = interactive_object.flang_ast.full_search(
+            user_ast_node.flang_ast_path
+        )
+        self.assertEqual(flang_ast_node.type, "text")
 
     def test_choice_nested(self):
         self._parse_template(

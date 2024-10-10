@@ -1,6 +1,6 @@
-from flang.utils.exceptions import UnknownConstructError
+from flang.utils.exceptions import UnknownFlangNodeError
 
-visible_construct_attributes = ["visible", "execute-[0-9]+"]
+visible_construct_attributes = ["hidden", "execute-[0-9]+"]
 naming_attributes = ["name", "alias"]
 cardinality_attributes = ["optional", "multi"]
 linking_syntax = ["link-name", "refers-to-link", "scope-start", "scope-end", "hoisting"]
@@ -39,4 +39,4 @@ def get_possible_construct_attributes(construct_name: str):
                 + ["value", "ref"]
             )
 
-    raise UnknownConstructError
+    raise UnknownFlangNodeError

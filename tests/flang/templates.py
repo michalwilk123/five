@@ -131,7 +131,7 @@ TEST_TEMPLATE_CHOICE_AND_MULTI = r"""
 
 TEST_TEMPLATE_USE = """
 <sequence name="import">
-<sequence name="foo" visible="false">
+<sequence name="foo" hidden="true">
 <text>foo</text>
 </sequence>
 <sequence name="bar">

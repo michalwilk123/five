@@ -39,7 +39,7 @@ tree_dict = {
                                             "name": "C3",
                                             "children": [
                                                 {"name": "C4", "children": None},
-                                                {"name": "C6", "children": None},
+                                                {"name": "C5", "children": None},
                                                 {"name": "C6", "children": None},
                                             ],
                                         }
@@ -121,7 +121,7 @@ class SearchableTreeTestCase(unittest.TestCase):
         for path in set(it for it, _ in self.TEST_TREE_NODE_ARRAY):
             parent = tree.full_search(path)
             node = SearchableTree(name="NEW_NODE")
-            tree.add_node(node, allow_duplicates=False, parent=parent)
+            parent.add_node(node, allow_duplicates=False)
 
         for path in set(it for it, _ in self.TEST_TREE_NODE_ARRAY):
             self.assertIsNotNone(tree.full_search(f"{path}{tree.path_separator}NEW_NODE"))
@@ -130,16 +130,29 @@ class SearchableTreeTestCase(unittest.TestCase):
         tree = SimpleTree.from_dict(tree_dict)
         node = tree.full_search("A.B.C.C1")
 
-        self.assertIsNotNone(node.search_down("A.B.C.C1"))
-        self.assertIsNotNone(node.search_down("A.B.C.C1.C2"))
-        self.assertIsNotNone(node.search_down("A.B.C.C1.C2.C3"))
-        self.assertIsNotNone(node.search_down("A.B.C.C1.C2.C3.C6"))
+        self.assertIsNotNone(node.search_down("C2"))
+        self.assertIsNotNone(node.search_down("C2.C3"))
+        self.assertIsNotNone(node.search_down("C2.C3.C6"))
 
-        self.assertIsNone(node.search_down("A.B.C"))
-        self.assertIsNone(node.search_down("A.B"))
-        self.assertIsNone(node.search_down("wrong_path"))
+        self.assertIsNone(node.search_down_full_path("A.B.C"))
+        self.assertIsNone(node.search_down_full_path("wrong_path"))
 
-    def test_relative_path(self): ...
+    def test_relative_search(self):
+        tree = SimpleTree.from_dict(tree_dict)
+
+        node = tree.full_search("A.B.C.C1.C2.C3.C4")
+        needle = node.relative_search(".C5")
+        self.assertIsNotNone(needle)
+        self.assertEqual(needle.name, "C5")
+
+        node = tree.full_search("A.E.G")
+        needle = node.relative_search("..B.D")
+        self.assertIsNotNone(needle)
+        self.assertEqual(needle.name, "D")
+
+        needle = node.relative_search("..B.C.C1.C2.C3.C6")
+        self.assertIsNotNone(needle)
+        self.assertEqual(needle.name, "C6")
 
     def test_adding_nodes_duplicates(self):
         tree = SimpleTree.from_dict(tree_dict)
@@ -148,7 +161,7 @@ class SearchableTreeTestCase(unittest.TestCase):
 
         for _ in range(3):
             new_node = SimpleTree(name="Duplicate")
-            node.add_node(new_node, parent=node)
+            node.add_node(new_node)
 
         self.assertEqual(start_size, 3)
 
@@ -161,7 +174,7 @@ class SearchableTreeTestCase(unittest.TestCase):
 
         with self.assertRaises(ExactSameNodeInsertionError):
             for _ in range(2):
-                node.add_node(new_node, parent=node)
+                node.add_node(new_node)
 
     def test_should_throw_error_when_duplicate_not_allowed(self):
         tree = SimpleTree.from_dict(tree_dict)
@@ -172,4 +185,4 @@ class SearchableTreeTestCase(unittest.TestCase):
         with self.assertRaises(DuplicateNodeInsertionError):
             for _ in range(2):
                 new_node = SimpleTree(name="Duplicate")
-                node.add_node(new_node, parent=node, allow_duplicates=False)
+                node.add_node(new_node, allow_duplicates=False)

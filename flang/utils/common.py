@@ -26,17 +26,6 @@ NAMED_BUILTIN_PATTERNS = {
     key: f"(?P<{key}>({value}))" for key, value in BUILTIN_PATTERNS.items()
 }
 
-global_emitted_functions = []
-
-
-def resolve_location_relative_path_to_absolute(relative_path, current_path):
-    path_without_dots = relative_path.lstrip(".")
-    backward_steps = len(relative_path) - len(path_without_dots)
-    target_path = ".".join(
-        current_path.split(".")[:-backward_steps] + [path_without_dots]
-    )
-    return target_path
-
 
 def interlace(*iterables):
     for items_to_yield in itertools.zip_longest(*iterables):
@@ -52,24 +41,5 @@ def convert_to_bool(value: str | bool) -> bool:
     return value.lower() in ("t", "true", "1")
 
 
-# TODO unused
-def compose(item, functions_to_apply):
-    """
-    Reverse of the `reduce` function takes an item and a iterable of
-    functions and applies them sequentially to the item and the result of each
-    function
-    """
-    return functools.reduce(
-        lambda previous_result, f: f(previous_result), functions_to_apply, item
-    )
-
-
 def kebab_to_snake_case(name: str):
     return name.replace("-", "_")
-
-
-def emit_function(name: str, args: list[str], body: str):
-    global global_emitted_functions
-
-    source = """
-    """

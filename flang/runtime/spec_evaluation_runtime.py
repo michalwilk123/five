@@ -1,12 +1,12 @@
 from collections.abc import Callable
 
 from flang.structures import (
-    FlangAbstractMatchObject,
-    FlangConstruct,
+    FlangAST,
     FlangMatchObject,
-    FlangTextMatchObject,
-    RootFlangMatchObject,
     ScopeTree,
+    UserASTAbstractNode,
+    UserASTRootNode,
+    UserASTTextNode,
 )
 from flang.utils.common import resolve_location_relative_path_to_absolute
 from flang.utils.exceptions import (
@@ -101,9 +101,7 @@ class LinkStorage:
 
 
 class SpecEvaluationRuntime:
-    def __init__(
-        self, project_runtime: ProjectParsingRuntime, spec: RootFlangMatchObject
-    ):
+    def __init__(self, project_runtime: ProjectParsingRuntime, spec: UserASTRootNode):
         self.project_runtime = project_runtime
         self.event_queue = EventQueue()
         self.scope_tree = ScopeTree(spec.identifier, parent=None)
@@ -143,7 +141,7 @@ class SpecEvaluationRuntime:
         construct = self.project_runtime.get_construct_from_spec(spec)
 
         if construct.get_attrib("link-name"):  # change to property
-            assert isinstance(spec, FlangTextMatchObject)
+            assert isinstance(spec, UserASTTextNode)
 
             link_name = construct.attributes["link-name"]
             # filename, local_path = construct.location
@@ -196,7 +194,7 @@ class SpecEvaluationRuntime:
     ):
         self._add_match_to_scope_tree(spec, link_storage.scope_tree)
 
-        if not isinstance(spec, FlangAbstractMatchObject):
+        if not isinstance(spec, UserASTAbstractNode):
             self.populate_queue(spec, link_storage)
 
         if isinstance(spec.content, list):

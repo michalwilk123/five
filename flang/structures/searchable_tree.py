@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import re
+from typing import Generic, TypeVar
 
 
 class ExactSameNodeInsertionError(Exception):
@@ -41,9 +42,7 @@ class SearchableTree:
             child.parent = self
 
     def get_(self, name: str) -> SearchableTree | None:
-        """
-        Shallow search for only current children
-        """
+        # Shallow search for only current children
         if self.children is None:
             return None
 
@@ -68,30 +67,22 @@ class SearchableTree:
 
         node = self.go_upwards(number_of_levels)
 
+        if node is None:
+            return self.full_search(stripped_path)
+
         return node.search_down(stripped_path)
 
     def go_upwards(self, number_of_steps: int) -> SearchableTree | None:
         node = self
 
         for _ in range(number_of_steps):
+            assert node is not None
             node = node.parent
 
         return node
 
-    def search_down(
-        self, path: str, allow_same_level: bool = True
-    ) -> SearchableTree | None:
-        location = self.location
-
-        if location == path:
-            return self if allow_same_level else None
-
-        if not path.startswith(location):
-            return None
-
-        path_names = path.removeprefix(location + self.path_separator).split(
-            self.path_separator
-        )
+    def search_down(self, path: str) -> SearchableTree | None:
+        path_names = path.split(self.path_separator)
         node = self
 
         for name in path_names:
@@ -102,8 +93,21 @@ class SearchableTree:
 
         return node
 
+    def search_down_full_path(
+        self, path: str, allow_same_level: bool = True
+    ) -> SearchableTree | None:
+        location = self.location
+
+        if location == path:
+            return self if allow_same_level else None
+
+        if not path.startswith(location):
+            return None
+
+        return self.search_down(path.removeprefix(location + self.path_separator))
+
     def full_search(self, path) -> SearchableTree | None:
-        return self.root.search_down(path)
+        return self.root.search_down_full_path(path)
 
     def contains(self, node_id: str, till: str | None = None): ...
 
@@ -123,11 +127,7 @@ class SearchableTree:
         self,
         node: SearchableTree,
         allow_duplicates=True,
-        parent: SearchableTree | None = None,
     ) -> SearchableTree:
-        if parent:
-            return parent.add_node(node, allow_duplicates)
-
         if not isinstance(self.children, list):
             self.children = []
 
@@ -174,7 +174,19 @@ class SearchableTree:
             if field_name in fields_to_exclude
         }
 
-    def resolve_path(path): ...
+    def resolve_path(self, target_path: str, current_path: str) -> SearchableTree | None:
+        if self.is_relative_path(target_path):
+            relative_node = self.full_search(current_path)
+            assert relative_node is not None
+
+            return relative_node.relative_search(target_path)
+        return self.full_search(target_path)
+
+    @property
+    def first_child(self) -> SearchableTree:
+        assert isinstance(self.children, list) and len(self.children) > 0
+        child = self.children[0]
+        return child
 
     def to_dict(self) -> dict:
         return dataclasses.asdict(self, dict_factory=self.dict_factory)
@@ -188,3 +200,8 @@ class SearchableTree:
             children = [cls.from_dict(child_dict) for child_dict in children]
 
         return cls(**copied_source, children=children)
+
+    def replace(self, **kwargs) -> SearchableTree:
+        new_obj = dataclasses.replace(self, **kwargs)
+        new_obj.parent = self.parent
+        return new_obj
