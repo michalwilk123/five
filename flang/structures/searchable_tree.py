@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import dataclasses
 import re
-from typing import Generic, TypeVar
+from typing import TypeVar
+
+T = TypeVar("T")
 
 
 class ExactSameNodeInsertionError(Exception):
@@ -14,9 +16,8 @@ class DuplicateNodeInsertionError(Exception):
 
 
 @dataclasses.dataclass(kw_only=True)
-class SearchableTree:
-    name: str
-    children: list[SearchableTree] | None = None
+class BasicTree:
+    children: list[BasicTree] | None = None
     path_separator: str = dataclasses.field(
         compare=False,
         repr=False,
@@ -41,7 +42,51 @@ class SearchableTree:
         for child in self.children:
             child.parent = self
 
-    def get_(self, name: str) -> SearchableTree | None:
+    @classmethod
+    def dict_factory(cls, obj):
+        fields_to_exclude = tuple(
+            field.name
+            for field in dataclasses.fields(cls)
+            if field.metadata.get("include_in_dict", True)
+        )
+
+        return {
+            field_name: field_value
+            for (field_name, field_value) in obj
+            if field_name in fields_to_exclude
+        }
+
+    @property
+    def first_child(self: T) -> T:
+        assert isinstance(self.children, list) and len(self.children) > 0
+        child = self.children[0]
+        return child
+
+    def to_dict(self) -> dict:
+        return dataclasses.asdict(self, dict_factory=self.dict_factory)
+
+    @classmethod
+    def from_dict(cls: T, source: dict) -> T:
+        copied_source = source.copy()
+
+        # could be more complicated if this would be useful
+        if isinstance(children := copied_source.pop("children", None), list):
+            children = [cls.from_dict(child_dict) for child_dict in children]
+
+        return cls(**copied_source, children=children)
+
+    def replace(self: T, **kwargs) -> T:
+        new_obj = dataclasses.replace(self, **kwargs)
+        new_obj.parent = self.parent
+        return new_obj
+
+
+@dataclasses.dataclass(kw_only=True)
+class SearchableTree(BasicTree):
+    name: str
+    children: list[SearchableTree] | None = None
+
+    def get_(self: T, name: str) -> T | None:
         # Shallow search for only current children
         if self.children is None:
             return None
@@ -55,7 +100,7 @@ class SearchableTree:
     def is_relative_path(self, path: str) -> bool:
         return path.startswith(self.path_separator)
 
-    def relative_search(self, path: str) -> SearchableTree | None:
+    def relative_search(self: T, path: str) -> T | None:
         stripped_path = path
         number_of_levels = 0
 
@@ -72,7 +117,7 @@ class SearchableTree:
 
         return node.search_down(stripped_path)
 
-    def go_upwards(self, number_of_steps: int) -> SearchableTree | None:
+    def go_upwards(self: T, number_of_steps: int) -> T | None:
         node = self
 
         for _ in range(number_of_steps):
@@ -81,7 +126,7 @@ class SearchableTree:
 
         return node
 
-    def search_down(self, path: str) -> SearchableTree | None:
+    def search_down(self: T, path: str) -> T | None:
         path_names = path.split(self.path_separator)
         node = self
 
@@ -94,8 +139,8 @@ class SearchableTree:
         return node
 
     def search_down_full_path(
-        self, path: str, allow_same_level: bool = True
-    ) -> SearchableTree | None:
+        self: T, path: str, allow_same_level: bool = True
+    ) -> T | None:
         location = self.location
 
         if location == path:
@@ -106,10 +151,8 @@ class SearchableTree:
 
         return self.search_down(path.removeprefix(location + self.path_separator))
 
-    def full_search(self, path) -> SearchableTree | None:
+    def full_search(self: T, path: str) -> T | None:
         return self.root.search_down_full_path(path)
-
-    def contains(self, node_id: str, till: str | None = None): ...
 
     @property  # should be cached property
     def location(self) -> str:
@@ -120,14 +163,14 @@ class SearchableTree:
         return f"{parent_location}{self.path_separator}{self.name}"
 
     @property
-    def root(self):
+    def root(self: T) -> T:
         return self if self.parent is None else self.parent.root
 
     def add_node(
-        self,
+        self: T,
         node: SearchableTree,
         allow_duplicates=True,
-    ) -> SearchableTree:
+    ) -> T:
         if not isinstance(self.children, list):
             self.children = []
 
@@ -160,48 +203,10 @@ class SearchableTree:
         self.children.append(node)
         return node
 
-    @classmethod
-    def dict_factory(cls, obj):
-        fields_to_exclude = tuple(
-            field.name
-            for field in dataclasses.fields(cls)
-            if field.metadata.get("include_in_dict", True)
-        )
-
-        return {
-            field_name: field_value
-            for (field_name, field_value) in obj
-            if field_name in fields_to_exclude
-        }
-
-    def resolve_path(self, target_path: str, current_path: str) -> SearchableTree | None:
+    def resolve_path(self: T, target_path: str, current_path: str) -> T | None:
         if self.is_relative_path(target_path):
             relative_node = self.full_search(current_path)
             assert relative_node is not None
 
             return relative_node.relative_search(target_path)
         return self.full_search(target_path)
-
-    @property
-    def first_child(self) -> SearchableTree:
-        assert isinstance(self.children, list) and len(self.children) > 0
-        child = self.children[0]
-        return child
-
-    def to_dict(self) -> dict:
-        return dataclasses.asdict(self, dict_factory=self.dict_factory)
-
-    @classmethod
-    def from_dict(cls, source: dict) -> SearchableTree:
-        copied_source = source.copy()
-
-        # could be more complicated if this would be useful
-        if isinstance(children := copied_source.pop("children", None), list):
-            children = [cls.from_dict(child_dict) for child_dict in children]
-
-        return cls(**copied_source, children=children)
-
-    def replace(self, **kwargs) -> SearchableTree:
-        new_obj = dataclasses.replace(self, **kwargs)
-        new_obj.parent = self.parent
-        return new_obj

@@ -3,7 +3,6 @@ from __future__ import annotations
 import dataclasses
 import pathlib
 import re
-from typing import Literal
 
 from flang.utils.common import convert_to_bool
 

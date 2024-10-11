@@ -1,4 +1,3 @@
-from flang.runtime.subparsers import parse_user_language
 from flang.structures import (
     BaseFlangInputReader,
     FlangAST,
@@ -7,6 +6,7 @@ from flang.structures import (
     IntermediateFileObject,
     UserASTRootNode,
 )
+from flang.utils.subparsers import parse_user_language
 
 
 class InteractiveFlangObject:
