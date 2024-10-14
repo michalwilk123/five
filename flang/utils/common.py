@@ -1,5 +1,7 @@
-import functools
-import itertools
+import sys
+import textwrap
+from pathlib import Path
+from typing import Callable
 
 VNAME = r"[A-Za-z]\w*"
 INTEGER = r"[0-9]|([1-9][0-9]+)"
@@ -27,13 +29,6 @@ NAMED_BUILTIN_PATTERNS = {
 }
 
 
-def interlace(*iterables):
-    for items_to_yield in itertools.zip_longest(*iterables):
-        for item in items_to_yield:
-            if item is not None:
-                yield item
-
-
 def convert_to_bool(value: str | bool) -> bool:
     if isinstance(value, bool):
         return value
@@ -41,5 +36,38 @@ def convert_to_bool(value: str | bool) -> bool:
     return value.lower() in ("t", "true", "1")
 
 
-def kebab_to_snake_case(name: str):
-    return name.replace("-", "_")
+def create_callable_from_raw_code(code: str) -> Callable:
+    namespace = {}
+    formatted_code = textwrap.dedent(code)
+    formatted_code = textwrap.indent(formatted_code, "    ")
+
+    function = f"""\
+def _generated_function(context, **kwargs):
+{formatted_code}
+"""
+
+    exec(function, namespace)
+
+    return namespace["_generated_function"]
+
+
+def create_callable_from_pathname(path: str, function: str) -> Callable:
+    path = Path(path)
+
+    assert path.exists()
+    assert path.is_file()
+
+    name_without_ext = path.stem
+    parent = path.parent
+
+    module_path = str(parent.absolute())
+    sys.path.append(module_path)
+
+    try:
+        module = __import__(name_without_ext)
+        function = getattr(module, function)
+    except AttributeError:
+        raise RuntimeError(f"No function {function} available in {path}")
+
+    sys.path.remove(module_path)
+    return function

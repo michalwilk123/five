@@ -1,10 +1,10 @@
 import dataclasses
 import unittest
 
-from flang.structures import (
+from flang.structures import SearchableTree
+from flang.utils.exceptions import (
     DuplicateNodeInsertionError,
     ExactSameNodeInsertionError,
-    SearchableTree,
 )
 
 

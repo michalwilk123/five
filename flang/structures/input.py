@@ -6,7 +6,7 @@ import io
 import pathlib
 import re
 
-from .spec import UserASTTextNode
+from .ast import UserASTTextNode
 
 
 class IntermediateFileObject:

@@ -4,15 +4,12 @@ import dataclasses
 import re
 from typing import TypeVar
 
+from flang.utils.exceptions import (
+    DuplicateNodeInsertionError,
+    ExactSameNodeInsertionError,
+)
+
 T = TypeVar("T")
-
-
-class ExactSameNodeInsertionError(Exception):
-    pass
-
-
-class DuplicateNodeInsertionError(Exception):
-    pass
 
 
 @dataclasses.dataclass(kw_only=True)
@@ -204,8 +201,10 @@ class SearchableTree(BasicTree):
         return node
 
     def resolve_path(self: T, target_path: str, current_path: str) -> T | None:
+        # TODO: Maybe should create something like `self` that translates directly to "{self.name}."
         if self.is_relative_path(target_path):
             relative_node = self.full_search(current_path)
+
             assert relative_node is not None
 
             return relative_node.relative_search(target_path)

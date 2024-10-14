@@ -1,3 +1,12 @@
+# ast tree errors
+class ExactSameNodeInsertionError(Exception):
+    pass
+
+
+class DuplicateNodeInsertionError(Exception):
+    pass
+
+
 # ast manipulation
 class TextNotParsedError(Exception): ...
 
