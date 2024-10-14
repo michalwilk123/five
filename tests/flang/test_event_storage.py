@@ -54,20 +54,20 @@ sample_events_path = "tests/flang/test_files/test_module/sample_events.py"
 class EventTestCase(unittest.TestCase):
     def test_create_event_from_text(self):
         event = Event.from_source_code(
-            "foo", 5, TEST_1_EVENT_SOURCE_CODE, {"event_name": "deletetion"}
+            "foo", TEST_1_EVENT_SOURCE_CODE, {"trigger": "deletetion"}
         )
         context = {}
         new_context = event.run(context)
         self.assertEqual(new_context["result"], "success")
 
     def test_should_deindent_code(self):
-        event = Event.from_source_code("foo", 5, TEST_2_EVENT_SOURCE_CODE)
+        event = Event.from_source_code("foo", TEST_2_EVENT_SOURCE_CODE)
         context = {}
         context = event.run(context)
         self.assertEqual(context["indent"], True)
 
     def test_create_event_from_filepath(self):
-        event = Event.from_path("foo", 5, sample_events_path, "test1")
+        event = Event.from_path("foo", sample_events_path, "test1")
 
         context = {}
         event.run(context)
@@ -77,11 +77,11 @@ class EventTestCase(unittest.TestCase):
 class EventStorageTestCase(unittest.TestCase):
     def test_event_context_persistancy(self):
         event_storage = EventStorage()
-        event = Event.from_source_code("foo", 6, TEST_6_EVENT_SOURCE_CODE)
+        event = Event.from_source_code("foo", TEST_6_EVENT_SOURCE_CODE)
 
-        event_storage.add_event("on-run", event)
-        event_storage.add_event("on-run", event)
-        event_storage.add_event("on-run", event)
+        event_storage.add_event("on-run", 5, event)
+        event_storage.add_event("on-run", 5, event)
+        event_storage.add_event("on-run", 5, event)
 
         runner = event_storage.execute_iter("on-run")
 
@@ -99,11 +99,11 @@ class EventStorageTestCase(unittest.TestCase):
 
     def test_event_execute_all(self):
         event_storage = EventStorage()
-        event = Event.from_source_code("foo", 6, TEST_6_EVENT_SOURCE_CODE)
+        event = Event.from_source_code("foo", TEST_6_EVENT_SOURCE_CODE)
 
-        event_storage.add_event("on_run", event)
-        event_storage.add_event("on_run", event)
-        event_storage.add_event("on_run", event)
+        event_storage.add_event("on_run", 5, event)
+        event_storage.add_event("on_run", 5, event)
+        event_storage.add_event("on_run", 5, event)
 
         ctx = event_storage.execute_all("on_run")
         self.assertEqual(ctx["value"], 3)

@@ -83,6 +83,12 @@ class ParserTestCase(unittest.TestCase):
     def test_linking(self):
         self._parse_template(tpl.TEST_TEMPLATE_LINKING, tpl.TEST_SAMPLE_LINKING)
 
+    def test_event(self):
+        interactive_object = self._parse_template(
+            tpl.TEST_TEMPLATE_FUNCTION_1, "say hello_world"
+        )
+        self.assertDictEqual(interactive_object.context, {"result": "hello_world"})
+
     def test_file_easy(self):
         self._parse_template(
             tpl.TEST_TEMPLATE_FILES_EASY, tpl.TEST_SAMPLE_FILES + "/easy", True

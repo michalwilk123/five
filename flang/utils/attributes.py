@@ -1,6 +1,12 @@
+import re
+
+from flang.utils.common import VNAME
 from flang.utils.exceptions import UnknownFlangNodeError
 
-visible_construct_attributes = ["hidden", "execute-[0-9]+"]
+EVENT_PRIORITY_PATTERN_STR = r"(_+\d+_)"
+EVENT_PATTERN = re.compile(f"event{EVENT_PRIORITY_PATTERN_STR}{VNAME}")
+
+visible_construct_attributes = ["hidden", EVENT_PATTERN]
 naming_attributes = ["name", "alias"]
 cardinality_attributes = ["optional", "multi"]
 linking_syntax = ["link-name", "refers-to-link", "scope-start", "scope-end", "hoisting"]

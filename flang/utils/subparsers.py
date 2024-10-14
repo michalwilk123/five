@@ -73,18 +73,11 @@ def match_on_complex_flang_ast(
 
         case "event":
             # TODO: <--- TUTAJ SKONCZYLES
-            # name = flang_ast.get_attrib("name", None) or create_unique_symbol(
-            #     "_flang_function"
-            # )
-            name = flang_ast.get_attrib("name", "dsajndkjasnkjd")
-            args = flang_ast.get_attrib("args", "").split(",")
-            body = flang_ast.text
-            # emit_function(name, args, body)
-            # # TODO
             raise NotImplementedError
         case "module":
             # NOTE: This represents a simple container of all nodes inside this node. This is
             # used mainly for modules and imports. By default it is hidden
+            # This is "sequence" that is hidden by default
             raise NotImplementedError
         case "use":
             target_location = flang_ast.get_attrib("ref")
@@ -234,7 +227,7 @@ def match_flang_flang_ast(
     flang_ast: FlangAST,
     reader: BaseFlangInputReader,
 ) -> tuple[list[BaseUserAST], BaseFlangInputReader]:
-    if flang_ast.get_bool_attrib("hidden"):
+    if flang_ast.get_bool_attrib("hidden") or flang_ast.type in ["event"]:
         return [], reader
 
     reader = reader.copy()

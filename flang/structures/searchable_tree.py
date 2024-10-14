@@ -97,7 +97,7 @@ class SearchableTree(BasicTree):
     def is_relative_path(self, path: str) -> bool:
         return path.startswith(self.path_separator)
 
-    def relative_search(self: T, path: str) -> T | None:
+    def translate_relative_path(self: T, path: str) -> str:
         stripped_path = path
         number_of_levels = 0
 
@@ -110,9 +110,15 @@ class SearchableTree(BasicTree):
         node = self.go_upwards(number_of_levels)
 
         if node is None:
-            return self.full_search(stripped_path)
+            return stripped_path
 
-        return node.search_down(stripped_path)
+        return node.location + self.path_separator + stripped_path
+
+    def relative_search(self: T, path: str) -> T | None:
+        translated = self.translate_relative_path(path)
+        assert translated is not None
+
+        return self.full_search(translated)
 
     def go_upwards(self: T, number_of_steps: int) -> T | None:
         node = self

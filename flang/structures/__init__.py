@@ -1,6 +1,7 @@
 from .ast import (
     BaseUserAST,
     FlangAST,
+    UserASTAbstractNode,
     UserASTFileMixin,
     UserASTRootNode,
     UserASTTextNode,
@@ -30,4 +31,5 @@ __all__ = [
     "SearchableTree",
     "Event",
     "EventStorage",
+    "UserASTAbstractNode",
 ]

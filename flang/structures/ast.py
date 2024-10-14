@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import dataclasses
 import pathlib
-import re
 
 from flang.utils.common import convert_to_bool
 
@@ -29,15 +28,7 @@ class BaseUserAST(SearchableTree):
     def get_raw_content(self) -> str | list[str]:
         raise NotImplementedError
 
-    @staticmethod
-    def get_flang_ast_name_from_spec_name(identifier: str) -> str:
-        return re.sub(r"\[\d+\]$", "", identifier)
-
-    @property
-    def flang_ast_name(self) -> str:
-        return self.get_flang_ast_name_from_spec_name(self.identifier)
-
-    def size(self):
+    def size(self) -> int:
         raise NotImplementedError
 
 

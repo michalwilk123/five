@@ -1,3 +1,5 @@
+import enum
+
 from flang.structures import (
     BaseFlangInputReader,
     FlangAST,
@@ -6,9 +8,14 @@ from flang.structures import (
     IntermediateFileObject,
     UserASTRootNode,
 )
+from flang.utils.evaluation import create_event_store, create_events_from_flang_ast
 from flang.utils.subparsers import parse_user_language
 
-# from flang.utils.evaluation import
+
+class BuiltinEvent(enum.Enum):
+    ON_READ = "read"
+    ON_DELETE = "delete"
+    ON_MODIFY = "modify"
 
 
 class InteractiveFlangObject:
@@ -16,14 +23,19 @@ class InteractiveFlangObject:
         self.flang_ast = flang_ast
         self.user_ast = user_ast
 
+        # evaluate here
+        self.event_storage = create_event_store(user_ast, flang_ast)
+        self.context = {}
+        context = self.event_storage.execute_all(BuiltinEvent.ON_READ.value)
+        self.context.update(context)
+
     @staticmethod
     def evaluate_user_language(
         flang_ast: FlangAST, reader: BaseFlangInputReader
     ) -> UserASTRootNode:
-        match_objects = parse_user_language(flang_ast, reader)
+        user_ast = parse_user_language(flang_ast, reader)
 
-        # evaluate here
-        return match_objects
+        return user_ast
 
     @classmethod
     def from_string(cls, flang_ast: FlangAST, sample: str):

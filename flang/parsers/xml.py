@@ -1,3 +1,4 @@
+import re
 import xml.etree.ElementTree as ET
 
 from flang.structures import FlangAST
@@ -13,9 +14,22 @@ def validate_attributes_for_xml_element(
     element: ET.Element,
 ):
     possible_attributes = get_possible_construct_attributes(element.tag)
-    not_validated_attributes = [
-        key for key in element.attrib if key not in possible_attributes
-    ]
+    not_validated_attributes = []
+
+    for key in element.attrib:
+        correct = False
+
+        for attr in possible_attributes:
+            if isinstance(attr, re.Pattern) and attr.match(key):
+                correct = True
+                break
+            elif attr == key:
+                correct = True
+                break
+
+        if not correct:
+            not_validated_attributes.append(key)
+
     if not_validated_attributes:
         raise UnknownAttributeException(
             "Construct: {} has unknown attributes: {}".format(

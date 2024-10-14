@@ -15,6 +15,7 @@ XML_SINGLE_TAG = rf"<{VNAME}(\s*{XML_ATTR})*\s*/>"
 
 BUILTIN_PATTERNS = {
     "vname": VNAME,
+    "integer": INTEGER,
     "number": NUMBER,
     "string": STRING,
     "c_function_call": C_FUNCTION_CALL,
