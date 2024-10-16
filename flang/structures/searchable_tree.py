@@ -2,19 +2,17 @@ from __future__ import annotations
 
 import dataclasses
 import re
-from typing import Any, TypeVar
+from typing import Any, Self
 
 from flang.utils.exceptions import (
     DuplicateNodeInsertionError,
     ExactSameNodeInsertionError,
 )
 
-T = TypeVar("T")
-
 
 @dataclasses.dataclass(kw_only=True)
 class BasicTree:
-    children: list[BasicTree] | None = None
+    children: list[type[BasicTree]] | None = None
     path_separator: str = dataclasses.field(
         compare=False,
         repr=False,
@@ -37,7 +35,7 @@ class BasicTree:
             return
 
         for child in self.children:
-            child.parent = self
+            child.parent = self  # type: ignore
 
     @classmethod
     def _get_fields_to_exclude(cls):
@@ -56,7 +54,7 @@ class BasicTree:
         }
 
     @property
-    def first_child(self: T) -> T:
+    def first_child(self) -> type[BasicTree]:
         assert isinstance(self.children, list) and len(self.children) > 0
         child = self.children[0]
         return child
@@ -64,12 +62,12 @@ class BasicTree:
     def to_dict(self) -> dict:
         return dataclasses.asdict(self, dict_factory=self.dict_factory)
 
-    def to_shallow_dict(self) -> dict[str]:
+    def to_shallow_dict(self) -> dict[str, Any]:
         tuple_obj = [(f.name, getattr(self, f.name)) for f in dataclasses.fields(self)]
         return self.dict_factory(tuple_obj)
 
     @classmethod
-    def from_dict(cls: T, source: dict) -> T:
+    def from_dict(cls, source: dict):
         copied_source = source.copy()
 
         # could be more complicated if this would be useful
@@ -78,7 +76,7 @@ class BasicTree:
 
         return cls(**copied_source, children=children)
 
-    def replace(self: T, **kwargs) -> T:
+    def replace(self, **kwargs):
         new_obj = dataclasses.replace(self, **kwargs)
         new_obj.parent = self.parent
         return new_obj
@@ -87,9 +85,9 @@ class BasicTree:
 @dataclasses.dataclass(kw_only=True)
 class SearchableTree(BasicTree):
     name: str
-    children: list[SearchableTree] | None = None
+    children: list[type[SearchableTree]] | None = None
 
-    def get_(self: T, name: str) -> T | None:
+    def get_(self, name: str) -> type[SearchableTree] | None:
         # Shallow search for only current children
         if self.children is None:
             return None
@@ -103,7 +101,7 @@ class SearchableTree(BasicTree):
     def is_relative_path(self, path: str) -> bool:
         return path.startswith(self.path_separator)
 
-    def translate_relative_path(self: T, path: str) -> str:
+    def translate_relative_path(self, path: str) -> str:
         stripped_path = path
         number_of_levels = 0
 
@@ -120,13 +118,13 @@ class SearchableTree(BasicTree):
 
         return node.location + self.path_separator + stripped_path
 
-    def relative_search(self: T, path: str) -> T | None:
+    def relative_search(self, path: str) -> type[SearchableTree] | None:
         translated = self.translate_relative_path(path)
         assert translated is not None
 
         return self.full_search(translated)
 
-    def go_upwards(self: T, number_of_steps: int) -> T | None:
+    def go_upwards(self, number_of_steps: int) -> SearchableTree | None:
         node = self
 
         for _ in range(number_of_steps):
@@ -135,12 +133,12 @@ class SearchableTree(BasicTree):
 
         return node
 
-    def search_down(self: T, path: str) -> T | None:
+    def search_down(self, path: str) -> type[SearchableTree] | None:
         path_names = path.split(self.path_separator)
         node = self
 
         for name in path_names:
-            node = node.get_(name)
+            poo = node.get_(name)
 
             if node is None:
                 return None
@@ -148,8 +146,8 @@ class SearchableTree(BasicTree):
         return node
 
     def search_down_full_path(
-        self: T, path: str, allow_same_level: bool = True
-    ) -> T | None:
+        self, path: str, allow_same_level: bool = True
+    ) -> type[SearchableTree] | None:
         location = self.location
 
         if location == path:
@@ -160,7 +158,7 @@ class SearchableTree(BasicTree):
 
         return self.search_down(path.removeprefix(location + self.path_separator))
 
-    def full_search(self: T, path: str) -> T | None:
+    def full_search(self, path: str) -> type[SearchableTree] | None:
         return self.root.search_down_full_path(path)
 
     @property  # should be cached property
@@ -172,14 +170,14 @@ class SearchableTree(BasicTree):
         return f"{parent_location}{self.path_separator}{self.name}"
 
     @property
-    def root(self: T) -> T:
+    def root(self) -> SearchableTree:
         return self if self.parent is None else self.parent.root
 
     def add_node(
-        self: T,
-        node: SearchableTree,
+        self,
+        node: type[SearchableTree],
         allow_duplicates=True,
-    ) -> T:
+    ) -> SearchableTree:
         if not isinstance(self.children, list):
             self.children = []
 
@@ -212,7 +210,9 @@ class SearchableTree(BasicTree):
         self.children.append(node)
         return node
 
-    def resolve_path(self: T, target_path: str, current_path: str) -> T | None:
+    def resolve_path(
+        self, target_path: str, current_path: str
+    ) -> type[SearchableTree] | None:
         # TODO: Maybe should create something like `self` that translates directly to "{self.name}."
         if self.is_relative_path(target_path):
             relative_node = self.full_search(current_path)
