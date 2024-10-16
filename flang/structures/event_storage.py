@@ -1,4 +1,6 @@
 import dataclasses
+from collections import namedtuple
+from copy import copy
 from typing import Callable, TypeVar
 
 from flang.utils.common import (
@@ -12,7 +14,7 @@ T = TypeVar("T")
 @dataclasses.dataclass
 class Event:
     location: str
-    callback: Callable
+    callback: Callable = dataclasses.field(repr=False)
     kwargs: dict = dataclasses.field(default_factory=dict)
 
     @classmethod
@@ -41,27 +43,44 @@ class Event:
     def run(self, context: dict):
         return self.callback(context, **self.kwargs)
 
-    def replace_attributes(self: T, attrs) -> T:
-        # TODO: finish this
-        ...
+
+AnnotatedEvent = namedtuple("AnnotatedEvent", "event trigger priority")
 
 
 @dataclasses.dataclass
 class EventStorage:
-    storage: list[Event] = dataclasses.field(default_factory=list, init=False)
+    storage: list[AnnotatedEvent] = dataclasses.field(default_factory=list, init=False)
 
-    def add_event(self, trigger: str, priority: int, event: Event):
-        event.kwargs["trigger"] = trigger
+    def add_event(
+        self,
+        trigger: str,
+        priority: int,
+        event: Event,
+        additional_event_kwargs: dict | None = None,
+    ):
+        additional_event_kwargs = additional_event_kwargs or {}
+        event = copy(event)
+        event.kwargs = {
+            **event.kwargs,
+            **additional_event_kwargs,
+        }
 
         # NOTE: should be using bisect.insort / bisect.bisect
-        self.storage.append(event)
+        self.storage.append(
+            AnnotatedEvent(event=event, trigger=trigger, priority=priority)
+        )
 
     def execute_iter(self, trigger: str):
+        prepared_events = sorted(
+            (event for event in self.storage if event.trigger == trigger),
+            key=lambda it: it.priority,
+            reverse=True,
+        )
         context = {}
 
-        for event in (e for e in self.storage if e.kwargs["trigger"] == trigger):
-            # NOTE: I plan that event(ctx) would be pure so the result should matter
-            result = event.run(context)
+        for item in prepared_events:
+            context = {**context}
+            result = item.event.run(context)
 
             if result is not None:
                 context = result

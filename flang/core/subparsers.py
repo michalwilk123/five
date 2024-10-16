@@ -1,4 +1,3 @@
-import dataclasses
 import re
 
 from flang.structures import BaseFlangInputReader, BaseUserAST, FlangAST
@@ -227,6 +226,9 @@ def match_flang_flang_ast(
     flang_ast: FlangAST,
     reader: BaseFlangInputReader,
 ) -> tuple[list[BaseUserAST], BaseFlangInputReader]:
+    if alias_name := flang_ast.get_attrib("alias"):
+        flang_ast.create_alias(alias_name)
+
     if flang_ast.get_bool_attrib("hidden") or flang_ast.type in ["event"]:
         return [], reader
 

@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import dataclasses
 import pathlib
+from typing import TypeVar
 
 from flang.utils.common import convert_to_bool
 
 from .searchable_tree import SearchableTree
+
+T = TypeVar("T")
 
 
 @dataclasses.dataclass
@@ -19,6 +22,25 @@ class FlangAST(SearchableTree):
 
     def get_bool_attrib(self, key: str, default=False):
         return convert_to_bool(self.attributes.get(key, default))
+
+    def create_alias(self, alias_name: str) -> None:
+        self.root._root_create_alias(alias_name, self.location)
+
+    def _root_create_alias(self, alias_name: str, location: str) -> None:
+        if not hasattr(self, "_meta"):
+            self._meta: dict[str, str] = {}
+
+        self._meta[alias_name] = location
+
+    def normalize_path(self: T, target_path: str) -> str:
+        if target_path.startswith("@"):
+            alias_name = target_path.removeprefix("@")
+            return self.root._meta[alias_name]
+
+        if self.is_relative_path(target_path):
+            return self.translate_relative_path(target_path)
+
+        return target_path
 
 
 @dataclasses.dataclass
@@ -46,6 +68,10 @@ class UserASTComplexMixin:
 
     def get_raw_content(self) -> str:
         return "".join(it.get_raw_content() for it in self.children)
+
+    @property
+    def shallow_dict(self) -> dict[str]:
+        raise NotImplementedError
 
 
 @dataclasses.dataclass

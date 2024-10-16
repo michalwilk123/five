@@ -227,11 +227,11 @@ TEST_TEMPLATE_LINKING = r"""
 
 TEST_TEMPLATE_FUNCTION_1 = r"""
 <sequence multi="true">
-<event name="print-message">
-    context["result"] = "hello_world"
+<event name="add-message">
+    context["result"] = kwargs["local_content"]
 </event>
 <sequence>
-<text value="say "/><regex event_5_read="..print-message" value="{string}|{vname}|{number}" name="value"/>
+<text value="say "/><regex event_5_read="..add-message" value="{string}|{vname}|{number}" name="value"/>
 </sequence>
 </sequence>
 """
@@ -239,8 +239,24 @@ TEST_TEMPLATE_FUNCTION_1 = r"""
 TEST_TEMPLATE_FUNCTION_2 = r"""
 <sequence>
 <event alias="func" source="tests/flang/test_files/test_module/sample_events.py:event2"/>
-<sequence execute-1=".print-message">
-<text value="say"/><regex value="{string|vname|number}" name="value"/>
+<sequence>
+<text value="say "/><regex value="{string}|{vname}|{number}" name="value" event_10_read="@func"/>
+</sequence>
+</sequence>
+"""
+
+TEST_TEMPLATE_FUNCTION_3 = r"""
+<sequence>
+<event alias="func">
+    if "executed" not in context:
+        context["message"] = kwargs["local_content"]
+    else:
+        context["message"] = kwargs["local_content"]
+</event>
+<sequence>
+<regex value="{vname}" event_5_read="@func" name="value1"/>
+<text value=" "/>
+<regex value="{vname}" event_10_read="@func" name="value2"/>
 </sequence>
 </sequence>
 """

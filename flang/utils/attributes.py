@@ -28,7 +28,7 @@ def get_possible_construct_attributes(construct_name: str):
                 + ["value"]
             )
         case "event":
-            return naming_attributes
+            return naming_attributes + ["source"]
         case "file":
             return (
                 naming_attributes

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import re
-from typing import TypeVar
+from typing import Any, TypeVar
 
 from flang.utils.exceptions import (
     DuplicateNodeInsertionError,
@@ -22,7 +22,7 @@ class BasicTree:
         default=".",
         metadata={"include_in_dict": False},
     )
-    index_for_duplicates_container: str = dataclasses.field(
+    pattern_for_duplicate_node: str = dataclasses.field(
         compare=False,
         repr=False,
         init=False,
@@ -40,17 +40,19 @@ class BasicTree:
             child.parent = self
 
     @classmethod
-    def dict_factory(cls, obj):
-        fields_to_exclude = tuple(
+    def _get_fields_to_exclude(cls):
+        return tuple(
             field.name
             for field in dataclasses.fields(cls)
             if field.metadata.get("include_in_dict", True)
         )
 
+    @classmethod
+    def dict_factory(cls, obj: list[tuple[str, Any]]) -> dict:
         return {
             field_name: field_value
             for (field_name, field_value) in obj
-            if field_name in fields_to_exclude
+            if field_name in cls._get_fields_to_exclude()
         }
 
     @property
@@ -61,6 +63,10 @@ class BasicTree:
 
     def to_dict(self) -> dict:
         return dataclasses.asdict(self, dict_factory=self.dict_factory)
+
+    def to_shallow_dict(self) -> dict[str]:
+        tuple_obj = [(f.name, getattr(self, f.name)) for f in dataclasses.fields(self)]
+        return self.dict_factory(tuple_obj)
 
     @classmethod
     def from_dict(cls: T, source: dict) -> T:
@@ -185,7 +191,7 @@ class SearchableTree(BasicTree):
             if duplicate is node:
                 raise ExactSameNodeInsertionError
 
-            pattern = node.index_for_duplicates_container.format(r"\d")
+            pattern = node.pattern_for_duplicate_node.format(r"\d")
             duplicates = filter(
                 lambda el: el.name.startswith(node.name) and node.name != el.name,
                 self.children,
@@ -199,7 +205,7 @@ class SearchableTree(BasicTree):
             )
 
             most_recent_duplicate_index += 1
-            updated_name = f"{node.name}{node.index_for_duplicates_container.format(most_recent_duplicate_index)}"
+            updated_name = f"{node.name}{node.pattern_for_duplicate_node.format(most_recent_duplicate_index)}"
             node.name = updated_name
 
         node.parent = self
@@ -210,7 +216,6 @@ class SearchableTree(BasicTree):
         # TODO: Maybe should create something like `self` that translates directly to "{self.name}."
         if self.is_relative_path(target_path):
             relative_node = self.full_search(current_path)
-
             assert relative_node is not None
 
             return relative_node.relative_search(target_path)

@@ -1,6 +1,6 @@
 import unittest
 
-from flang.core import InteractiveFlangObject
+from flang.interactive_flang_object import BuiltinEvent, InteractiveFlangObject
 from flang.parsers.xml import parse_text
 from flang.structures import BaseUserAST, FlangAST
 from flang.utils.exceptions import MatchNotFoundError, TextNotParsedError
@@ -88,6 +88,26 @@ class ParserTestCase(unittest.TestCase):
             tpl.TEST_TEMPLATE_FUNCTION_1, "say hello_world"
         )
         self.assertDictEqual(interactive_object.context, {"result": "hello_world"})
+
+    def test_event_remote_with_alias(self):
+        interactive_object = self._parse_template(
+            tpl.TEST_TEMPLATE_FUNCTION_2, "say witaj_swiecie"
+        )
+        self.assertDictEqual(interactive_object.context, {"result": "witaj_swiecie1"})
+
+    def test_multiple_events_priorities(self):
+        interactive_object = self._parse_template(
+            tpl.TEST_TEMPLATE_FUNCTION_3, "second first"
+        )
+
+        contexts = [
+            ctx
+            for ctx in iter(
+                interactive_object.event_storage.execute_iter(BuiltinEvent.ON_READ.value)
+            )
+        ]
+        self.assertDictEqual(contexts[0], {"message": "first"})
+        self.assertDictEqual(contexts[1], {"message": "second"})
 
     def test_file_easy(self):
         self._parse_template(

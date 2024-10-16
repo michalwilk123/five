@@ -1,5 +1,7 @@
 import enum
 
+from flang.core.evaluation import create_event_store
+from flang.core.subparsers import parse_user_language
 from flang.structures import (
     BaseFlangInputReader,
     FlangAST,
@@ -8,8 +10,6 @@ from flang.structures import (
     IntermediateFileObject,
     UserASTRootNode,
 )
-from flang.utils.evaluation import create_event_store, create_events_from_flang_ast
-from flang.utils.subparsers import parse_user_language
 
 
 class BuiltinEvent(enum.Enum):
