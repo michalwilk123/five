@@ -1,18 +1,18 @@
-from flang.runtime import FlangConstruct, ProjectParsingRuntime
+from flang.runtime import ProjectParsingRuntime
+from flang.structures import FlangAST
 from flang.utils.common import convert_to_bool
 
 
 class FenvShell:
-    def __init__(
-        self, flang_object: ProjectParsingRuntime, root: FlangConstruct | None = None
-    ) -> None:
-        self.root = root or flang_object.root_construct
-        self.flang_object = flang_object
+    def __init__(self, flang_ast: FlangAST | None = None) -> None:
+        self.flang_ast = flang_ast
+        # self.root = root or flang_object.root_construct
+        # self.flang_object = flang_object
 
     def start(self):
-        return self.create(self.root)
+        return self.create(self.flang_ast)
 
-    def create(self, construct: FlangConstruct):
+    def create(self, construct: FlangAST):
         match construct.name:
             case "component":
                 text = ""

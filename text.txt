@@ -22,3 +22,6 @@ choice
 sequence
 regex
 text
+
+# syntax for events:
+<regex name="sth" value="{vname}" event_5_on-delete="@some_lib/func"/>

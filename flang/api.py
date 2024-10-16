@@ -1,11 +1,11 @@
 from types import SimpleNamespace
 
-from flang.structures import FlangConstruct
+from flang.structures import FlangAST
 from flang.utils.attributes import get_possible_construct_attributes
 from flang.utils.common import kebab_to_snake_case
 
 
-def build_construct_api(construct: FlangConstruct) -> object:
+def build_construct_api(construct: FlangAST) -> object:
     callable_items = ["text", "location", "name", "children"]
 
     api_object = SimpleNamespace(
