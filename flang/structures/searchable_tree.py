@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import re
-from typing import Any, Self
+from typing import Any, Self, cast
 
 from flang.utils.exceptions import (
     DuplicateNodeInsertionError,
@@ -84,17 +84,17 @@ class BasicTree:
 
 @dataclasses.dataclass(kw_only=True)
 class SearchableTree(BasicTree):
-    name: str
     children: list[type[SearchableTree]] | None = None
+    name: str
 
-    def get_(self, name: str) -> type[SearchableTree] | None:
+    def get_(self, name: str) -> Self | None:
         # Shallow search for only current children
         if self.children is None:
             return None
 
         for child in self.children:
             if child.name == name:
-                return child
+                return cast(Self, child)
 
         return None
 
@@ -133,21 +133,19 @@ class SearchableTree(BasicTree):
 
         return node
 
-    def search_down(self, path: str) -> type[SearchableTree] | None:
+    def search_down(self, path: str) -> Self | None:
         path_names = path.split(self.path_separator)
         node = self
 
         for name in path_names:
-            poo = node.get_(name)
-
-            if node is None:
+            if not (node := cast(Self, node.get_(name))):
                 return None
 
         return node
 
     def search_down_full_path(
         self, path: str, allow_same_level: bool = True
-    ) -> type[SearchableTree] | None:
+    ) -> Self | None:
         location = self.location
 
         if location == path:
@@ -158,8 +156,8 @@ class SearchableTree(BasicTree):
 
         return self.search_down(path.removeprefix(location + self.path_separator))
 
-    def full_search(self, path: str) -> type[SearchableTree] | None:
-        return self.root.search_down_full_path(path)
+    def full_search(self, path: str) -> Self | None:
+        return cast(Self | None, self.root.search_down_full_path(path))
 
     @property  # should be cached property
     def location(self) -> str:
@@ -178,7 +176,7 @@ class SearchableTree(BasicTree):
         node: type[SearchableTree],
         allow_duplicates=True,
     ) -> SearchableTree:
-        if not isinstance(self.children, list):
+        if self.children is None:
             self.children = []
 
         duplicate = self.get_(node.name)
