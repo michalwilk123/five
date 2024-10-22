@@ -1,35 +1,47 @@
 from .ast import (
     BaseUserAST,
     FlangAST,
-    UserASTAbstractNode,
+    UserASTComplexNode,
+    UserASTDirectoryNode,
     UserASTFileMixin,
+    UserASTFlatFileNode,
+    UserASTRootContainerNode,
     UserASTRootNode,
     UserASTTextNode,
 )
 from .event_storage import Event, EventStorage
 from .events import ScopeTree
 from .input import (
-    BaseFlangInputReader,
     FlangFileInputReader,
     FlangTextInputReader,
-    IntermediateFileObject,
+    InputReaderInterface,
+    create_input_reader_from_file_representation,
 )
 from .searchable_tree import SearchableTree
+from .virtual_file import FileOperation, FileRepresentation, VirtualFileRepresentation
 
 __all__ = [
-    "BaseFlangInputReader",
-    "FlangTextInputReader",
-    "FlangFileInputReader",
-    "FlangTextInputReader",
-    "IntermediateFileObject",
-    "UserASTFileMixin",
-    "UserASTTextNode",
-    "UserASTRootNode",
+    "ASTPatchElement",
     "BaseUserAST",
-    "FlangAST",
-    "ScopeTree",
-    "SearchableTree",
     "Event",
     "EventStorage",
-    "UserASTAbstractNode",
+    "FileOperation",
+    "FileRepresentation",
+    "FlangAST",
+    "FlangFileInputReader",
+    "FlangTextInputReader",
+    "FlangTextInputReader",
+    "InputReaderInterface",
+    "IntermediateFileObject",
+    "ScopeTree",
+    "SearchableTree",
+    "UserASTComplexNode",
+    "UserASTDirectoryNode",
+    "UserASTFileMixin",
+    "UserASTFlatFileNode",
+    "UserASTRootContainerNode",
+    "UserASTRootNode",
+    "UserASTTextNode",
+    "VirtualFileRepresentation",
+    "create_input_reader_from_file_representation",
 ]

@@ -1,20 +1,24 @@
+import fnmatch
 import re
 
-from flang.structures import BaseFlangInputReader, BaseUserAST, FlangAST
-from flang.structures.ast import (
-    UserASTAbstractNode,
+from flang.structures import (
+    BaseUserAST,
+    FlangAST,
+    FlangFileInputReader,
+    InputReaderInterface,
     UserASTComplexNode,
     UserASTDirectoryNode,
     UserASTFileMixin,
     UserASTFlatFileNode,
+    UserASTRootContainerNode,
     UserASTTextNode,
 )
-from flang.structures.input import FlangFileInputReader, IntermediateFileObject
-from flang.utils.common import BUILTIN_PATTERNS
+from flang.utils.common import BUILTIN_PATTERNS, NAMED_BUILTIN_PATTERNS
 from flang.utils.exceptions import (
     ComplexMatchNotFound,
     FileMatchNotFound,
     MatchNotFoundError,
+    NoMoreDataException,
     SkipFlangNodeException,
     SymbolNotFoundError,
     TextMatchNotFound,
@@ -23,9 +27,56 @@ from flang.utils.exceptions import (
 )
 
 
+def _match_text_with_regex(text: str, pattern: str, negative: bool = False) -> str | None:
+    pattern = pattern.format(**NAMED_BUILTIN_PATTERNS)
+
+    if negative:
+        re_match = re.search(pattern, text)
+
+        if re_match is None:
+            return text
+
+        matched_text = text[: re_match.start()]
+        return None if matched_text == "" else matched_text
+
+    re_match = re.match(pattern, text)
+
+    if re_match is not None:
+        re_match = re_match.group()
+
+    return re_match
+
+
+def _match_text_with_text(text: str, pattern: str, negative: bool = False) -> str | None:
+    if negative:
+        idx = text.find(pattern)
+
+        if idx == -1:
+            return text
+
+        return text[:idx]
+    else:
+        if text.startswith(pattern):
+            return pattern
+
+    return None
+
+
+def _is_file_matched(filename: str, pattern: str, variant: str) -> str | None:
+    assert variant in ("filename", "glob", "regex")
+
+    if variant == "glob":
+        pattern = fnmatch.translate(pattern)
+
+    if variant == "filename":
+        return filename == pattern
+
+    return re.match(pattern, filename)
+
+
 def match_on_complex_flang_ast(
     flang_ast: FlangAST,
-    reader: BaseFlangInputReader,
+    reader: InputReaderInterface,
 ) -> BaseUserAST:
     match flang_ast.type:
         case "sequence":
@@ -35,7 +86,7 @@ def match_on_complex_flang_ast(
 
             try:
                 for child in flang_ast.children:
-                    match_objects, reader = match_flang_flang_ast(child, reader)
+                    match_objects, reader = match_flang_ast_node(child, reader)
 
                     matches += match_objects
             except MatchNotFoundError as e:
@@ -49,12 +100,12 @@ def match_on_complex_flang_ast(
                 children=matches,
             )
         case "choice":
-            matches = []
+            matches: list[BaseUserAST] = []
             readers = []
 
             for child in flang_ast.children:
                 try:
-                    match_objects, reader = match_flang_flang_ast(child, reader)
+                    match_objects, reader = match_flang_ast_node(child, reader)
 
                     matches += match_objects
                     readers.append(reader)
@@ -64,19 +115,17 @@ def match_on_complex_flang_ast(
 
             if not matches:
                 raise ComplexMatchNotFound(
-                    f"Could not match any flang_ast from: {flang_ast.type or flang_ast.location}"
+                    f"Could not match any flang_ast from: {flang_ast.type or flang_ast.location} text: {reader.read()[:15]}"
                 )
 
             max_reader = max(readers, key=lambda it: it.get_key())
-            return matches[readers.index(max_reader)]
+            node = matches[readers.index(max_reader)]
 
-        case "event":
-            # TODO: <--- TUTAJ SKONCZYLES
-            raise NotImplementedError
+            return node
         case "module":
             # NOTE: This represents a simple container of all nodes inside this node. This is
             # used mainly for modules and imports. By default it is hidden
-            # This is "sequence" that is hidden by default
+            # This is "sequence" that is hidden by default. Dont know if this is so necessary...
             raise NotImplementedError
         case "use":
             target_location = flang_ast.get_attrib("ref")
@@ -105,16 +154,15 @@ def match_on_complex_flang_ast(
             raise UnknownFlangNodeError("Not complex flang_ast")
 
 
-def match_on_text(
-    flang_ast: FlangAST,
-    reader: BaseFlangInputReader,
+def new_match_on_text(
+    flang_ast: FlangAST, reader: InputReaderInterface
 ) -> UserASTTextNode:
     text_to_match = reader.read()
-    flang_ast_text = flang_ast.get_attrib("value", flang_ast.text)
     content = None
+    flang_ast_text = flang_ast.get_attrib("value", flang_ast.text)
 
     match flang_ast.type:
-        case "regex":
+        case "predicate":
             assert isinstance(text_to_match, str) and isinstance(flang_ast_text, str)
 
             flang_ast_pattern = flang_ast_text.format(**BUILTIN_PATTERNS)
@@ -131,7 +179,7 @@ def match_on_text(
                 )
 
             content = matched_text.group()
-        case "text":
+        case "const":
             assert isinstance(text_to_match, str) and isinstance(flang_ast_text, str)
 
             if not text_to_match.startswith(flang_ast_text):
@@ -144,6 +192,48 @@ def match_on_text(
         case _:
             raise UnknownFlangNodeError("Not text flang_ast")
 
+    if flang_ast.get_bool_attrib("not"):
+        raise TextMatchNotFound('Matched with "not" attribute, so')
+
+    return UserASTTextNode(
+        name=flang_ast.name, flang_ast_path=flang_ast.location, content=content
+    )
+
+
+def match_on_text(flang_ast: FlangAST, reader: InputReaderInterface) -> UserASTTextNode:
+    content = None
+    flang_ast_text = flang_ast.get_attrib("value", flang_ast.text)
+
+    match flang_ast.type:
+        case "regex":
+            text_to_match = reader.read()
+            content = _match_text_with_regex(
+                text_to_match, flang_ast_text, flang_ast.get_bool_attrib("not")
+            )
+
+            if content is None:
+                raise TextMatchNotFound(
+                    f'Could not match regex pattern: "{flang_ast_text}" with text: "{reader.read()[:15]}"'
+                )
+
+            if content == "":
+                raise RuntimeError(
+                    "We have matched an empty object which does not make any sense. Please fix the template to not match such text. Like what would you expect after matching nothing?"
+                )
+        case "text":
+            text_to_match = reader.read()
+            content = _match_text_with_text(
+                text_to_match, flang_ast_text, flang_ast.get_bool_attrib("not")
+            )
+
+            if content is None:
+                raise TextMatchNotFound(
+                    f'Could not match text pattern: "{flang_ast_text}" with '
+                    f'text: "{reader.read()[:len(flang_ast_text)]}"'
+                )
+        case _:
+            raise UnknownFlangNodeError("Not text flang_ast")
+
     return UserASTTextNode(
         name=flang_ast.name, flang_ast_path=flang_ast.location, content=content
     )
@@ -151,34 +241,32 @@ def match_on_text(
 
 def match_on_file(
     flang_ast: FlangAST,
-    reader: BaseFlangInputReader,
+    reader: InputReaderInterface,
 ) -> UserASTFileMixin:
     if flang_ast.type != "file":
         raise UnknownFlangNodeError("Not file flang_ast")
 
     assert isinstance(reader, FlangFileInputReader)
 
-    current_files = reader.read()
+    try:
+        filename = reader.read()
+    except NoMoreDataException as e:
+        raise FileMatchNotFound("No files found") from e
 
     pattern = flang_ast.get_attrib("pattern")
     variant = flang_ast.get_attrib("variant", "filename")
 
-    matched_file = IntermediateFileObject.get_first_matched_file(
-        current_files, pattern, variant
-    )
-
-    if not matched_file:
+    if not _is_file_matched(filename, pattern, variant):
         raise FileMatchNotFound(
-            f'Could not match filename pattern: "{pattern}" variant: {variant} with available '
-            f'files in directory: "{[f.path.name for f in current_files]}"'
+            f'Could not match filename pattern: "{pattern}" variant: {variant} with current '
+            f'file : "{filename}"'
         )
 
     child = flang_ast.first_child
-    sub_reader = matched_file.get_input_reader()
+    sub_reader = reader.get_nested_reader(filename)
+    content, out_reader = match_flang_ast_node(child, sub_reader)
 
-    content, out_reader = match_flang_flang_ast(child, sub_reader)
-
-    if out_reader.read():
+    if not out_reader.is_empty():
         raise TextNotParsedError(f"Text left: {out_reader.read()}")
 
     if isinstance(sub_reader, FlangFileInputReader):
@@ -186,25 +274,25 @@ def match_on_file(
             name=flang_ast.name,
             flang_ast_path=flang_ast.location,
             children=content,  # type: ignore TODO: napraw to
-            filename=matched_file.filename,
+            filename=filename,
         )
 
     return UserASTFlatFileNode(
         name=flang_ast.name,
         flang_ast_path=flang_ast.location,
         children=content,
-        filename=matched_file.filename,
+        filename=filename,
     )
 
 
 def match_against_all_flang_ast_variants(
     flang_ast: FlangAST,
-    reader: BaseFlangInputReader,
+    reader: InputReaderInterface,
 ) -> BaseUserAST:
     matchers = (
         match_on_complex_flang_ast,
-        match_on_text,
         match_on_file,
+        match_on_text,
     )
     match_object = None
 
@@ -222,10 +310,10 @@ def match_against_all_flang_ast_variants(
     return match_object
 
 
-def match_flang_flang_ast(
+def match_flang_ast_node(
     flang_ast: FlangAST,
-    reader: BaseFlangInputReader,
-) -> tuple[list[BaseUserAST], BaseFlangInputReader]:
+    reader: InputReaderInterface,
+) -> tuple[list[BaseUserAST], InputReaderInterface]:
     if alias_name := flang_ast.get_attrib("alias"):
         flang_ast.create_alias(alias_name)
 
@@ -263,17 +351,18 @@ def match_flang_flang_ast(
 
 
 def parse_user_language(
-    flang_ast: FlangAST, reader: BaseFlangInputReader
-) -> tuple[list[BaseUserAST], BaseFlangInputReader]:
+    flang_ast: FlangAST, reader: InputReaderInterface
+) -> tuple[list[BaseUserAST], InputReaderInterface]:
 
-    match_objects, out_reader = match_flang_flang_ast(flang_ast.root, reader)
+    match_objects, out_reader = match_flang_ast_node(flang_ast.root, reader)
 
-    if out_reader.read():
+    if not out_reader.is_empty():
         raise TextNotParsedError(f"Text left: {out_reader.read()}")
 
     if flang_ast.root.type == "file":
         assert (
-            len(match_objects) == 1
+            len(match_objects)
+            == 1  # TODO: this does not really make sense here. Should return UserASTContainerNode
         ), "When matching a file tree, we should only return one file (root) as the result"
         assert isinstance(match_objects[0], UserASTFileMixin)
         return match_objects[0]
@@ -285,4 +374,4 @@ def parse_user_language(
 
     assert isinstance(match_objects, list), isinstance(match_objects, list)
 
-    return UserASTAbstractNode(children=match_objects)
+    return UserASTRootContainerNode(children=match_objects)

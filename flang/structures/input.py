@@ -1,69 +1,17 @@
 from __future__ import annotations
 
 import abc
-import fnmatch
 import io
-import pathlib
-import re
 
-from .ast import UserASTTextNode
+from flang.utils.exceptions import NoMoreDataException
 
+from .ast import UserASTFileMixin, UserASTTextNode
+from .virtual_file import FileRepresentation
 
-class IntermediateFileObject:
-    def __init__(self, path: str, content: list | None = None) -> None:
-        self.path = pathlib.Path(path)
-        self._content = content
-
-        assert self.path.exists()
-
-    @property
-    def content(self) -> str | list[IntermediateFileObject]:
-        if self._content is not None:
-            return self._content
-
-        if self.path.is_dir():
-            return [IntermediateFileObject(str(file)) for file in self.path.iterdir()]
-        else:
-            with open(self.path) as f:
-                return f.read()
-
-    @property
-    def filename(self) -> str:
-        return self.path.name
-
-    def get_input_reader(self) -> FlangFileInputReader | FlangTextInputReader:
-        if self.path.is_dir():
-            assert isinstance(self.content, list)
-            return FlangFileInputReader(self.content, filename=self.path.name)
-
-        assert isinstance(self.content, str)
-        return FlangTextInputReader(self.content)
-
-    @staticmethod
-    def get_first_matched_file(
-        list_of_files: list[IntermediateFileObject], pattern: str, variant: str
-    ) -> IntermediateFileObject | None:
-        assert variant in ("filename", "glob", "regex")
-
-        if variant == "glob":
-            pattern = fnmatch.translate(pattern)
-
-        def _is_pathname_matched(file_object):
-            if variant == "filename":
-                return file_object.path.name == pattern
-
-            return re.match(pattern, file_object.path.name)
-
-        try:
-            return next(filter(_is_pathname_matched, list_of_files))
-        except StopIteration:
-            return None
+SANITY_CHECK = True
 
 
-sanity_check = True
-
-
-class BaseFlangInputReader(abc.ABC):
+class InputReaderInterface(abc.ABC):
     @abc.abstractmethod
     def read(self):
         raise NotImplementedError
@@ -77,16 +25,20 @@ class BaseFlangInputReader(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def copy(self) -> BaseFlangInputReader:
+    def copy(self) -> InputReaderInterface:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def is_empty(self) -> bool:
         raise NotImplementedError
 
     @property
-    @abc.abstractmethod
-    def previous(self) -> BaseFlangInputReader:
-        raise NotImplementedError
+    def previous(self) -> FlangTextInputReader:
+        assert self._previous is not None
+        return self._previous
 
 
-class FlangTextInputReader(BaseFlangInputReader):
+class FlangTextInputReader(InputReaderInterface):
     def __init__(
         self,
         data: str | io.StringIO,
@@ -97,6 +49,9 @@ class FlangTextInputReader(BaseFlangInputReader):
         self._cursor = cursor or 0
         self._previous = previous
 
+    def is_empty(self) -> bool:
+        return self.read() == ""
+
     def read(self, size=None) -> str:
         self._data.seek(self._cursor)  # look-up correct scope of input stream
         data = self._data.read() if size is None else self._data.read(size)
@@ -104,13 +59,10 @@ class FlangTextInputReader(BaseFlangInputReader):
         return data
 
     def get_key(self):
-        import warnings
-
-        warnings.warn("NOT IMPLEMENTED!")
-        return 0
+        return self._cursor
 
     def consume_data(self, data: UserASTTextNode) -> None:
-        if sanity_check:
+        if SANITY_CHECK:
             consumed_data = self.read(data.size())
             assert consumed_data == data.get_raw_content(), "{} {}".format(
                 consumed_data, data.get_raw_content()
@@ -120,47 +72,56 @@ class FlangTextInputReader(BaseFlangInputReader):
     def copy(self) -> FlangTextInputReader:
         return FlangTextInputReader(self._data, cursor=self._cursor, previous=self)
 
-    @property
-    def previous(self) -> FlangTextInputReader:
-        assert self._previous is not None
-        return self._previous
 
-
-class FlangFileInputReader(BaseFlangInputReader):
+class FlangFileInputReader(InputReaderInterface):
     def __init__(
         self,
-        data: list[IntermediateFileObject],
-        filename: str,
+        data: list[FileRepresentation],
         cursor: list | None = None,
         previous: FlangFileInputReader | None = None,
     ) -> None:
         self._data = data
         self._cursor = list(range(len(data))) if cursor is None else cursor.copy()
         self._previous = previous
-        self.filename = filename
 
-    def read(self) -> list[IntermediateFileObject]:
-        return [self._data[i] for i in self._cursor]
+    def is_empty(self) -> bool:
+        return self._cursor == []
+
+    def read(self) -> str:
+        if self.is_empty():
+            raise NoMoreDataException
+
+        return next(iter(self._data[i].get_name() for i in self._cursor))
 
     def get_key(self):
-        import warnings
+        return len(self._data) - len(self._cursor)
 
-        warnings.warn("NOT IMPLEMENTED!")
-        return 0
+    # can be changed in future to include file metadata, so cannot really take string as data
+    def consume_data(self, data: UserASTFileMixin) -> None:
+        filename = data.filename
+        filenames = [f.get_name() for f in self._data]
 
-    def consume_data(self, data: FlangFileInputReader) -> None:
-        filenames = [f.path.name for f in self._data]
-        self._cursor.remove(filenames.index(data.filename))
+        self._cursor.remove(filenames.index(filename))
 
-        if sanity_check:
-            assert len(self._cursor) == len(set(self._cursor))
+        if SANITY_CHECK:
+            assert len(self._cursor) == len(set(self._cursor)), "Should be no duplicates"
+
+    def get_nested_reader(self, filename: str):
+        assert self._data != []
+
+        file_representation = next(
+            iter(item for item in self._data if item.get_name() == filename)
+        )
+        return create_input_reader_from_file_representation(file_representation)
 
     def copy(self) -> FlangFileInputReader:
-        return FlangFileInputReader(
-            self._data, filename=self.filename, cursor=self._cursor.copy(), previous=self
-        )
+        return FlangFileInputReader(self._data, cursor=self._cursor.copy(), previous=self)
 
-    @property
-    def previous(self) -> FlangFileInputReader:
-        assert self._previous is not None
-        return self._previous
+
+def create_input_reader_from_file_representation(
+    fr: FileRepresentation,
+) -> InputReaderInterface:
+    if fr.get_is_directory():
+        return FlangFileInputReader(data=fr.get_content())
+
+    return FlangTextInputReader(data=fr.get_content())

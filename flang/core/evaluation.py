@@ -7,13 +7,12 @@ from flang.structures import (
     Event,
     EventStorage,
     FlangAST,
-    UserASTAbstractNode,
+    UserASTRootContainerNode,
 )
 from flang.utils.attributes import EVENT_PATTERN, EVENT_PRIORITY_PATTERN_STR
 
-EventDictionary = dict[
-    str, Event
-]  # EventDictionary keys represents absolute paths to events from flang_ast
+# EventDictionary keys represents absolute paths to events from flang_ast
+EventDictionary = dict[str, Event]
 ParsedEventStringInfo = collections.namedtuple(
     "ParsedEventStringInfo", "priority trigger"
 )
@@ -143,7 +142,7 @@ def initialize_event_triggers_for_user_ast(
     event_storage: EventStorage,
     global_events_dict: EventDictionary,
 ) -> EventStorage:
-    if not isinstance(user_ast, UserASTAbstractNode):
+    if not isinstance(user_ast, UserASTRootContainerNode):
         add_triggers(user_ast, flang_ast, event_storage, global_events_dict)
 
     if user_ast.children is not None:

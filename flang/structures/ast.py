@@ -109,14 +109,17 @@ ABSTRACT_IDENTIFIER = "<ABSTRACT-ROOT>"
 
 # kw_only=True is added because we override the old field and add a default value
 @dataclasses.dataclass(kw_only=True)
-class UserASTAbstractNode(BaseUserAST, UserASTComplexMixin):
+class UserASTRootContainerNode(BaseUserAST, UserASTComplexMixin):
     flang_ast_path: str = dataclasses.field(
         init=False, repr=False, compare=False, default=ABSTRACT_IDENTIFIER
     )
     name: str = dataclasses.field(
         init=False, repr=False, compare=False, default=ABSTRACT_IDENTIFIER
     )
+    generate_patch: bool = dataclasses.field(
+        init=False, repr=False, compare=False, default=False
+    )
 
 
 FlangFileMatch = UserASTFileMixin
-UserASTRootNode = UserASTFileMixin | UserASTAbstractNode
+UserASTRootNode = UserASTFileMixin | UserASTRootContainerNode

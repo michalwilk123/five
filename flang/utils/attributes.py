@@ -25,7 +25,7 @@ def get_possible_construct_attributes(construct_name: str):
                 + cardinality_attributes
                 + visible_construct_attributes
                 + linking_syntax
-                + ["value"]
+                + ["value", "not"]
             )
         case "event":
             return naming_attributes + ["source"]

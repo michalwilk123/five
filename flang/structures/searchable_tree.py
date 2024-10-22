@@ -138,7 +138,7 @@ class SearchableTree(BasicTree):
         node = self
 
         for name in path_names:
-            if not (node := cast(Self, node.get_(name))):
+            if not (node := node.get_(name)):
                 return None
 
         return node
@@ -157,7 +157,7 @@ class SearchableTree(BasicTree):
         return self.search_down(path.removeprefix(location + self.path_separator))
 
     def full_search(self, path: str) -> Self | None:
-        return cast(Self | None, self.root.search_down_full_path(path))
+        return self.root.search_down_full_path(path)
 
     @property  # should be cached property
     def location(self) -> str:

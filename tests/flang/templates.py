@@ -167,7 +167,7 @@ TEST_TEMPLATE_RECURSIVE = r"""
     <sequence name="xml-node" multi="true">
         <regex name="open-tag" value="{xml_open_tag}"/>
         <choice name="xml-content" multi="true">
-            <regex name="raw-content" value="[^{lt}{rt}]+"/>
+            <regex name="raw-content" not="true" value="{lt}|{gt}"/>
             <use ref="....xml-body"/>
         </choice>
         <regex name="close-tag" value="{xml_close_tag}"/>
@@ -177,12 +177,12 @@ TEST_TEMPLATE_RECURSIVE = r"""
 
 TEST_TEMPLATE_FILES_EASY = r"""
 <file pattern="easy" variant="filename" name="html-project">
-<file multi="true" pattern="*.html" variant="glob">
-<sequence name="html">
-<text name="content" value="some text "/>
-<regex name="number" value="{number}"/>
-</sequence>
-</file>
+    <file multi="true" pattern="*.html" variant="glob">
+        <sequence name="html">
+            <text name="content" value="some text "/>
+            <regex name="number" value="{number}"/>
+        </sequence>
+    </file>
 </file>
 """
 

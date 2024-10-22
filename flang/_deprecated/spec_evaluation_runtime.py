@@ -4,7 +4,7 @@ from flang.structures import (
     FlangAST,
     FlangMatchObject,
     ScopeTree,
-    UserASTAbstractNode,
+    UserASTRootContainerNode,
     UserASTRootNode,
     UserASTTextNode,
 )
@@ -194,7 +194,7 @@ class SpecEvaluationRuntime:
     ):
         self._add_match_to_scope_tree(spec, link_storage.scope_tree)
 
-        if not isinstance(spec, UserASTAbstractNode):
+        if not isinstance(spec, UserASTRootContainerNode):
             self.populate_queue(spec, link_storage)
 
         if isinstance(spec.content, list):

@@ -47,17 +47,18 @@ def _build_tree(
     if validate_attributes:
         validate_attributes_for_xml_element(element)
 
-    children = [
-        _build_tree(child_element, validate_attributes) for child_element in element
-    ]
-    construct = FlangAST(
+    ast_node = FlangAST(
         name=node_name,
         type=element.tag,
         attributes=element.attrib or {},
-        children=children,
+        children=[],
         text=element.text or element.attrib.get("value"),
     )
-    return construct
+    for child_element in element:
+        node = _build_tree(child_element, validate_attributes)
+        ast_node.add_node(node)
+
+    return ast_node
 
 
 def parse_text(text: str, validate_attributes: bool = False) -> FlangAST:
