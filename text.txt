@@ -22,3 +22,10 @@ choice
 sequence
 regex
 text
+
+# syntax for events:
+<regex name="sth" value="{vname}" event_5_on-delete="@some_lib/func"/>
+
+
+generate will take list of patches to generate code, for interactive 
+mode it will return the patches that it has missing

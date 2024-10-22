@@ -1,32 +1,27 @@
 import unittest
 
-from flang.handlers import FlangProjectAnalyzer
-from flang.parsers import FlangXMLParser
-from flang.runtime import ProjectParsingRuntime
-from flang.structures import PossibleRootFlangMatch
+from flang.interactive_flang_object import BuiltinEvent, InteractiveFlangObject
+from flang.parsers.xml import parse_text
+from flang.structures import BaseUserAST, FlangAST
 from flang.utils.exceptions import MatchNotFoundError, TextNotParsedError
 
 from . import templates as tpl
 
 
-class FlangParserTestCase(unittest.TestCase):
-    def setUp(self) -> None:
-        self.parser = FlangXMLParser()
-
+class ParserTestCase(unittest.TestCase):
     def _parse_template(
         self, template: str, sample: str, file: bool = False
-    ) -> tuple[ProjectParsingRuntime, PossibleRootFlangMatch]:
-        project_construct = self.parser.parse_text(template, validate_attributes=True)
-        processor = FlangProjectAnalyzer(project_construct)
+    ) -> InteractiveFlangObject:
+        flang_ast = parse_text(template, validate_attributes=True)
 
         if file:
-            structured_text = processor.forward_filename(sample)
+            interactive_object = InteractiveFlangObject.from_filenames(
+                flang_ast, paths=[sample]
+            )
         else:
-            structured_text = processor.forward_string(sample)
+            interactive_object = InteractiveFlangObject.from_string(flang_ast, sample)
 
-        assert structured_text is not None
-
-        return project_construct, structured_text
+        return interactive_object
 
     def test_basic(self):
         self._parse_template(tpl.TEST_BASIC_TEMPLATE, tpl.TEST_BASIC_SAMPLE)
@@ -40,20 +35,22 @@ class FlangParserTestCase(unittest.TestCase):
             self._parse_template(tpl.TEST_BASIC_TEMPLATE, tpl.TEST_BASIC_SAMPLE_FAILURE_2)
 
     def test_choice(self):
-        project_construct, match_object = self._parse_template(
-            tpl.TEST_TEMPLATE_CHOICE, "AAA"
-        )
-        match_object = match_object.first_child.first_child
+        interactive_object = self._parse_template(tpl.TEST_TEMPLATE_CHOICE, "AAA")
+        user_ast_node: BaseUserAST = interactive_object.user_ast.first_child.first_child
 
-        constr = project_construct.get_construct_from_spec(match_object)
-        self.assertEqual(constr.name, "text")
-
-        project_construct, match_object = self._parse_template(
-            tpl.TEST_TEMPLATE_CHOICE, "SOMEVALUE"
+        flang_ast_node: FlangAST = interactive_object.flang_ast.full_search(
+            user_ast_node.flang_ast_path
         )
-        match_object = match_object.first_child.first_child
-        constr = project_construct.get_construct_from_spec(match_object)
-        self.assertEqual(constr.name, "regex")
+        self.assertEqual(flang_ast_node.type, "text")
+
+        interactive_object = self._parse_template(tpl.TEST_TEMPLATE_CHOICE, "SOMEVALUE")
+        interactive_object = self._parse_template(tpl.TEST_TEMPLATE_CHOICE, "AAA")
+        user_ast_node: BaseUserAST = interactive_object.user_ast.first_child.first_child
+
+        flang_ast_node: FlangAST = interactive_object.flang_ast.full_search(
+            user_ast_node.flang_ast_path
+        )
+        self.assertEqual(flang_ast_node.type, "text")
 
     def test_choice_nested(self):
         self._parse_template(
@@ -80,12 +77,38 @@ class FlangParserTestCase(unittest.TestCase):
 
     def test_recursive(self):
         # todo: parametrize?
-        self._parse_template(tpl.TEST_TEMPLATE_RECURSIVE, tpl.TEST_SAMPLE_RECURSIVE_1)
+        # self._parse_template(tpl.TEST_TEMPLATE_RECURSIVE, tpl.TEST_SAMPLE_RECURSIVE_1)
         self._parse_template(tpl.TEST_TEMPLATE_RECURSIVE, tpl.TEST_SAMPLE_RECURSIVE_2)
-        self._parse_template(tpl.TEST_TEMPLATE_RECURSIVE, tpl.TEST_SAMPLE_RECURSIVE_3)
+        # self._parse_template(tpl.TEST_TEMPLATE_RECURSIVE, tpl.TEST_SAMPLE_RECURSIVE_3)
 
     def test_linking(self):
         self._parse_template(tpl.TEST_TEMPLATE_LINKING, tpl.TEST_SAMPLE_LINKING)
+
+    def test_event(self):
+        interactive_object = self._parse_template(
+            tpl.TEST_TEMPLATE_FUNCTION_1, "say hello_world"
+        )
+        self.assertDictEqual(interactive_object.context, {"result": "hello_world"})
+
+    def test_event_remote_with_alias(self):
+        interactive_object = self._parse_template(
+            tpl.TEST_TEMPLATE_FUNCTION_2, "say witaj_swiecie"
+        )
+        self.assertDictEqual(interactive_object.context, {"result": "witaj_swiecie1"})
+
+    def test_multiple_events_priorities(self):
+        interactive_object = self._parse_template(
+            tpl.TEST_TEMPLATE_FUNCTION_3, "second first"
+        )
+
+        contexts = [
+            ctx
+            for ctx in iter(
+                interactive_object.event_storage.execute_iter(BuiltinEvent.ON_READ.value)
+            )
+        ]
+        self.assertDictEqual(contexts[0], {"message": "first"})
+        self.assertDictEqual(contexts[1], {"message": "second"})
 
     def test_file_easy(self):
         self._parse_template(

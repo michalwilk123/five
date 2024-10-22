@@ -1,9 +1,15 @@
-from flang.utils.exceptions import UnknownConstructError
+import re
 
-visible_construct_attributes = ["visible", "event-[0-9]+"]
+from flang.utils.common import VNAME
+from flang.utils.exceptions import UnknownFlangNodeError
+
+EVENT_PRIORITY_PATTERN_STR = r"(_+\d+_)"
+EVENT_PATTERN = re.compile(f"event{EVENT_PRIORITY_PATTERN_STR}{VNAME}")
+
+visible_construct_attributes = ["hidden", EVENT_PATTERN]
 naming_attributes = ["name", "alias"]
 cardinality_attributes = ["optional", "multi"]
-linking_syntax = ["link-definition", "link-from", "scope"]
+linking_syntax = ["link-name", "refers-to-link", "scope-start", "scope-end", "hoisting"]
 
 
 def get_possible_construct_attributes(construct_name: str):
@@ -19,10 +25,10 @@ def get_possible_construct_attributes(construct_name: str):
                 + cardinality_attributes
                 + visible_construct_attributes
                 + linking_syntax
-                + ["value"]
+                + ["value", "not"]
             )
         case "event":
-            return naming_attributes
+            return naming_attributes + ["source"]
         case "file":
             return (
                 naming_attributes
@@ -39,7 +45,4 @@ def get_possible_construct_attributes(construct_name: str):
                 + ["value", "ref"]
             )
 
-    raise UnknownConstructError
-
-
-def validate_construct_attributes(): ...
+    raise UnknownFlangNodeError
