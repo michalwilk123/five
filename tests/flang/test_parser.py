@@ -111,9 +111,11 @@ class ParserTestCase(unittest.TestCase):
         self.assertDictEqual(contexts[1], {"message": "second"})
 
     def test_file_easy(self):
-        self._parse_template(
+        io = self._parse_template(
             tpl.TEST_TEMPLATE_FILES_EASY, tpl.TEST_SAMPLE_FILES + "/easy", True
         )
+
+        __import__("pprint").pprint(io.user_ast)
 
     def test_file_xml(self):
         self._parse_template(

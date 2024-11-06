@@ -12,6 +12,7 @@ XML_ATTR = rf'{VNAME}="[^"\n]*"'
 XML_OPEN_TAG = rf"<{VNAME}(\s*{XML_ATTR})*>"
 XML_CLOSE_TAG = rf"</{VNAME}>"
 XML_SINGLE_TAG = rf"<{VNAME}(\s*{XML_ATTR})*\s*/>"
+WSPACE = rf"\s+"
 
 SPECIAL_CHARS = {
     "lt": "<",
@@ -26,6 +27,7 @@ BUILTIN_PATTERNS = {
     "xml_open_tag": XML_OPEN_TAG,
     "xml_close_tag": XML_CLOSE_TAG,
     "xml_single_tag": XML_SINGLE_TAG,
+    "wspace": WSPACE,
     **SPECIAL_CHARS,
 }
 NAMED_BUILTIN_PATTERNS = {

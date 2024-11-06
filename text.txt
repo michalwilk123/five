@@ -1,7 +1,7 @@
 
 {
     "symbol": file,
-    "filename": dupa
+    "filename": hbjkmk
     "content": [
         {
             "symbol": file,

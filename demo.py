@@ -1,8 +1,7 @@
 from flang.interactive_flang_object import InteractiveFlangObject
 from flang.parsers.xml import parse_text
-from pprint import pprint
-from flang.structures import BaseUserAST, FlangAST, UserASTRootContainerNode, UserASTTextNode
-import itertools
+from flang.structures import BaseUserAST, FlangAST, UserASTTextNode
+from flang.structures.ast import UserASTRootContainerNode
 
 TEST_SAMPLE_RECURSIVE_3 = """\
 <html>
@@ -35,8 +34,22 @@ TEST_TEMPLATE_RECURSIVE = r"""
 
 
 def generate_patches(user_ast:BaseUserAST, flang_ast: FlangAST):
+    if not isinstance(user_ast, UserASTRootContainerNode):
+        flast = flang_ast.full_search(user_ast.flang_ast_path)
+
+        if flast.type == "choice":
+            print("WYBOR: {}")
+
+        if flast.get_bool_attrib("optional"):
+            print("optional")
+
+        if flast.get_bool_attrib("multi"):
+            print("multi")
+
     if isinstance(user_ast, UserASTTextNode):
+        print(f"TEXT location: {user_ast.location} content: {repr(user_ast.content)}")
         return user_ast.content
+
 
     if isinstance(user_ast.children, list):
          return "".join(generate_patches(child, flang_ast) for child in user_ast.children)
@@ -50,5 +63,18 @@ if __name__ == "__main__":
     flang_ast = parse_text(template, validate_attributes=True)
     interactive_object = InteractiveFlangObject.from_string(flang_ast, TEST_SAMPLE_RECURSIVE_3)
 
-    print(gen := generate_patches(interactive_object.user_ast, interactive_object.flang_ast))
-    print(gen == TEST_SAMPLE_RECURSIVE_3)
+    generated = generate_patches(interactive_object.user_ast, interactive_object.flang_ast)
+    # print()
+
+# def rewrite_language(from_obj, target_obj, )
+
+
+def rewrite():
+    flang_ast_python = parse_text("some")
+    flang_ast_javascript = parse_text("some")
+
+    python_user_ast = InteractiveFlangObject.from_string(flang_ast, TEST_SAMPLE_RECURSIVE_3).user_ast
+    rewrite_language()
+
+
+
