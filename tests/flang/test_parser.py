@@ -5,6 +5,7 @@ from flang.parsers.xml import parse_text
 from flang.structures import BaseUserAST, FlangAST
 from flang.utils.exceptions import MatchNotFoundError, TextNotParsedError
 
+from . import generation_templates as gtpl
 from . import templates as tpl
 
 
@@ -36,21 +37,16 @@ class ParserTestCase(unittest.TestCase):
 
     def test_choice(self):
         interactive_object = self._parse_template(tpl.TEST_TEMPLATE_CHOICE, "AAA")
-        user_ast_node: BaseUserAST = interactive_object.user_ast.first_child.first_child
-
-        flang_ast_node: FlangAST = interactive_object.flang_ast.full_search(
-            user_ast_node.flang_ast_path
-        )
-        self.assertEqual(flang_ast_node.type, "text")
+        user_ast_node: BaseUserAST = interactive_object.user_ast.full_search(
+            "import.choice"
+        ).first_child
+        self.assertEqual(user_ast_node.name, "text-val")
 
         interactive_object = self._parse_template(tpl.TEST_TEMPLATE_CHOICE, "SOMEVALUE")
-        interactive_object = self._parse_template(tpl.TEST_TEMPLATE_CHOICE, "AAA")
-        user_ast_node: BaseUserAST = interactive_object.user_ast.first_child.first_child
-
-        flang_ast_node: FlangAST = interactive_object.flang_ast.full_search(
-            user_ast_node.flang_ast_path
-        )
-        self.assertEqual(flang_ast_node.type, "text")
+        user_ast_node: BaseUserAST = interactive_object.user_ast.full_search(
+            "import.choice"
+        ).first_child
+        self.assertEqual(user_ast_node.name, "regex")
 
     def test_choice_nested(self):
         self._parse_template(
@@ -76,10 +72,31 @@ class ParserTestCase(unittest.TestCase):
             self._parse_template(tpl.TEST_TEMPLATE_OPTIONAL, tpl.TEST_OPTIONAL_SAMPLE_3)
 
     def test_recursive(self):
-        # todo: parametrize?
-        # self._parse_template(tpl.TEST_TEMPLATE_RECURSIVE, tpl.TEST_SAMPLE_RECURSIVE_1)
+        # TODO: parametrize?
+        self._parse_template(tpl.TEST_TEMPLATE_RECURSIVE, tpl.TEST_SAMPLE_RECURSIVE_1)
         self._parse_template(tpl.TEST_TEMPLATE_RECURSIVE, tpl.TEST_SAMPLE_RECURSIVE_2)
-        # self._parse_template(tpl.TEST_TEMPLATE_RECURSIVE, tpl.TEST_SAMPLE_RECURSIVE_3)
+        self._parse_template(tpl.TEST_TEMPLATE_RECURSIVE, tpl.TEST_SAMPLE_RECURSIVE_3)
+
+    def test_choice_with_terminal(self):
+        # TODO: parametrize?
+        self._parse_template(
+            tpl.TEST_TEMPLATE_CHOICE_TERMINAL, tpl.TEST_SAMPLE_RECURSIVE_1
+        )
+        self._parse_template(
+            tpl.TEST_TEMPLATE_CHOICE_TERMINAL, tpl.TEST_SAMPLE_RECURSIVE_2
+        )
+        self._parse_template(
+            tpl.TEST_TEMPLATE_CHOICE_TERMINAL, tpl.TEST_SAMPLE_RECURSIVE_3
+        )
+        self._parse_template(
+            tpl.TEST_TEMPLATE_CHOICE_TERMINAL, tpl.TEST_SAMPLE_TERMINAL_PARSING
+        )
+
+        with self.assertRaises(TextNotParsedError):
+            self._parse_template(
+                tpl.TEST_TEMPLATE_CHOICE_TERMINAL,
+                tpl.TEST_SAMPLE_TERMINAL_PARSING_INVALID,
+            )
 
     def test_linking(self):
         self._parse_template(tpl.TEST_TEMPLATE_LINKING, tpl.TEST_SAMPLE_LINKING)
@@ -111,16 +128,35 @@ class ParserTestCase(unittest.TestCase):
         self.assertDictEqual(contexts[1], {"message": "second"})
 
     def test_file_easy(self):
-        io = self._parse_template(
+        self._parse_template(
             tpl.TEST_TEMPLATE_FILES_EASY, tpl.TEST_SAMPLE_FILES + "/easy", True
         )
-
-        __import__("pprint").pprint(io.user_ast)
 
     def test_file_xml(self):
         self._parse_template(
             tpl.TEST_TEMPLATE_FILES_XML, tpl.TEST_SAMPLE_FILES + "/xml", True
         )
+
+    def test_python_code_1(self):
+        self._parse_template(gtpl.PYTHON_CODE_TEMPLATE, gtpl.PYTHON_CODE_SAMPLE_1)
+
+    def test_python_code_2(self):
+        self._parse_template(gtpl.PYTHON_CODE_TEMPLATE, gtpl.PYTHON_CODE_SAMPLE_2)
+
+    def test_python_code_3(self):
+        self._parse_template(gtpl.PYTHON_CODE_TEMPLATE, gtpl.PYTHON_CODE_SAMPLE_3)
+
+    def test_python_code_4(self):
+        self._parse_template(gtpl.PYTHON_CODE_TEMPLATE, gtpl.PYTHON_CODE_SAMPLE_4)
+
+    def test_js_code_1(self):
+        self._parse_template(gtpl.JAVASCRIPT_CODE_TEMPLATE, gtpl.JS_CODE_SAMPLE_1)
+
+    # def test_js_code_2(self):
+    #     self._parse_template(gtpl.JAVASCRIPT_CODE_TEMPLATE, gtpl.JS_CODE_SAMPLE_2)
+
+    # def test_js_code_3(self):
+    #     self._parse_template(gtpl.JAVASCRIPT_CODE_TEMPLATE, gtpl.JS_CODE_SAMPLE_3)
 
     def test_file_medium(self):
         ...

@@ -1,15 +1,14 @@
 import enum
 
-from flang.core.ast_generators import generate_user_language
 from flang.core.evaluation import create_event_store
-from flang.core.subparsers import parse_user_language
+from flang.core.parsers import parse_user_language
 from flang.structures import (
     FileRepresentation,
     FlangAST,
     FlangFileInputReader,
     FlangTextInputReader,
     InputReaderInterface,
-    UserASTRootNode,
+    UserRoot,
     create_input_reader_from_file_representation,
 )
 
@@ -21,7 +20,7 @@ class BuiltinEvent(enum.Enum):
 
 
 class InteractiveFlangObject:
-    def __init__(self, flang_ast: FlangAST, user_ast: UserASTRootNode) -> None:
+    def __init__(self, flang_ast: FlangAST, user_ast: UserRoot) -> None:
         self.flang_ast = flang_ast
         self.user_ast = user_ast
 
@@ -34,14 +33,10 @@ class InteractiveFlangObject:
     def edit(self):
         raise NotImplementedError
 
-    def generate(self, patch):
-        generate_user_language()
-        raise NotImplementedError
-
     @staticmethod
     def evaluate_user_language(
         flang_ast: FlangAST, reader: InputReaderInterface
-    ) -> UserASTRootNode:
+    ) -> UserRoot:
         user_ast = parse_user_language(flang_ast, reader)
         return user_ast
 

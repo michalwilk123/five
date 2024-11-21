@@ -1,7 +1,7 @@
 from flang.interactive_flang_object import InteractiveFlangObject
 from flang.parsers.xml import parse_text
-from flang.structures import BaseUserAST, FlangAST, UserASTTextNode
-from flang.structures.ast import UserASTRootContainerNode
+from flang.structures import BaseUserAST, FlangAST, UserLeaf, UserRoot
+# from flang.structures.ast import UserASTRootContainerNode
 
 TEST_SAMPLE_RECURSIVE_3 = """\
 <html>
@@ -20,21 +20,21 @@ some <em>fancy</em> text
 
 TEST_TEMPLATE_RECURSIVE = r"""
 <choice name="xml-body" multi="true">
-    <regex name="wspace">\s+</regex>
+    <text regex="true" name="wspace">\s+</text>
     <sequence name="xml-node" multi="true">
-        <regex name="open-tag" value="{xml_open_tag}"/>
+        <text regex="true" name="open-tag" value="{xml_open_tag}"/>
         <choice name="xml-content" multi="true">
-            <regex name="raw-content" not="true" value="{lt}|{gt}"/>
+            <text regex="true" name="raw-content" not="true" value="{lt}|{gt}"/>
             <use ref="....xml-body"/>
         </choice>
-        <regex name="close-tag" value="{xml_close_tag}"/>
+        <text regex="true" name="close-tag" value="{xml_close_tag}"/>
     </sequence>
 </choice>
 """
 
 
 def generate_patches(user_ast:BaseUserAST, flang_ast: FlangAST):
-    if not isinstance(user_ast, UserASTRootContainerNode):
+    if not isinstance(user_ast, UserRoot):
         flast = flang_ast.full_search(user_ast.flang_ast_path)
 
         if flast.type == "choice":
@@ -46,7 +46,7 @@ def generate_patches(user_ast:BaseUserAST, flang_ast: FlangAST):
         if flast.get_bool_attrib("multi"):
             print("multi")
 
-    if isinstance(user_ast, UserASTTextNode):
+    if isinstance(user_ast, UserLeaf):
         print(f"TEXT location: {user_ast.location} content: {repr(user_ast.content)}")
         return user_ast.content
 

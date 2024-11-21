@@ -8,7 +8,7 @@ EVENT_PATTERN = re.compile(f"event{EVENT_PRIORITY_PATTERN_STR}{VNAME}")
 
 visible_construct_attributes = ["hidden", EVENT_PATTERN]
 naming_attributes = ["name", "alias"]
-cardinality_attributes = ["optional", "multi"]
+cardinality_attributes = ["optional", "multi", "terminal"]
 linking_syntax = ["link-name", "refers-to-link", "scope-start", "scope-end", "hoisting"]
 
 
@@ -19,13 +19,13 @@ def get_possible_construct_attributes(construct_name: str):
             return (
                 naming_attributes + cardinality_attributes + visible_construct_attributes
             )
-        case "text" | "regex":
+        case "text":
             return (
                 naming_attributes
                 + cardinality_attributes
                 + visible_construct_attributes
                 + linking_syntax
-                + ["value", "not"]
+                + ["value", "regex"]
             )
         case "event":
             return naming_attributes + ["source"]

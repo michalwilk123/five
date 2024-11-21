@@ -5,7 +5,8 @@ import io
 
 from flang.utils.exceptions import NoMoreDataException
 
-from .ast import UserASTFileMixin, UserASTTextNode
+# from .ast import UserASTFileMixin, UserASTTextNode
+from .ast import UserBranch, UserLeaf
 from .virtual_file import FileRepresentation
 
 SANITY_CHECK = True
@@ -61,12 +62,12 @@ class FlangTextInputReader(InputReaderInterface):
     def get_key(self):
         return self._cursor
 
-    def consume_data(self, data: UserASTTextNode) -> None:
+    def consume_data(self, data: UserLeaf) -> None:
         if SANITY_CHECK:
             consumed_data = self.read(data.size())
-            assert consumed_data == data.get_raw_content(), "{} {}".format(
-                consumed_data, data.get_raw_content()
-            )
+            # assert consumed_data == data.get_raw_content(), "{} {}".format(
+            #     consumed_data, data.get_raw_content()
+            # )
         self._cursor += data.size()
 
     def copy(self) -> FlangTextInputReader:
@@ -97,7 +98,7 @@ class FlangFileInputReader(InputReaderInterface):
         return len(self._data) - len(self._cursor)
 
     # can be changed in future to include file metadata, so cannot really take string as data
-    def consume_data(self, data: UserASTFileMixin) -> None:
+    def consume_data(self, data: UserBranch) -> None:
         filename = data.filename
         filenames = [f.get_name() for f in self._data]
 

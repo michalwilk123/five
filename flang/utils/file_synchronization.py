@@ -6,7 +6,7 @@ import tempfile
 import zipfile
 from datetime import datetime
 from pathlib import Path
-from typing import List, Set, Tuple
+from typing import List, Set
 
 
 @dataclasses.dataclass

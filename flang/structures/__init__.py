@@ -1,13 +1,9 @@
-from .ast import (
+from .ast import (  # UserASTComplexNode,; UserASTDirectoryNode,; UserASTFileMixin,; UserASTFlatFileNode,; UserASTRootContainerNode,; UserASTRootNode,; UserASTTextNode,
     BaseUserAST,
     FlangAST,
-    UserASTComplexNode,
-    UserASTDirectoryNode,
-    UserASTFileMixin,
-    UserASTFlatFileNode,
-    UserASTRootContainerNode,
-    UserASTRootNode,
-    UserASTTextNode,
+    UserBranch,
+    UserLeaf,
+    UserRoot,
 )
 from .event_storage import Event, EventStorage
 from .events import ScopeTree
@@ -17,6 +13,7 @@ from .input import (
     InputReaderInterface,
     create_input_reader_from_file_representation,
 )
+from .lex import LexicalAnalysisPattern, LexicalAnalysisPatternStorage
 from .searchable_tree import SearchableTree
 from .virtual_file import FileOperation, FileRepresentation, VirtualFileRepresentation
 
@@ -35,13 +32,11 @@ __all__ = [
     "IntermediateFileObject",
     "ScopeTree",
     "SearchableTree",
-    "UserASTComplexNode",
-    "UserASTDirectoryNode",
-    "UserASTFileMixin",
-    "UserASTFlatFileNode",
-    "UserASTRootContainerNode",
-    "UserASTRootNode",
-    "UserASTTextNode",
     "VirtualFileRepresentation",
     "create_input_reader_from_file_representation",
+    "LexicalAnalysisPatternStorage",
+    "LexicalAnalysisPattern",
+    "UserBranch",
+    "UserLeaf",
+    "UserRoot",
 ]

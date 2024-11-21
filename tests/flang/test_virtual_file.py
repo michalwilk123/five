@@ -78,14 +78,14 @@ class VirtualFileTestCase(unittest.TestCase):
         self.assertEqual(vfr, module_baseline)
 
     def test_create_files_from_virtual_representation(self):
-        diffs = test_vfr.diff()
+        diffs = test_vfr.realize()
 
         self.assertEqual(len(diffs), 5)
         self.assertTrue(all(diff.operation == FileOperation.CREATE for diff in diffs))
 
     def test_generate_files_in_virtual_representation(self):
         with tempfile.TemporaryDirectory() as tf:
-            diffs = test_vfr.diff(root=tf)
+            diffs = test_vfr.realize(root=tf)
             self.assertEqual(len(diffs), 5)
             self.assertTrue(all(diff.operation == FileOperation.CREATE for diff in diffs))
 
@@ -100,7 +100,7 @@ class VirtualFileTestCase(unittest.TestCase):
         vfr_copy: VirtualFileRepresentation = copy.deepcopy(test_vfr)
 
         with tempfile.TemporaryDirectory() as tf:
-            diffs = vfr_copy.diff(root=tf)
+            diffs = vfr_copy.realize(root=tf)
             self.assertEqual(len(diffs), 5)
             self.assertTrue(all(diff.operation == FileOperation.CREATE for diff in diffs))
 
@@ -109,7 +109,7 @@ class VirtualFileTestCase(unittest.TestCase):
             vfr_copy.content.pop(0)
             vfr_copy.content.pop(1)
 
-            diffs = vfr_copy.diff(root=tf)
+            diffs = vfr_copy.realize(root=tf)
             self.assertEqual(len(diffs), 2)
             self.assertTrue(all(diff.operation == FileOperation.DELETE for diff in diffs))
 
@@ -123,7 +123,7 @@ class VirtualFileTestCase(unittest.TestCase):
         vfr_copy: VirtualFileRepresentation = copy.deepcopy(test_vfr)
 
         with tempfile.TemporaryDirectory() as tf:
-            diffs = vfr_copy.diff(root=tf)
+            diffs = vfr_copy.realize(root=tf)
             self.assertEqual(len(diffs), 5)
             self.assertTrue(all(diff.operation == FileOperation.CREATE for diff in diffs))
 
@@ -132,7 +132,7 @@ class VirtualFileTestCase(unittest.TestCase):
             vfr_copy.content[3].content = f"{vfr_copy.content[3].content} NEW TEXT"
             new_text = vfr_copy.content[3].content
 
-            diffs = vfr_copy.diff(root=tf)
+            diffs = vfr_copy.realize(root=tf)
             self.assertEqual(len(diffs), 1)
             self.assertTrue(all(diff.operation == FileOperation.MODIFY for diff in diffs))
 

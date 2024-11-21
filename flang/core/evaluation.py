@@ -2,13 +2,7 @@ import collections
 import re
 from typing import Any
 
-from flang.structures import (
-    BaseUserAST,
-    Event,
-    EventStorage,
-    FlangAST,
-    UserASTRootContainerNode,
-)
+from flang.structures import BaseUserAST, Event, EventStorage, FlangAST, UserRoot
 from flang.utils.attributes import EVENT_PATTERN, EVENT_PRIORITY_PATTERN_STR
 
 # EventDictionary keys represents absolute paths to events from flang_ast
@@ -142,7 +136,7 @@ def initialize_event_triggers_for_user_ast(
     event_storage: EventStorage,
     global_events_dict: EventDictionary,
 ) -> EventStorage:
-    if not isinstance(user_ast, UserASTRootContainerNode):
+    if not isinstance(user_ast, UserRoot):
         add_triggers(user_ast, flang_ast, event_storage, global_events_dict)
 
     if user_ast.children is not None:

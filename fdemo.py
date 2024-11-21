@@ -1,4 +1,4 @@
-from fenv.interpreter.syntax import parser
+from fenv.fenv_script.syntax import parser
 
 input_text = """
 # comment

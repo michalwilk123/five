@@ -1,3 +1,4 @@
+import html
 import re
 import xml.etree.ElementTree as ET
 
@@ -47,12 +48,15 @@ def _build_tree(
     if validate_attributes:
         validate_attributes_for_xml_element(element)
 
+    text = element.text or element.attrib.get("value")
+    text = text and html.unescape(text)
+
     ast_node = FlangAST(
         name=node_name,
         type=element.tag,
         attributes=element.attrib or {},
         children=[],
-        text=element.text or element.attrib.get("value"),
+        text=text,
     )
     for child_element in element:
         node = _build_tree(child_element, validate_attributes)

@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Callable
 
 VNAME = r"[A-Za-z]\w*"
-INTEGER = r"[0-9]|([1-9][0-9]+)"
+INTEGER = r"([1-9][0-9]+)|[0-9]"
 NUMBER = r"-?(([1-9]+\d*)|0)(\.\d*)?"
 STRING = r'(?<!\\)(?:\\{2})*"(?:(?<!\\)(?:\\{2})*\\"|[^"])+(?<!\\)(?:\\{2})*"'
 C_FUNCTION_CALL = rf"{VNAME}\({VNAME}(,\s*)?\)"

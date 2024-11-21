@@ -133,7 +133,7 @@ class VirtualFileRepresentation(AbstractFileInterface):
         return self.DiffResultContainer(
             list(
                 itertools.chain(
-                    ops, *(file.diff(root=path) for file in self.get_content())
+                    ops, *(file.realize(root=path) for file in self.get_content())
                 )
             )
         )
@@ -160,7 +160,7 @@ class VirtualFileRepresentation(AbstractFileInterface):
 
         return []
 
-    def diff(self, root: str = "") -> DiffResultContainer:
+    def realize(self, root: str = "") -> DiffResultContainer:
         # Compare virtual file representation with actual filesystem.
         path = os.path.join(root, self.name)
 
