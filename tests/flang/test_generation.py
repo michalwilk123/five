@@ -25,4 +25,3 @@ class GeneratorTestCase(unittest.TestCase):
         for template, _ in TEXT_TEMPLATES:
             flang_ast = parse_text(template, validate_attributes=True)
             user_ast = generate_ast(flang_ast)
-    

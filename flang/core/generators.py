@@ -5,10 +5,7 @@ from flang.structures import BaseUserAST, FlangAST, UserBranch, UserLeaf, UserRo
 from flang.utils.exceptions import SymbolNotFoundError
 from flang.utils.regex import lex_storage
 
-from .utils import resolve_use_node
-
-
-def join_content(items): ...
+from .utils import get_cardinality_key, resolve_use_node
 
 
 class GeneratorSetup:
@@ -44,7 +41,7 @@ class GeneratorSetup:
 
         raise RuntimeError
 
-    def generate_cardinality(self, flang_node:FlangAST) -> int:
+    def _generate_cardinality(self, flang_node: FlangAST):
         if flang_node.get_bool_attrib("hidden"):
             return 0
 
@@ -57,6 +54,15 @@ class GeneratorSetup:
             number_choice = number_choice + [0]
 
         return random.choice(number_choice)
+
+    def get_cardinality(self, flang_node: BaseUserAST):
+        cardinality_key = get_cardinality_key(flang_node.location)
+
+        for key, value in self.patches.items():
+            if fnmatch.fnmatchcase(cardinality_key, key):
+                return value
+
+        return self._generate_cardinality(flang_node)
 
     def get(self, node: BaseUserAST):
         location = node.location
@@ -134,18 +140,18 @@ def fill_node_content(
 
 
 def generate_filled_node_with_cardinality(
-    flang_ast: FlangAST, parent: BaseUserAST, setup: GeneratorSetup
+    flang_node: FlangAST, parent: BaseUserAST, setup: GeneratorSetup
 ) -> None:
-    if flang_ast.get_bool_attrib("hidden") or flang_ast.type in ["event"]:
+    if flang_node.get_bool_attrib("hidden") or flang_node.type in ["event"]:
         return
 
-    quantity = setup.generate_cardinality(flang_ast)
+    quantity = setup.get_cardinality(flang_node)
 
     for _ in range(quantity):
-        node = generate_empty_node(flang_ast)
-        flang_node = flang_ast.full_search(node.flang_ast_path)
+        node = generate_empty_node(flang_node)
+        flang_node = flang_node.full_search(node.flang_ast_path)
 
-        assert flang_ast is not None
+        assert flang_node is not None
 
         parent.add_node(node)
         data = setup.get(node)

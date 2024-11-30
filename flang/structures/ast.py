@@ -45,6 +45,7 @@ class FlangAST(SearchableTree):
 @dataclasses.dataclass
 class BaseUserAST(SearchableTree):
     flang_ast_path: str
+    specification: dict[str, str | int] = {}
 
     def get_raw_content(self) -> str | list[str]:
         raise NotImplementedError

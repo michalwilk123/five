@@ -2,7 +2,7 @@ import unittest
 
 from flang.interactive_flang_object import BuiltinEvent, InteractiveFlangObject
 from flang.parsers.xml import parse_text
-from flang.structures import BaseUserAST, FlangAST
+from flang.structures import BaseUserAST
 from flang.utils.exceptions import MatchNotFoundError, TextNotParsedError
 
 from . import generation_templates as gtpl
