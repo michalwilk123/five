@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import re
-from typing import Any, Self, cast
+from typing import Any, ClassVar, Self
 
 from flang.utils.exceptions import (
     DuplicateNodeInsertionError,
@@ -13,20 +13,8 @@ from flang.utils.exceptions import (
 @dataclasses.dataclass(kw_only=True)
 class BasicTree:
     children: list[type[BasicTree]] | None = None
-    path_separator: str = dataclasses.field(
-        compare=False,
-        repr=False,
-        init=False,
-        default=".",
-        metadata={"include_in_dict": False},
-    )
-    pattern_for_duplicate_node: str = dataclasses.field(
-        compare=False,
-        repr=False,
-        init=False,
-        default="[{}]",
-        metadata={"include_in_dict": False},
-    )
+    PATH_SEPARATOR: ClassVar[str] = "."
+    DUPLICATE_NODE_BRACKETS: ClassVar[tuple[str, str]] = ("[", "]")
 
     def __post_init__(self):
         self.parent = None
@@ -66,6 +54,13 @@ class BasicTree:
         tuple_obj = [(f.name, getattr(self, f.name)) for f in dataclasses.fields(self)]
         return self.dict_factory(tuple_obj)
 
+    def set_children(self, children: list[SearchableTree]) -> SearchableTree:
+        if children:
+            for child in children:
+                self.add_node(child)
+
+        return self
+
     @classmethod
     def from_dict(cls, source: dict):
         copied_source = source.copy()
@@ -74,7 +69,7 @@ class BasicTree:
         if isinstance(children := copied_source.pop("children", None), list):
             children = [cls.from_dict(child_dict) for child_dict in children]
 
-        return cls(**copied_source, children=children)
+        return cls(**copied_source).set_children(children)
 
     def replace(self, **kwargs):
         new_obj = dataclasses.replace(self, **kwargs)
@@ -84,7 +79,9 @@ class BasicTree:
 
 @dataclasses.dataclass(kw_only=True)
 class SearchableTree(BasicTree):
-    children: list[type[SearchableTree]] | None = None
+    children: list[type[SearchableTree]] | None = dataclasses.field(
+        default=None, init=False
+    )
     name: str
 
     def get_(self, name: str) -> Self | None:
@@ -94,19 +91,19 @@ class SearchableTree(BasicTree):
 
         for child in self.children:
             if child.name == name:
-                return cast(Self, child)
+                return child
 
         return None
 
     def is_relative_path(self, path: str) -> bool:
-        return path.startswith(self.path_separator)
+        return path.startswith(self.PATH_SEPARATOR)
 
     def translate_relative_path(self, path: str) -> str:
         stripped_path = path
         number_of_levels = 0
 
         while stripped_path != (
-            new_path := stripped_path.removeprefix(self.path_separator)
+            new_path := stripped_path.removeprefix(self.PATH_SEPARATOR)
         ):
             stripped_path = new_path
             number_of_levels += 1
@@ -116,7 +113,7 @@ class SearchableTree(BasicTree):
         if node is None:
             return stripped_path
 
-        return node.location + self.path_separator + stripped_path
+        return self.join_paths(node.location, stripped_path)
 
     def relative_search(self, path: str) -> type[SearchableTree] | None:
         translated = self.translate_relative_path(path)
@@ -134,7 +131,7 @@ class SearchableTree(BasicTree):
         return node
 
     def search_down(self, path: str) -> Self | None:
-        path_names = path.split(self.path_separator)
+        path_names = path.split(self.PATH_SEPARATOR)
         node = self
 
         for name in path_names:
@@ -154,7 +151,7 @@ class SearchableTree(BasicTree):
         if not path.startswith(location):
             return None
 
-        return self.search_down(path.removeprefix(location + self.path_separator))
+        return self.search_down(path.removeprefix(location + self.PATH_SEPARATOR))
 
     def full_search(self, path: str) -> Self | None:
         return self.root.search_down_full_path(path)
@@ -165,11 +162,46 @@ class SearchableTree(BasicTree):
             return self.name
 
         parent_location = self.parent.location
-        return f"{parent_location}{self.path_separator}{self.name}"
+        return self.parent.join_paths(parent_location, self.name)
 
     @property
     def root(self) -> SearchableTree:
         return self if self.parent is None else self.parent.root
+
+    def is_name_duplicate(self, name: str) -> bool:
+        if name == self.name:
+            return True
+        if not self.name.startswith(name):
+            return False
+
+        pattern = (
+            re.escape(name + self.DUPLICATE_NODE_BRACKETS[0])
+            + r"\d+"
+            + re.escape(self.DUPLICATE_NODE_BRACKETS[1])
+        )
+        return bool(re.match(pattern, self.name))
+
+    def get_next_node_name(self, name: str) -> str:
+        if self.children:
+            amount_of_duplicates = len(
+                [1 for item in self.children if item.is_name_duplicate(name)]
+            )
+        else:
+            return name
+
+        if amount_of_duplicates == 0:
+            return name
+
+        return (
+            name
+            + self.DUPLICATE_NODE_BRACKETS[0]
+            + str(amount_of_duplicates)
+            + self.DUPLICATE_NODE_BRACKETS[1]
+        )
+
+    @classmethod
+    def join_paths(cls, *chunks: str):
+        return cls.PATH_SEPARATOR.join(chunks)
 
     def add_node(
         self,
@@ -187,22 +219,7 @@ class SearchableTree(BasicTree):
             if duplicate is node:
                 raise ExactSameNodeInsertionError
 
-            pattern = node.pattern_for_duplicate_node.format(r"\d")
-            duplicates = filter(
-                lambda el: el.name.startswith(node.name) and node.name != el.name,
-                self.children,
-            )
-            most_recent_duplicate_index = max(
-                (
-                    int(re.search(pattern, it.name.removeprefix(node.name)).group())
-                    for it in duplicates
-                ),
-                default=0,
-            )
-
-            most_recent_duplicate_index += 1
-            updated_name = f"{node.name}{node.pattern_for_duplicate_node.format(most_recent_duplicate_index)}"
-            node.name = updated_name
+            node.name = self.get_next_node_name(node.name)
 
         node.parent = self
         self.children.append(node)

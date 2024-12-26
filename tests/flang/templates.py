@@ -218,8 +218,8 @@ TEST_TEMPLATE_CHOICE_TERMINAL = r"""
 """
 
 TEST_TEMPLATE_FILES_EASY = r"""
-<file pattern="easy" variant="text" name="html-project">
-    <file multi="true" pattern="{filename}.html" variant="regex">
+<file pattern="easy" name="html-project">
+    <file multi="true" pattern="{filename}.html" regex="true">
         <sequence name="html">
             <text name="content" value="some text "/>
             <text regex="true" name="number" value="{number}"/>
@@ -229,8 +229,8 @@ TEST_TEMPLATE_FILES_EASY = r"""
 """
 
 TEST_TEMPLATE_FILES_XML = rf"""
-<file pattern="xml" variant="text" name="html-project">
-<file multi="true" pattern="{{filename}}.html" variant="regex">
+<file pattern="xml" name="html-project">
+<file multi="true" pattern="{{filename}}.html" regex="true">
 {TEST_TEMPLATE_RECURSIVE}
 </file>
 </file>

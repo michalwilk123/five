@@ -60,6 +60,13 @@ PYTHON_CODE_TEMPLATE = """
 
 JAVASCRIPT_CODE_TEMPLATE = """
 <sequence>
+    <choice alias="bool-stmt" hidden="true">
+        <text name="true" value="true"/>
+        <text name="false" value="false"/>
+        <sequence>
+            <text regex="true" value="{vname}|{integer}" name="l-value"/><text value=" % "/><text regex="true" value="{vname}|{integer}" name="r-value"/>
+        </sequence>
+    </choice>
     <choice name="code" multi="true" optional="true" alias="code">
         <sequence name="for-in-loop">
             <text value="for(int "/><text regex="true" value="{vname}" name="index"/><text value="=" />
@@ -103,13 +110,6 @@ JAVASCRIPT_CODE_TEMPLATE = """
             <text value=");"/>
         </sequence>
         <text regex="true" name="wspace">\s+</text>
-    </choice>
-    <choice alias="bool-stmt" hidden="true">
-        <text name="true" value="true"/>
-        <text name="false" value="false"/>
-        <sequence>
-            <text regex="true" value="{vname}|{integer}" name="l-value"/><text value=" % "/><text regex="true" value="{vname}|{integer}" name="r-value"/>
-        </sequence>
     </choice>
     <text alias="tab" value="    " hidden="true"/>
 </sequence>

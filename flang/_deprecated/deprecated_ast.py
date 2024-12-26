@@ -6,7 +6,7 @@ from typing import TypeVar
 
 from flang.utils.common import convert_to_bool
 
-from .searchable_tree import SearchableTree
+from ..structures.searchable_tree import SearchableTree
 
 T = TypeVar("T")
 

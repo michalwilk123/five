@@ -2,7 +2,7 @@ from typing import Any
 
 from flang.structures import BaseUserAST, FlangAST, UserBranch, UserLeaf, UserRoot
 
-from .utils import get_cardinality_key
+from ..core.utils import get_cardinality_key
 
 
 def generate_single_specification(
@@ -52,7 +52,9 @@ def _generate_specification_from_list(
             if previous_node != node.flang_ast_path:
                 break
 
-            specification |= generate_single_specification(flang_ast.full_search(node.flang_ast_path), node)
+            specification |= generate_single_specification(
+                flang_ast.full_search(node.flang_ast_path), node
+            )
             cardinality += 1
             idx += 1
 

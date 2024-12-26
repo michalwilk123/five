@@ -20,7 +20,12 @@ from flang.utils.exceptions import (
 )
 from flang.utils.regex import lex_storage
 
-from .utils import resolve_use_node
+from .utils import (
+    create_branch_with_children,
+    get_resolved_children,
+    is_flang_node_hidden,
+    resolve_use_node,
+)
 
 
 def _match_text_with_regex(text: str, pattern: str) -> str | None:
@@ -39,29 +44,27 @@ def _match_text_with_text(text: str, pattern: str) -> str | None:
     return None
 
 
-def _is_file_matched(filename: str, pattern: str, variant: str) -> bool:
-    assert variant in ("text", "regex")
+def _is_file_matched(filename: str, pattern: str, regex: bool) -> bool:
+    if not regex:
+        return filename == pattern
 
-    if variant == "regex":
-        pattern = pattern.replace(".", r"\.")
-        pattern = pattern.replace(r"\\.", ".")  # fix patterns broken by above code
-        pattern = lex_storage.create_pattern(pattern)
-        return re.match(pattern, filename) is None
-
-    return filename == pattern
+    pattern = pattern.replace(".", r"\.")
+    pattern = pattern.replace(r"\\.", ".")  # fix patterns broken by above code
+    pattern = lex_storage.create_pattern(pattern)
+    return re.match(pattern, filename) is None
 
 
 def match_on_sequence(
     flang_ast: FlangAST,
     reader: InputReaderInterface,
-) -> BaseUserAST:
-    if not flang_ast.children:
+) -> UserBranch:
+    if not (children := get_resolved_children(flang_ast)):
         raise RuntimeError("Cannot create sequence from empty list of objects")
 
     matches = []
 
     try:
-        for child in flang_ast.children:
+        for child in children:
             match_objects, reader = match_flang_ast_node(child, reader)
 
             matches += match_objects
@@ -70,23 +73,19 @@ def match_on_sequence(
             f"Could not match sequence of flang_asts: {flang_ast.type or flang_ast.location}"
         ) from e
 
-    return UserBranch(
-        name=flang_ast.name,
-        flang_ast_path=flang_ast.location,
-        children=matches,
-    )
+    return create_branch_with_children(flang_ast.name, flang_ast.location, matches, None)
 
 
 def match_on_choice(
     flang_ast: FlangAST,
     reader: InputReaderInterface,
-) -> BaseUserAST:
-    if not flang_ast.children:
+) -> UserBranch:
+    if not (children := get_resolved_children(flang_ast)):
         raise RuntimeError("Cannot choose from empty list of objects")
 
     max_matches, max_reader, max_child = None, None, None
 
-    for child in flang_ast.children:
+    for child in children:
         try:
             match_objects, new_reader = match_flang_ast_node(child, reader)
             new_match_found = (
@@ -101,27 +100,18 @@ def match_on_choice(
 
     if max_matches is None:
         raise ComplexMatchNotFound(
-            f"Could not match any flang_ast from: {[child.location for child in flang_ast.children]} text: {reader.read()[:15]}"
+            f"Could not match any flang_ast from: {[child.location for child in children]} text: {reader.read()[:15]}"
         )
 
-    match_object = UserBranch(
-        name=flang_ast.name,
-        flang_ast_path=flang_ast.location,
-        children=max_matches,
+    match_object = create_branch_with_children(
+        flang_ast.name, flang_ast.location, max_matches, None
     )
 
     if max_child.get_bool_attrib("terminal"):
         # NOTE: This should be done in more clever way imo. For example by using sth like Monads??
-        match_object._is_terminal = None
+        match_object.is_terminal = None
 
     return match_object
-
-
-def match_on_use(
-    flang_ast: FlangAST,
-    reader: InputReaderInterface,
-) -> BaseUserAST:
-    return match_on_single_node(resolve_use_node(flang_ast), reader)
 
 
 def match_on_text(flang_ast: FlangAST, reader: InputReaderInterface) -> UserLeaf:
@@ -159,11 +149,11 @@ def match_on_file(
         raise FileMatchNotFound("No files found") from e
 
     pattern = flang_ast.get_attrib("pattern")
-    variant = flang_ast.get_attrib("variant", "text")
+    regex = flang_ast.get_bool_attrib("regex")
 
-    if not _is_file_matched(filename, pattern, variant):
+    if not _is_file_matched(filename, pattern, regex):
         raise FileMatchNotFound(
-            f'Could not match filename pattern: "{pattern}" variant: {variant} with current '
+            f'Could not match filename pattern: "{pattern}" {regex=} with current '
             f'file : "{filename}"'
         )
 
@@ -174,11 +164,8 @@ def match_on_file(
     if not out_reader.is_empty():
         raise TextNotParsedError(f"Text left: {out_reader.read()}")
 
-    return UserBranch(
-        name=flang_ast.name,
-        flang_ast_path=flang_ast.location,
-        children=content,
-        filename=filename,
+    return create_branch_with_children(
+        flang_ast.name, flang_ast.location, content, filename
     )
 
 
@@ -190,7 +177,6 @@ def match_on_single_node(
         "sequence": match_on_sequence,
         "choice": match_on_choice,
         "text": match_on_text,
-        "use": match_on_use,
         "file": match_on_file,
     }
     match_fn = matchers.get(flang_ast.type)
@@ -215,15 +201,18 @@ def match_flang_ast_node(
     if alias_name := flang_ast.get_attrib("alias"):
         flang_ast.create_alias(alias_name)
 
-    if flang_ast.get_bool_attrib("hidden") or flang_ast.type in ["event"]:
+    if is_flang_node_hidden(flang_ast):
         return [], reader
+
+    if flang_ast.type == "use":
+        flang_ast = resolve_use_node(flang_ast)
 
     reader = reader.copy()
     matches = []
+    # possible_tries = flang_ast.get_bool_attrib("optional") then [0] <- moze na cos takiego przepisac
 
     try:
         match_object = match_on_single_node(flang_ast, reader)
-
         matches.append(match_object)
         reader.consume_data(match_object)
     except MatchNotFoundError as e:
@@ -239,7 +228,7 @@ def match_flang_ast_node(
             matches.append(match_object)
             reader.consume_data(match_object)
 
-            if hasattr(match_object, "_is_terminal"):
+            if hasattr(match_object, "is_terminal"):
                 break
         except MatchNotFoundError as e:
             reader = reader.previous
@@ -272,4 +261,9 @@ def parse_user_language(
 
     assert isinstance(match_objects, list), isinstance(match_objects, list)
 
-    return UserRoot(children=match_objects)
+    root = UserRoot()
+
+    for match in match_objects:
+        root.add_node(match)
+
+    return root

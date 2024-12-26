@@ -34,7 +34,7 @@ def get_possible_construct_attributes(construct_name: str):
                 naming_attributes
                 + cardinality_attributes
                 + visible_construct_attributes
-                + ["pattern", "variant"]
+                + ["pattern", "regex"]
             )
         case "use":
             return (

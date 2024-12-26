@@ -55,7 +55,6 @@ def _build_tree(
         name=node_name,
         type=element.tag,
         attributes=element.attrib or {},
-        children=[],
         text=text,
     )
     for child_element in element:

@@ -1,7 +1,7 @@
 import unittest
 
+from flang._deprecated.deprecated_spec_generation import generate_specification
 from flang.core.parsers import parse_user_language
-from flang.core.spec_generation import generate_specification
 from flang.parsers.xml import parse_text
 from flang.structures import FlangTextInputReader
 

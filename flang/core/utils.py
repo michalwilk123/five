@@ -1,11 +1,4 @@
-from flang.structures import (
-    BaseUserAST,
-    FlangAST,
-    UserBranch,
-    UserLeaf,
-    UserRoot,
-    VirtualFileRepresentation,
-)
+from flang.structures import BaseUserAST, FlangAST, UserBranch
 from flang.utils.exceptions import SymbolNotFoundError
 
 
@@ -30,53 +23,48 @@ def resolve_use_node(flang_ast: FlangAST):
     attributes.pop("ref")
 
     # TODO: can be cached very easily
-    return target_flang_ast.replace(attributes=attributes)
+    target_copy = target_flang_ast.replace(attributes=attributes)
+
+    if target_flang_ast.children:
+        for child in target_flang_ast.children:
+            target_copy.add_node(child)
+
+    return target_copy
 
 
-def _join_children(content: list) -> list[VirtualFileRepresentation] | str:
-    is_directory = None
-
-    for item in content:
-        if isinstance(item, str):
-            assert (
-                is_directory != True
-            ), "Ast cannot contain strings and files. Cannot create directory with text content!"
-            is_directory = False
-        elif isinstance(item, VirtualFileRepresentation):
-            assert (
-                is_directory != False
-            ), "Ast cannot contain strings and files. Cannot create directory with text content!"
-            is_directory = True
-
-    if is_directory:
-        return [file for sublist in content for file in sublist]
-    return "".join(content)
+def is_flang_node_hidden(flang_node: FlangAST) -> bool:
+    return flang_node.get_bool_attrib("hidden") or flang_node.type in ["event"]
 
 
-def _inner_materialize_ast(user_ast: BaseUserAST) -> VirtualFileRepresentation | str:
-    if isinstance(user_ast, UserLeaf):
-        return user_ast.content
-    elif isinstance(user_ast, UserBranch):
-        materialized = [_inner_materialize_ast(child) for child in user_ast.children]
-        content = _join_children(materialized)
+def get_resolved_children(flang_node: FlangAST):
+    if not flang_node.children:
+        return
 
-        return (
-            VirtualFileRepresentation(name=user_ast.filename, content=content)
-            if user_ast.filename
-            else content
-        )
+    children = []
 
-    raise RuntimeError
+    for child in flang_node.children:
+        if is_flang_node_hidden(flang_node):
+            continue
 
+        if child.type == "use":
+            child = resolve_use_node(child)
 
-def materialize_ast(user_ast: BaseUserAST, file_target: str | None = None):
-    assert isinstance(user_ast, UserBranch)
+        children.append(child)
 
-    if file_target:
-        user_ast.filename = file_target
-
-    return _inner_materialize_ast()
+    return children
 
 
-def get_cardinality_key(location: str) -> str:
-    return f"_card:{location}"
+def create_branch_with_children(
+    name: str, ast_path: str, children: list[BaseUserAST], filename: None | str
+):
+    user_branch = UserBranch(
+        name=name,
+        flang_ast_path=ast_path,
+        filename=filename,
+    )
+
+    for child in children:
+        assert isinstance(child, BaseUserAST)
+        user_branch.add_node(child)
+
+    return user_branch

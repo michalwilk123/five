@@ -19,7 +19,9 @@ class SimpleTree(SearchableTree):
     pass
 
 
-tree_native = SimpleTree(name="A", children=[SimpleTree(name="B"), SimpleTree(name="C")])
+tree_native = SimpleTree(name="A").set_children(
+    [SimpleTree(name="B"), SimpleTree(name="C")]
+)
 tree_dict = {
     "name": "A",
     "children": [
@@ -110,7 +112,7 @@ class SearchableTreeTestCase(unittest.TestCase):
             self.assertEqual(node.location, path)
             self.assertIs(node.root, tree)
 
-            node_name = path.split(node.path_separator)[-1]
+            node_name = path.split(node.PATH_SEPARATOR)[-1]
             self.assertEqual(node.name, node_name)
 
         self.assertIsNone(tree.full_search("wrong.path"))
@@ -124,7 +126,7 @@ class SearchableTreeTestCase(unittest.TestCase):
             parent.add_node(node, allow_duplicates=False)
 
         for path in set(it for it, _ in self.TEST_TREE_NODE_ARRAY):
-            self.assertIsNotNone(tree.full_search(f"{path}{tree.path_separator}NEW_NODE"))
+            self.assertIsNotNone(tree.full_search(f"{path}{tree.PATH_SEPARATOR}NEW_NODE"))
 
     def test_search_down(self):
         tree = SimpleTree.from_dict(tree_dict)
