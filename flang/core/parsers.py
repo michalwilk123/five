@@ -22,7 +22,7 @@ from flang.utils.regex import lex_storage
 
 from .utils import (
     create_branch_with_children,
-    get_resolved_children,
+    get_available_children,
     is_flang_node_hidden,
     resolve_use_node,
 )
@@ -58,7 +58,7 @@ def match_on_sequence(
     flang_ast: FlangAST,
     reader: InputReaderInterface,
 ) -> UserBranch:
-    if not (children := get_resolved_children(flang_ast)):
+    if not (children := get_available_children(flang_ast)):
         raise RuntimeError("Cannot create sequence from empty list of objects")
 
     matches = []
@@ -66,7 +66,6 @@ def match_on_sequence(
     try:
         for child in children:
             match_objects, reader = match_flang_ast_node(child, reader)
-
             matches += match_objects
     except MatchNotFoundError as e:
         raise ComplexMatchNotFound(
@@ -80,7 +79,7 @@ def match_on_choice(
     flang_ast: FlangAST,
     reader: InputReaderInterface,
 ) -> UserBranch:
-    if not (children := get_resolved_children(flang_ast)):
+    if not (children := get_available_children(flang_ast)):
         raise RuntimeError("Cannot choose from empty list of objects")
 
     max_matches, max_reader, max_child = None, None, None
@@ -157,6 +156,7 @@ def match_on_file(
             f'file : "{filename}"'
         )
 
+    assert len(flang_ast.children), "file node has to have only 1 child"
     child = flang_ast.first_child
     sub_reader = reader.get_nested_reader(filename)
     content, out_reader = match_flang_ast_node(child, sub_reader)
@@ -198,18 +198,16 @@ def match_flang_ast_node(
     flang_ast: FlangAST,
     reader: InputReaderInterface,
 ) -> tuple[list[BaseUserAST], InputReaderInterface]:
-    if alias_name := flang_ast.get_attrib("alias"):
-        flang_ast.create_alias(alias_name)
-
-    if is_flang_node_hidden(flang_ast):
-        return [], reader
+    # If i dont do this
+    # i will get duplicates of the same object
+    original_flang_ast = flang_ast
 
     if flang_ast.type == "use":
         flang_ast = resolve_use_node(flang_ast)
 
     reader = reader.copy()
     matches = []
-    # possible_tries = flang_ast.get_bool_attrib("optional") then [0] <- moze na cos takiego przepisac
+    # possible_number_of_samples = flang_ast.get_bool_attrib("optional") then [0] <- moze na cos takiego przepisac
 
     try:
         match_object = match_on_single_node(flang_ast, reader)
@@ -233,6 +231,10 @@ def match_flang_ast_node(
         except MatchNotFoundError as e:
             reader = reader.previous
             break
+
+    if original_flang_ast != flang_ast:
+        for match in matches:
+            match.flang_ast_path = original_flang_ast.location
 
     return matches, reader
 

@@ -3,12 +3,13 @@ from flang.structures import LexicalAnalysisPattern, LexicalAnalysisPatternStora
 VNAME = r"[A-Za-z]\w*"
 INTEGER = r"([1-9][0-9]+)|[0-9]"
 NUMBER = r"-?(([1-9]+\d*)|0)(\.\d*)?"
+WHITESPACE = r"\s"
 STRING = r'(?<!\\)(?:\\{2})*"(?:(?<!\\)(?:\\{2})*\\"|[^"])+(?<!\\)(?:\\{2})*"'
 C_FUNCTION_CALL = rf"{VNAME}\({VNAME}(,\s*)?\)"
 XML_ATTR = rf'{VNAME}="[^"\n]*"'
-XML_OPEN_TAG = rf"<{VNAME}(\s*{XML_ATTR})*>"
+XML_OPEN_TAG = rf"<{VNAME}({WHITESPACE}*{XML_ATTR})*>"
 XML_CLOSE_TAG = rf"</{VNAME}>"
-XML_SINGLE_TAG = rf"<{VNAME}(\s*{XML_ATTR})*\s*/>"
+XML_SINGLE_TAG = rf"<{VNAME}({WHITESPACE}*{XML_ATTR})*{WHITESPACE}*/>"
 WSPACE = r"\s+"
 XML_CONTENT_CHAR = "[^<>]"
 ANY = ".|\n"
@@ -18,6 +19,7 @@ VNamePattern = LexicalAnalysisPattern(
 )
 IntegerPattern = LexicalAnalysisPattern("INTEGER", INTEGER, ["123", "10", "2"])
 NumberPattern = LexicalAnalysisPattern("NUMBER", NUMBER, ["1.23", "0.5", "10.0"])
+WhitespacePattern = LexicalAnalysisPattern("whitespace", WHITESPACE, [" ", "\n"])
 StringPattern = LexicalAnalysisPattern(
     "STRING",
     STRING,
@@ -56,6 +58,7 @@ lex_storage = LexicalAnalysisPatternStorage(
         CFunctionCallPattern,
         StringPattern,
         NumberPattern,
+        WhitespacePattern,
         IntegerPattern,
         VNamePattern,
         XmlContentCharPattern,

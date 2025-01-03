@@ -1,11 +1,13 @@
 import unittest
-from pprint import pprint
 
 from flang.core.generators import generate_specification, get_constructed_ast
 from flang.interactive_flang_object import InteractiveFlangObject
 from flang.parsers.xml import parse_text
+from flang.structures.ast import ast_to_string
+from pprint import pprint
 
 from . import templates as tpl
+from . import generation_templates as gtpl
 
 TEXT_TEMPLATES = [
     [tpl.TEST_BASIC_TEMPLATE, tpl.TEST_BASIC_SAMPLE],
@@ -18,8 +20,13 @@ TEXT_TEMPLATES = [
     [tpl.TEST_TEMPLATE_CHOICE_TERMINAL, tpl.TEST_SAMPLE_TERMINAL_PARSING],
     [tpl.TEST_TEMPLATE_LINKING, tpl.TEST_SAMPLE_LINKING],
     [tpl.TEST_TEMPLATE_FUNCTION_1, "say hello_world"],
+    [gtpl.JAVASCRIPT_CODE_TEMPLATE, gtpl.JS_CODE_SAMPLE_3]
 ]
 
+FILE_TEMPLATES = [
+    [tpl.TEST_TEMPLATE_FILES_EASY, tpl.TEST_SAMPLE_FILES + "/easy"],
+    [tpl.TEST_TEMPLATE_FILES_XML, tpl.TEST_SAMPLE_FILES + "/xml"],
+]
 
 class GeneratorTestCase(unittest.TestCase):
     def test_generate_text_sanity_check(self):
@@ -33,11 +40,38 @@ class GeneratorTestCase(unittest.TestCase):
             user_ast = InteractiveFlangObject.from_string(flang_ast, sample).user_ast
             generate_specification(flang_ast, user_ast)
 
-    def test_lossless_generation_cycle(self):
+    def test_lossless_generation_cycle_text(self):
         for template, sample in TEXT_TEMPLATES:
             flang_ast = parse_text(template, validate_attributes=True)
             user_ast = InteractiveFlangObject.from_string(flang_ast, sample).user_ast
+            # print("====================== original:")
+            # print(user_ast)
 
             spec = generate_specification(flang_ast, user_ast)
             generated = get_constructed_ast(flang_ast, spec, fill_missing=False)
+
+            # print("====================== generated:")
+            # print(generated)
+            # print("====================== spec:")
+            # print(spec)
+            # print("====================== diff:")
+            # print(user_ast.diff(generated))
+            self.assertEqual(user_ast, generated)
+
+    def test_lossless_generation_cycle_files(self):
+        for template, filepath in FILE_TEMPLATES:
+            flang_ast = parse_text(template, validate_attributes=True)
+            user_ast = InteractiveFlangObject.from_filenames(flang_ast, [filepath]).user_ast
+
+            spec = generate_specification(flang_ast, user_ast)
+            generated = get_constructed_ast(flang_ast, spec, fill_missing=False).first_child # TODO: wtf dude...
+
+            # print(user_ast.diff(generated))
+            # print("======================")
+            # print(user_ast)
+            # print("======================")
+            # print(generated)
+            # print("======================")
+            # print(spec)
+
             self.assertEqual(user_ast, generated)

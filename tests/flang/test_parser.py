@@ -152,11 +152,11 @@ class ParserTestCase(unittest.TestCase):
     def test_js_code_1(self):
         self._parse_template(gtpl.JAVASCRIPT_CODE_TEMPLATE, gtpl.JS_CODE_SAMPLE_1)
 
-    # def test_js_code_2(self):
-    #     self._parse_template(gtpl.JAVASCRIPT_CODE_TEMPLATE, gtpl.JS_CODE_SAMPLE_2)
+    def test_js_code_2(self):
+        self._parse_template(gtpl.JAVASCRIPT_CODE_TEMPLATE, gtpl.JS_CODE_SAMPLE_2)
 
-    # def test_js_code_3(self):
-    #     self._parse_template(gtpl.JAVASCRIPT_CODE_TEMPLATE, gtpl.JS_CODE_SAMPLE_3)
+    def test_js_code_3(self):
+        self._parse_template(gtpl.JAVASCRIPT_CODE_TEMPLATE, gtpl.JS_CODE_SAMPLE_3)
 
     def test_file_medium(self):
         ...

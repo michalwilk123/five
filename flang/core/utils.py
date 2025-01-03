@@ -36,18 +36,17 @@ def is_flang_node_hidden(flang_node: FlangAST) -> bool:
     return flang_node.get_bool_attrib("hidden") or flang_node.type in ["event"]
 
 
-def get_resolved_children(flang_node: FlangAST):
-    if not flang_node.children:
-        return
+def get_available_children(flang_node: FlangAST):
+    assert flang_node.children
 
     children = []
 
     for child in flang_node.children:
-        if is_flang_node_hidden(flang_node):
-            continue
+        if alias_name := child.get_attrib("alias"):
+            child.create_alias(alias_name)
 
-        if child.type == "use":
-            child = resolve_use_node(child)
+        if is_flang_node_hidden(child):
+            continue
 
         children.append(child)
 

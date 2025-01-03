@@ -15,6 +15,7 @@ class FlangAST(SearchableTree):
     type: str
     attributes: dict
     text: str | None
+    # reffers_to = default(None)
 
     def get_attrib(self, key: str, default=None):
         return self.attributes.get(key, default)
@@ -23,6 +24,7 @@ class FlangAST(SearchableTree):
         return convert_to_bool(self.attributes.get(key, default))
 
     def create_alias(self, alias_name: str) -> None:
+        # to powinno byc w `add_node`
         self.root._root_create_alias(alias_name, self.location)
 
     def _root_create_alias(self, alias_name: str, location: str) -> None:
@@ -34,7 +36,10 @@ class FlangAST(SearchableTree):
     def normalize_path(self: T, target_path: str) -> str:
         if target_path.startswith("@"):
             alias_name = target_path.removeprefix("@")
-            return self.root._meta[alias_name]
+            try:
+                return self.root._meta[alias_name]
+            except AttributeError:
+                pass
 
         if self.is_relative_path(target_path):
             return self.translate_relative_path(target_path)
@@ -65,6 +70,14 @@ class BaseUserAST(SearchableTree):
         if self.children:
             if not other.children:
                 return False
+            
+            if len(self.children) != len(other.children):
+                print(f"CHILDREN DIFFERENT: {self.name=} {other.name=}: \n{self.children=} \n{other.children=}")
+                print(ast_to_string(self))
+                print("======")
+                print(ast_to_string(other))
+                print(self.location)
+                return False
 
             return all(
                 child1.diff(child2)
@@ -73,6 +86,13 @@ class BaseUserAST(SearchableTree):
 
         return True
 
+def ast_to_string(ast:BaseUserAST):
+    if hasattr(ast, "content"):
+        return ast.content
+    if ast.children:
+        return "".join(ast_to_string(child) for child in ast.children)
+    return ""
+            
 
 @dataclasses.dataclass
 class UserBranch(BaseUserAST):
