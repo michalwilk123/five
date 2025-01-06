@@ -4,11 +4,11 @@ from flang.core.evaluation import create_event_store
 from flang.core.parsers import parse_user_language
 from flang.structures import (
     FileRepresentation,
-    FlangAST,
     FlangFileInputReader,
+    FlangRoot,
     FlangTextInputReader,
     InputReaderInterface,
-    UserRoot,
+    TemplateTree,
     create_input_reader_from_file_representation,
 )
 
@@ -20,44 +20,45 @@ class BuiltinEvent(enum.Enum):
 
 
 class InteractiveFlangObject:
-    def __init__(self, flang_ast: FlangAST, user_ast: UserRoot) -> None:
-        self.flang_ast = flang_ast
-        self.user_ast = user_ast
+    def __init__(self, template_tree: TemplateTree, flang_tree: FlangRoot) -> None:
+        self.template_tree = template_tree
+        self.flang_tree = flang_tree
 
         # evaluate here
-        self.event_storage = create_event_store(user_ast, flang_ast)
+        self.event_storage = create_event_store(flang_tree, template_tree)
         self.context = {}
         context = self.event_storage.execute_all(BuiltinEvent.ON_READ.value)
         self.context.update(context)
 
     def edit(self):
         raise NotImplementedError
+    
 
     @staticmethod
     def evaluate_user_language(
-        flang_ast: FlangAST, reader: InputReaderInterface
-    ) -> UserRoot:
-        user_ast = parse_user_language(flang_ast, reader)
-        return user_ast
+        template_tree: TemplateTree, reader: InputReaderInterface
+    ) -> FlangRoot:
+        flang_tree = parse_user_language(template_tree, reader)
+        return flang_tree
 
     @classmethod
-    def from_reader(cls, flang_ast: FlangAST, reader: InputReaderInterface):
-        user_ast = cls.evaluate_user_language(flang_ast, reader)
-        return cls(flang_ast, user_ast)
+    def from_reader(cls, template_tree: TemplateTree, reader: InputReaderInterface):
+        flang_tree = cls.evaluate_user_language(template_tree, reader)
+        return cls(template_tree, flang_tree)
 
     @classmethod
-    def from_string(cls, flang_ast: FlangAST, sample: str):
+    def from_string(cls, template_tree: TemplateTree, sample: str):
         reader = FlangTextInputReader(sample)
-        return cls.from_reader(flang_ast, reader)
+        return cls.from_reader(template_tree, reader)
 
     @classmethod
-    def from_filenames(cls, flang_ast: FlangAST, paths: list[str]) -> None:
+    def from_filenames(cls, template_tree: TemplateTree, paths: list[str]) -> None:
         files = [FileRepresentation(path) for path in paths]
         reader = FlangFileInputReader(files)
-        return cls.from_reader(flang_ast, reader)
+        return cls.from_reader(template_tree, reader)
 
     @classmethod
-    def from_filename_contents(cls, flang_ast: FlangAST, path: str) -> None:
+    def from_filename_contents(cls, template_tree: TemplateTree, path: str) -> None:
         fr = FileRepresentation(path)
         reader = create_input_reader_from_file_representation(fr)
-        return cls.from_reader(flang_ast, reader)
+        return cls.from_reader(template_tree, reader)

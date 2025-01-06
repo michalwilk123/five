@@ -2,7 +2,7 @@ import html
 import re
 import xml.etree.ElementTree as ET
 
-from flang.structures import FlangAST
+from flang.structures import TemplateTree
 from flang.utils.attributes import get_possible_construct_attributes
 from flang.utils.exceptions import UnknownAttributeException
 
@@ -42,7 +42,7 @@ def validate_attributes_for_xml_element(
 def _build_tree(
     element: ET.Element,
     validate_attributes: bool,
-) -> FlangAST:
+) -> TemplateTree:
     node_name = element.attrib.get("name", element.tag)
 
     if validate_attributes:
@@ -51,7 +51,7 @@ def _build_tree(
     text = element.text or element.attrib.get("value")
     text = text and html.unescape(text)
 
-    ast_node = FlangAST(
+    ast_node = TemplateTree(
         name=node_name,
         type=element.tag,
         attributes=element.attrib or {},
@@ -64,7 +64,7 @@ def _build_tree(
     return ast_node
 
 
-def parse_text(text: str, validate_attributes: bool = False) -> FlangAST:
+def parse_text(text: str, validate_attributes: bool = False) -> TemplateTree:
     processed_xml = ET.fromstring(text)
     return _build_tree(processed_xml, validate_attributes)
 

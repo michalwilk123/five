@@ -1,6 +1,6 @@
 import unittest
 
-from flang.structures import FlangAST
+from flang.structures import TemplateTree
 
 test_event_node = {}
 

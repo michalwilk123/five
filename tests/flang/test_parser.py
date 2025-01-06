@@ -2,7 +2,7 @@ import unittest
 
 from flang.interactive_flang_object import BuiltinEvent, InteractiveFlangObject
 from flang.parsers.xml import parse_text
-from flang.structures import BaseUserAST
+from flang.structures import FlangAST
 from flang.utils.exceptions import MatchNotFoundError, TextNotParsedError
 
 from . import generation_templates as gtpl
@@ -13,14 +13,14 @@ class ParserTestCase(unittest.TestCase):
     def _parse_template(
         self, template: str, sample: str, file: bool = False
     ) -> InteractiveFlangObject:
-        flang_ast = parse_text(template, validate_attributes=True)
+        template_tree = parse_text(template, validate_attributes=True)
 
         if file:
             interactive_object = InteractiveFlangObject.from_filenames(
-                flang_ast, paths=[sample]
+                template_tree, paths=[sample]
             )
         else:
-            interactive_object = InteractiveFlangObject.from_string(flang_ast, sample)
+            interactive_object = InteractiveFlangObject.from_string(template_tree, sample)
 
         return interactive_object
 
@@ -37,13 +37,13 @@ class ParserTestCase(unittest.TestCase):
 
     def test_choice(self):
         interactive_object = self._parse_template(tpl.TEST_TEMPLATE_CHOICE, "AAA")
-        user_ast_node: BaseUserAST = interactive_object.user_ast.full_search(
+        user_ast_node: FlangAST = interactive_object.user_ast.full_search(
             "import.choice"
         ).first_child
         self.assertEqual(user_ast_node.name, "text-val")
 
         interactive_object = self._parse_template(tpl.TEST_TEMPLATE_CHOICE, "SOMEVALUE")
-        user_ast_node: BaseUserAST = interactive_object.user_ast.full_search(
+        user_ast_node: FlangAST = interactive_object.user_ast.full_search(
             "import.choice"
         ).first_child
         self.assertEqual(user_ast_node.name, "regex")

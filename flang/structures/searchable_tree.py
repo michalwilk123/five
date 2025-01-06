@@ -206,7 +206,7 @@ class SearchableTree(BasicTree):
     def add_node(
         self,
         node: type[SearchableTree],
-        allow_duplicates=True,
+        allow_duplicates: bool = True,
     ) -> SearchableTree:
         if self.children is None:
             self.children = []
@@ -235,3 +235,19 @@ class SearchableTree(BasicTree):
 
             return relative_node.relative_search(target_path)
         return self.full_search(target_path)
+
+
+@dataclasses.dataclass
+class SearchableTreeRoot(SearchableTree):
+    name: str = dataclasses.field(default="", init=False, repr=False)
+    PATH_SEPARATOR: ClassVar[str] = ""
+
+    @property
+    def root(self) -> Self:
+        return self.children[0]
+
+    def full_search(self, path: str) -> Self | None:
+        if not path:
+            return self
+
+        return self.children[0].search_down_full_path(path)

@@ -72,8 +72,8 @@ def dummy_main():
     ...
 
     # interpreter = FlangParser()
-    # flang_ast = interpreter.parse_text(DUMMY_TEST_TEMPLATE_CHOICE_1)
-    # match_processor = FlangStandardProcessorToolchain(flang_ast)
+    # template_tree = interpreter.parse_text(DUMMY_TEST_TEMPLATE_CHOICE_1)
+    # match_processor = FlangStandardProcessorToolchain(template_tree)
     # ret = match_processor.backward(DUMMY_TEST_SAMPLE_1)
     # text = match_processor.forward(ret)
 

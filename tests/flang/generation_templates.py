@@ -152,66 +152,6 @@ JAVASCRIPT_CODE_TEMPLATE = """
 </sequence>
 """
 
-JAVASCRIPT_CODE_TEMPLATE_OLD = """
-<sequence optional="true">
-    <text alias="tab" value="    " hidden="true"/>
-    <choice alias="bool-stmt" hidden="true">
-        <text name="true" value="true"/>
-        <text name="false" value="false"/>
-        <sequence>
-            <text regex="true" value="{vname}|{integer}" name="l-value"/><text value=" % "/><text regex="true" value="{vname}|{integer}" name="r-value"/>
-        </sequence>
-    </choice>
-    <choice name="code" multi="true" alias="code">
-        <sequence name="for-in-loop">
-            <text value="for(var "/><text regex="true" value="{vname}" name="index"/><text value="=" />
-            <text regex="true" value="{integer}" name="start"/><text value="; "/><text regex="true" value="{vname}" name="start"/>
-            <text value="&lt;"/><text regex="true" value="{integer}" name="end"/><text value="; "/><text regex="true" value="{vname}" name="start"/>
-            <text value="++) {&#xA;"/>
-            <sequence name="for-loop-body" multi="true">
-                <use ref="@tab"/>
-                <use ref="@code"/>
-            </sequence>
-            <text regex="true" optional="true" multi="true" name="wspace">\s+</text>
-            <text value="}"/>
-        </sequence>
-        <sequence name="if-stmt">
-            <text value="if ("/><use ref="@bool-stmt"/><text value=") {&#xA;"/>
-            <choice>
-                <sequence>
-                    <use ref="@tab"/>
-                    <use ref="@code"/>
-                    <text regex="true" optional="true" multi="true" name="wspace">\s+</text>
-                    <text value="}"/>
-                </sequence>
-                <sequence>
-                    <text value="else if ("/><use ref="@bool-stmt"/><text value=") {&#xA;"/>
-                    <sequence>
-                        <use ref="@tab"/>
-                        <use ref="@code"/>
-                    <text value="}"/>
-                    </sequence>
-                </sequence>
-            </choice>
-            <sequence optional="true">
-                <text value="else {&#xA;"/>
-                <sequence>
-                    <use ref="@tab"/>
-                    <use ref="@code"/>
-                    <text value="}"/>
-                </sequence>
-            </sequence>
-        </sequence>
-        <sequence>
-            <text value="console.log("/>
-            <text regex="true" value="{integer}|{string}|{vname}"/>
-            <text value=");"/>
-        </sequence>
-        <text regex="true" name="wspace">\s+</text>
-    </choice>
-</sequence>
-"""
-
 PYTHON_CODE_SAMPLE_1 = """
 print("hello world")
 pass

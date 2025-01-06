@@ -1,17 +1,17 @@
 from __future__ import annotations
 
 import dataclasses
-from typing import ClassVar, Self, TypeVar
+from typing import ClassVar, TypeVar
 
 from flang.utils.common import convert_to_bool
 
-from .searchable_tree import SearchableTree
+from .searchable_tree import SearchableTree, SearchableTreeRoot
 
 T = TypeVar("T")
 
 
 @dataclasses.dataclass
-class FlangAST(SearchableTree):
+class TemplateTree(SearchableTree):
     type: str
     attributes: dict
     text: str | None
@@ -23,23 +23,26 @@ class FlangAST(SearchableTree):
     def get_bool_attrib(self, key: str, default=False):
         return convert_to_bool(self.attributes.get(key, default))
 
-    def create_alias(self, alias_name: str) -> None:
-        # to powinno byc w `add_node`
-        self.root._root_create_alias(alias_name, self.location)
+    def add_node(
+        self, node: TemplateTree, allow_duplicates: bool = True
+    ) -> SearchableTree:
+        node = super().add_node(node, allow_duplicates)
 
-    def _root_create_alias(self, alias_name: str, location: str) -> None:
-        if not hasattr(self, "_meta"):
-            self._meta: dict[str, str] = {}
+        if alias := node.get_attrib("alias"):
+            if not hasattr(self.root, "alias_record"):
+                self.root.alias_record = {}
 
-        self._meta[alias_name] = location
+            if alias in self.root.alias_record:
+                raise Exception(f"Trying to set already existing alias: {alias}")
+
+            self.root.alias_record[alias] = node.location
+
+        return node
 
     def normalize_path(self: T, target_path: str) -> str:
         if target_path.startswith("@"):
             alias_name = target_path.removeprefix("@")
-            try:
-                return self.root._meta[alias_name]
-            except AttributeError:
-                pass
+            return self.root.alias_record[alias_name]
 
         if self.is_relative_path(target_path):
             return self.translate_relative_path(target_path)
@@ -48,9 +51,9 @@ class FlangAST(SearchableTree):
 
 
 @dataclasses.dataclass
-class BaseUserAST(SearchableTree):
+class FlangAST(SearchableTree):
     DUPLICATE_NODE_BRACKETS: ClassVar[tuple[str, str]] = ("(", ")")
-    flang_ast_path: str
+    template_id: str
 
     def get_raw_content(self) -> str | list[str]:
         raise NotImplementedError
@@ -58,21 +61,23 @@ class BaseUserAST(SearchableTree):
     def size(self) -> int:
         raise NotImplementedError
 
-    def diff(self, other: BaseUserAST):
+    def diff(self, other: FlangAST):
         if self.name != other.name:
             print(f"NAME DIFFERENT: {self.name=} {other.name=}")
             return False
 
-        if self.flang_ast_path != other.flang_ast_path:
-            print(f"PATH DIFFERENT: {self.flang_ast_path=} {other.flang_ast_path=}")
+        if self.template_id != other.template_id:
+            print(f"PATH DIFFERENT: {self.template_id=} {other.template_id=}")
             return False
 
         if self.children:
             if not other.children:
                 return False
-            
+
             if len(self.children) != len(other.children):
-                print(f"CHILDREN DIFFERENT: {self.name=} {other.name=}: \n{self.children=} \n{other.children=}")
+                print(
+                    f"CHILDREN DIFFERENT: {self.name=} {other.name=}: \n{self.children=} \n{other.children=}"
+                )
                 print(ast_to_string(self))
                 print("======")
                 print(ast_to_string(other))
@@ -86,22 +91,23 @@ class BaseUserAST(SearchableTree):
 
         return True
 
-def ast_to_string(ast:BaseUserAST):
+
+def ast_to_string(ast: FlangAST):
     if hasattr(ast, "content"):
         return ast.content
     if ast.children:
         return "".join(ast_to_string(child) for child in ast.children)
     return ""
-            
+
 
 @dataclasses.dataclass
-class UserBranch(BaseUserAST):
+class FlangBranch(FlangAST):
     filename: str | None = None
 
     def size(self) -> int:
         return sum(child.size() for child in self.children) if self.children else 0
 
-    def diff(self, other: UserBranch):
+    def diff(self, other: FlangBranch):
         if self.filename != other.filename:
             print(f"FILENAME DIFFERENT: {self.filename=} {other.filename=}")
             return False
@@ -110,14 +116,14 @@ class UserBranch(BaseUserAST):
 
 
 @dataclasses.dataclass
-class UserLeaf(BaseUserAST):
+class FlangLeaf(FlangAST):
     children: None = dataclasses.field(default=None, init=False)
     content: str
 
     def size(self) -> int:
         return len(self.content)
 
-    def diff(self, other: UserBranch):
+    def diff(self, other: FlangBranch):
         if self.content != other.content:
             print(f"CONTENT DIFFERENT: {self.content=} {other.content=}")
             return False
@@ -126,36 +132,12 @@ class UserLeaf(BaseUserAST):
 
 
 @dataclasses.dataclass
-class UserRoot(UserBranch):
-    name: str = dataclasses.field(default="", init=False, repr=False)
-    flang_ast_path: str = dataclasses.field(default="", init=False, repr=False)
-    PATH_SEPARATOR: ClassVar[str] = ""
-
-    @property
-    def root(self) -> SearchableTree:
-        return self.children[0]
-
-    def full_search(self, path: str) -> Self | None:
-        if not path:
-            return self
-
-        return self.children[0].search_down_full_path(path)
+class TemplateRoot(SearchableTreeRoot, TemplateTree):
+    type: str = dataclasses.field(default="", init=False, repr=False)
+    text: None = dataclasses.field(default=None, init=False, repr=False)
+    attributes: dict = dataclasses.field(default_factory=dict, init=False, repr=False)
 
 
 @dataclasses.dataclass
-class FlangASTRoot(FlangAST):
-    type: str = dataclasses.field(default="", init=False, repr=False)
-    name: str = dataclasses.field(default="", init=False, repr=False)
-    text: None = dataclasses.field(default=None, init=False, repr=False)
-    attributes: dict = dataclasses.field(default_factory=dict, init=False, repr=False)
-    PATH_SEPARATOR: ClassVar[str] = ""
-
-    @property
-    def root(self) -> SearchableTree:
-        return self.children[0]
-
-    def full_search(self, path: str) -> Self | None:
-        if not path:
-            return self
-
-        return self.children[0].search_down_full_path(path)
+class FlangRoot(SearchableTreeRoot, FlangBranch):
+    template_id: str = dataclasses.field(default="", init=False, repr=False)

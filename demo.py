@@ -1,6 +1,6 @@
 from flang.interactive_flang_object import InteractiveFlangObject
 from flang.parsers.xml import parse_text
-from flang.structures import BaseUserAST, FlangAST, UserLeaf, UserRoot
+from flang.structures import FlangAST, TemplateTree, FlangLeaf, FlangRoot
 # from flang.structures.ast import UserASTRootContainerNode
 
 TEST_SAMPLE_RECURSIVE_3 = """\
@@ -33,9 +33,9 @@ TEST_TEMPLATE_RECURSIVE = r"""
 """
 
 
-def generate_patches(user_ast:BaseUserAST, flang_ast: FlangAST):
-    if not isinstance(user_ast, UserRoot):
-        flast = flang_ast.full_search(user_ast.flang_ast_path)
+def generate_patches(flang_tree:FlangAST, template_tree: TemplateTree):
+    if not isinstance(flang_tree, FlangRoot):
+        flast = template_tree.full_search(flang_tree.template_id)
 
         if flast.type == "choice":
             print("WYBOR: {}")
@@ -46,13 +46,13 @@ def generate_patches(user_ast:BaseUserAST, flang_ast: FlangAST):
         if flast.get_bool_attrib("multi"):
             print("multi")
 
-    if isinstance(user_ast, UserLeaf):
-        print(f"TEXT location: {user_ast.location} content: {repr(user_ast.content)}")
-        return user_ast.content
+    if isinstance(flang_tree, FlangLeaf):
+        print(f"TEXT location: {flang_tree.location} content: {repr(flang_tree.content)}")
+        return flang_tree.content
 
 
-    if isinstance(user_ast.children, list):
-         return "".join(generate_patches(child, flang_ast) for child in user_ast.children)
+    if isinstance(flang_tree.children, list):
+         return "".join(generate_patches(child, template_tree) for child in flang_tree.children)
     
     return ""
 
@@ -60,20 +60,20 @@ def generate_patches(user_ast:BaseUserAST, flang_ast: FlangAST):
 if __name__ == "__main__":
     template = TEST_TEMPLATE_RECURSIVE
 
-    flang_ast = parse_text(template, validate_attributes=True)
-    interactive_object = InteractiveFlangObject.from_string(flang_ast, TEST_SAMPLE_RECURSIVE_3)
+    template_tree = parse_text(template, validate_attributes=True)
+    interactive_object = InteractiveFlangObject.from_string(template_tree, TEST_SAMPLE_RECURSIVE_3)
 
-    generated = generate_patches(interactive_object.user_ast, interactive_object.flang_ast)
+    generated = generate_patches(interactive_object.flang_tree, interactive_object.template_tree)
     # print()
 
 # def rewrite_language(from_obj, target_obj, )
 
 
 def rewrite():
-    flang_ast_python = parse_text("some")
-    flang_ast_javascript = parse_text("some")
+    template_tree_python = parse_text("some")
+    template_tree_javascript = parse_text("some")
 
-    python_user_ast = InteractiveFlangObject.from_string(flang_ast, TEST_SAMPLE_RECURSIVE_3).user_ast
+    python_flang_tree = InteractiveFlangObject.from_string(template_tree, TEST_SAMPLE_RECURSIVE_3).flang_tree
     rewrite_language()
 
 

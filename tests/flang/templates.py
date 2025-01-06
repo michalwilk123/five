@@ -301,6 +301,42 @@ TEST_TEMPLATE_FUNCTION_3 = r"""
 </sequence>
 """
 
+TEST_TEMPLATE_REWRITE = """
+<sequence>
+    <sequence alias="polish" hidden="true">
+        <text value="Dzień dobry! Nazywam się "/>
+        <text regex="true" value="\\w+" name="name"/>
+    </sequence>
+    <sequence alias="english" hidden="true">
+        <choice>
+            <text value="Good morning!"/>
+            <text value="Good afternoon!"/>
+        </choice>
+        <text value=" My name is "/>
+        <text regex="true" value="\\w+" name="name"/>
+        <sequence name="extra-message" optional="true">
+            <text value=". "/>
+            <text regex="true" value="[A-Z].+"/>
+        </sequence>
+    </sequence>
+    <sequence name="greeting" multi="true">
+        <choice>
+            <use ref="@polish"/>
+            <use ref="@english"/>
+        </choice>
+        <text regex="true" value="\\.?\\n"/>
+    </sequence>
+</sequence>
+"""
+
+REWRITE_SAMPLE_1 = """\
+Dzień dobry! Nazywam się Michał.
+Good morning! My name is Alan. How are you?
+Dzień dobry! Nazywam się Piotr.
+Good afternoon! My name is Victor. How was your day?
+Good morning! My name is Ernest.
+"""
+
 # END
 ## END
 ### END
