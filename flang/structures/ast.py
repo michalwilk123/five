@@ -52,6 +52,11 @@ class TemplateTree(SearchableTree):
 
 @dataclasses.dataclass
 class FlangAST(SearchableTree):
+    """
+    Class that is like guardrails for developing flang generation. In future this may be removed and we'd
+    only use the specification data structures
+    """
+
     DUPLICATE_NODE_BRACKETS: ClassVar[tuple[str, str]] = ("(", ")")
     template_id: str
 
@@ -62,8 +67,8 @@ class FlangAST(SearchableTree):
         raise NotImplementedError
 
     def diff(self, other: FlangAST):
-        if self.name != other.name:
-            print(f"NAME DIFFERENT: {self.name=} {other.name=}")
+        if self.get_id() != other.get_id():
+            print(f"NAME DIFFERENT: {self.get_id()=} {other.get_id()=}")
             return False
 
         if self.template_id != other.template_id:
@@ -76,7 +81,7 @@ class FlangAST(SearchableTree):
 
             if len(self.children) != len(other.children):
                 print(
-                    f"CHILDREN DIFFERENT: {self.name=} {other.name=}: \n{self.children=} \n{other.children=}"
+                    f"CHILDREN DIFFERENT: {self.get_id()=} {other.get_id()=}: \n{self.children=} \n{other.children=}"
                 )
                 print(ast_to_string(self))
                 print("======")

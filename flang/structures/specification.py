@@ -1,0 +1,2 @@
+class Specification(dict):
+    pass

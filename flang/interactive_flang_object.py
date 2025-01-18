@@ -23,16 +23,13 @@ class InteractiveFlangObject:
     def __init__(self, template_tree: TemplateTree, flang_tree: FlangRoot) -> None:
         self.template_tree = template_tree
         self.flang_tree = flang_tree
+        self.operation_log = None
 
         # evaluate here
         self.event_storage = create_event_store(flang_tree, template_tree)
         self.context = {}
         context = self.event_storage.execute_all(BuiltinEvent.ON_READ.value)
         self.context.update(context)
-
-    def edit(self):
-        raise NotImplementedError
-    
 
     @staticmethod
     def evaluate_user_language(
@@ -62,3 +59,7 @@ class InteractiveFlangObject:
         fr = FileRepresentation(path)
         reader = create_input_reader_from_file_representation(fr)
         return cls.from_reader(template_tree, reader)
+
+    def run_operation(self): ...
+
+    def get_operation_state(self): ...

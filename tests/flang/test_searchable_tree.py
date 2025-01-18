@@ -22,27 +22,46 @@ class SimpleTree(SearchableTree):
 tree_native = SimpleTree(name="A").set_children(
     [SimpleTree(name="B"), SimpleTree(name="C")]
 )
+# NOTE: indeks nie powinien ustawiony jezeli jest rowny 0. Przynajmneij powinno byc to opcjonalne
 tree_dict = {
     "name": "A",
+    "index": 0,
     "children": [
         {
             "name": "B",
+            "index": 0,
             "children": [
                 {
                     "name": "C",
+                    "index": 0,
                     "children": [
                         {
                             "name": "C1",
+                            "index": 0,
                             "children": [
                                 {
                                     "name": "C2",
+                                    "index": 0,
                                     "children": [
                                         {
                                             "name": "C3",
+                                            "index": 0,
                                             "children": [
-                                                {"name": "C4", "children": None},
-                                                {"name": "C5", "children": None},
-                                                {"name": "C6", "children": None},
+                                                {
+                                                    "name": "C4",
+                                                    "index": 0,
+                                                    "children": None,
+                                                },
+                                                {
+                                                    "name": "C5",
+                                                    "index": 0,
+                                                    "children": None,
+                                                },
+                                                {
+                                                    "name": "C6",
+                                                    "index": 0,
+                                                    "children": None,
+                                                },
                                             ],
                                         }
                                     ],
@@ -51,22 +70,24 @@ tree_dict = {
                         },
                     ],
                 },
-                {"name": "D", "children": None},
+                {"name": "D", "index": 0, "children": None},
             ],
         },
         {
             "name": "E",
+            "index": 0,
             "children": [
-                {"name": "F", "children": None},
+                {"name": "F", "index": 0, "children": None},
                 {
                     "name": "G",
+                    "index": 0,
                     "children": [
-                        {"name": "H", "children": None},
+                        {"name": "H", "index": 0, "children": None},
                     ],
                 },
             ],
         },
-        {"name": "I", "children": None},
+        {"name": "I", "index": 0, "children": None},
     ],
 }
 

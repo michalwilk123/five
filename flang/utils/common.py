@@ -46,7 +46,6 @@ def create_callable_from_raw_code(code: str) -> Callable:
     namespace = {}
     formatted_code = textwrap.dedent(code)
     formatted_code = textwrap.indent(formatted_code, "    ")
-
     function = f"""\
 def _generated_function(context, **kwargs):
 {formatted_code}
@@ -65,7 +64,6 @@ def create_callable_from_pathname(path: str, function: str) -> Callable:
 
     name_without_ext = path.stem
     parent = path.parent
-
     module_path = str(parent.absolute())
     sys.path.append(module_path)
 

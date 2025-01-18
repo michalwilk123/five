@@ -83,14 +83,37 @@ class SearchableTree(BasicTree):
         default=None, init=False
     )
     name: str
+    index: int = dataclasses.field(default=0)
 
-    def get_(self, name: str) -> Self | None:
+    @classmethod
+    def pack(cls, index: int, name: str) -> str:
+        if index == 0:
+            return name
+
+        return (
+            name
+            + cls.DUPLICATE_NODE_BRACKETS[0]
+            + str(index)
+            + cls.DUPLICATE_NODE_BRACKETS[1]
+        )
+
+    @classmethod
+    def unpack(cls, node_id: str) -> tuple[int, str]:
+        suff = node_id.split(cls.DUPLICATE_NODE_BRACKETS[0])[-1]
+        name = node_id.removesuffix(cls.DUPLICATE_NODE_BRACKETS[0] + suff)
+        node_id = int(suff.removesuffix(cls.DUPLICATE_NODE_BRACKETS[1]))
+        return node_id, name
+
+    def get_id(self) -> str:
+        return self.pack(self.index, self.name)
+
+    def get_(self, id: str) -> Self | None:
         # Shallow search for only current children
         if self.children is None:
             return None
 
         for child in self.children:
-            if child.name == name:
+            if child.get_id() == id:
                 return child
 
         return None
@@ -134,8 +157,8 @@ class SearchableTree(BasicTree):
         path_names = path.split(self.PATH_SEPARATOR)
         node = self
 
-        for name in path_names:
-            if not (node := node.get_(name)):
+        for id in path_names:
+            if not (node := node.get_(id)):
                 return None
 
         return node
@@ -159,45 +182,27 @@ class SearchableTree(BasicTree):
     @property  # should be cached property
     def location(self) -> str:
         if self.parent is None:
-            return self.name
+            return self.get_id()
 
         parent_location = self.parent.location
-        return self.parent.join_paths(parent_location, self.name)
+        return self.parent.join_paths(parent_location, self.get_id())
 
     @property
     def root(self) -> SearchableTree:
         return self if self.parent is None else self.parent.root
 
-    def is_name_duplicate(self, name: str) -> bool:
-        if name == self.name:
-            return True
-        if not self.name.startswith(name):
-            return False
+    def get_next_node_index(self, name: str) -> tuple[int, str]:
+        if not self.children:
+            return 0
 
-        pattern = (
-            re.escape(name + self.DUPLICATE_NODE_BRACKETS[0])
-            + r"\d+"
-            + re.escape(self.DUPLICATE_NODE_BRACKETS[1])
+        last_node_index = max(
+            (item.index for item in self.children if item.name == name), default=None
         )
-        return bool(re.match(pattern, self.name))
 
-    def get_next_node_name(self, name: str) -> str:
-        if self.children:
-            amount_of_duplicates = len(
-                [1 for item in self.children if item.is_name_duplicate(name)]
-            )
-        else:
-            return name
+        if last_node_index is None:
+            return 0
 
-        if amount_of_duplicates == 0:
-            return name
-
-        return (
-            name
-            + self.DUPLICATE_NODE_BRACKETS[0]
-            + str(amount_of_duplicates)
-            + self.DUPLICATE_NODE_BRACKETS[1]
-        )
+        return last_node_index + 1
 
     @classmethod
     def join_paths(cls, *chunks: str):
@@ -205,13 +210,13 @@ class SearchableTree(BasicTree):
 
     def add_node(
         self,
-        node: type[SearchableTree],
+        node: SearchableTree,
         allow_duplicates: bool = True,
     ) -> SearchableTree:
         if self.children is None:
             self.children = []
 
-        duplicate = self.get_(node.name)
+        duplicate = self.get_(node.get_id())
 
         if duplicate is not None:
             if not allow_duplicates:
@@ -219,15 +224,14 @@ class SearchableTree(BasicTree):
             if duplicate is node:
                 raise ExactSameNodeInsertionError
 
-            node.name = self.get_next_node_name(node.name)
+            node.index = self.get_next_node_index(node.name)
 
         node.parent = self
         self.children.append(node)
+
         return node
 
-    def resolve_path(
-        self, target_path: str, current_path: str
-    ) -> type[SearchableTree] | None:
+    def resolve_path(self, target_path: str, current_path: str) -> SearchableTree | None:
         # TODO: Maybe should create something like `self` that translates directly to "{self.name}."
         if self.is_relative_path(target_path):
             relative_node = self.full_search(current_path)

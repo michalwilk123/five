@@ -321,11 +321,12 @@ TEST_TEMPLATE_REWRITE = """
     </sequence>
     <sequence name="greeting" multi="true">
         <choice>
-            <use ref="@polish"/>
-            <use ref="@english"/>
+            <use name="polish" ref="@polish"/>
+            <use name="english" ref="@english"/>
         </choice>
         <text regex="true" value="\\.?\\n"/>
     </sequence>
+    <text optional="true" multi="true" value="dot"/>
 </sequence>
 """
 
@@ -335,7 +336,7 @@ Good morning! My name is Alan. How are you?
 Dzień dobry! Nazywam się Piotr.
 Good afternoon! My name is Victor. How was your day?
 Good morning! My name is Ernest.
-"""
+dotdot"""
 
 # END
 ## END

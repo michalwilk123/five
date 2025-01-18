@@ -37,16 +37,16 @@ class ParserTestCase(unittest.TestCase):
 
     def test_choice(self):
         interactive_object = self._parse_template(tpl.TEST_TEMPLATE_CHOICE, "AAA")
-        user_ast_node: FlangAST = interactive_object.user_ast.full_search(
+        flang_tree_node: FlangAST = interactive_object.flang_tree.full_search(
             "import.choice"
         ).first_child
-        self.assertEqual(user_ast_node.name, "text-val")
+        self.assertEqual(flang_tree_node.name, "text-val")
 
         interactive_object = self._parse_template(tpl.TEST_TEMPLATE_CHOICE, "SOMEVALUE")
-        user_ast_node: FlangAST = interactive_object.user_ast.full_search(
+        flang_tree_node: FlangAST = interactive_object.flang_tree.full_search(
             "import.choice"
         ).first_child
-        self.assertEqual(user_ast_node.name, "regex")
+        self.assertEqual(flang_tree_node.name, "regex")
 
     def test_choice_nested(self):
         self._parse_template(
@@ -157,6 +157,9 @@ class ParserTestCase(unittest.TestCase):
 
     def test_js_code_3(self):
         self._parse_template(gtpl.JAVASCRIPT_CODE_TEMPLATE, gtpl.JS_CODE_SAMPLE_3)
+
+    def test_rewrite_sample(self):
+        self._parse_template(tpl.TEST_TEMPLATE_REWRITE, tpl.REWRITE_SAMPLE_1)
 
     def test_file_medium(self):
         ...

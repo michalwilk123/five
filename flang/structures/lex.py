@@ -3,6 +3,13 @@ import random
 import re
 import string
 
+"""
+NOTE: maybe someday we will ditch the regex patterns? It is kinda problematic for my use case
+
+1. It is to some excent not readable to at first glance its hard to tell what it does
+2. It is not easy to distinguish what is a part of syntax and what is a raw text to match
+"""
+
 
 class UnknownLexPatternError(Exception):
     pass

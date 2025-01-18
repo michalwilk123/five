@@ -73,7 +73,7 @@ def match_on_sequence(
         ) from e
 
     return create_branch_with_children(
-        template_tree.name, template_tree.location, matches, None
+        template_tree.get_id(), template_tree.location, matches, None
     )
 
 
@@ -105,7 +105,7 @@ def match_on_choice(
         )
 
     match_object = create_branch_with_children(
-        template_tree.name, template_tree.location, max_matches, None
+        template_tree.get_id(), template_tree.location, max_matches, None
     )
 
     if max_child.get_bool_attrib("terminal"):
@@ -134,7 +134,7 @@ def match_on_text(template_tree: TemplateTree, reader: InputReaderInterface) -> 
         )
 
     return FlangLeaf(
-        name=template_tree.name, template_id=template_tree.location, content=content
+        name=template_tree.get_id(), template_id=template_tree.location, content=content
     )
 
 
@@ -167,7 +167,7 @@ def match_on_file(
         raise TextNotParsedError(f"Text left: {out_reader.read()}")
 
     return create_branch_with_children(
-        template_tree.name, template_tree.location, content, filename
+        template_tree.get_id(), template_tree.location, content, filename
     )
 
 

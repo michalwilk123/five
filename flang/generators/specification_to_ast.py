@@ -1,107 +1,28 @@
 import random
-from collections import Counter
 
+from flang.core.utils import (
+    get_available_children,
+    is_flang_node_hidden,
+    resolve_use_node,
+)
 from flang.structures import (
     FlangAST,
     FlangBranch,
     FlangLeaf,
     FlangRoot,
+    Specification,
     TemplateRoot,
     TemplateTree,
 )
 from flang.utils.regex import lex_storage
 
-from .utils import get_available_children, is_flang_node_hidden, resolve_use_node
-
-TEXT_CONTENT_KEY = "{}:content"
-CHOICE_INDEX_KEY = "{}:choice-index"
-CHILDREN_KEY = "{}:children"
-FILENAME_KEY = "{}:filename"
-
-
-def has_deterministic_cardinality(template: TemplateTree) -> bool:
-    return template.get_bool_attrib("hidden") or not (
-        "multi" in template.attributes or "optional" in template.attributes
-    )
-
-
-def generate_specification_for_cardinality(
-    template: TemplateTree, branch: FlangBranch
-) -> dict:
-    ctr = Counter(
-        [template.full_search(item.template_id).name for item in branch.children]
-    )
-    children_card_dict = {}
-
-    for child in get_available_children(template):
-        original_node = child
-
-        if child.type == "use":
-            child = resolve_use_node(child)
-
-        if has_deterministic_cardinality(child):
-            continue
-
-        children_card_dict[original_node.name] = ctr.get(original_node.name, 0)
-
-    return (
-        {CHILDREN_KEY.format(branch.location): children_card_dict}
-        if children_card_dict
-        else {}
-    )
-
-
-def generate_specification_for_branch(
-    template: TemplateTree, branch: FlangBranch
-) -> dict:
-    specs = generate_specification_for_cardinality(template, branch)
-
-    if template.type == "choice":
-        specs[CHOICE_INDEX_KEY.format(branch.location)] = [
-            item.location for item in get_available_children(template)
-        ].index(branch.children[0].template_id)
-    elif template.type == "file":
-        specs[FILENAME_KEY.format(branch.location)] = branch.filename
-
-    return specs
-
-
-def generate_specification_for_leaf(template: TemplateTree, leaf: FlangLeaf) -> dict:
-    not_deterministic = template.get_bool_attrib(
-        "regex"
-    ) and leaf.content != template.get_attrib("default")
-
-    return (
-        {TEXT_CONTENT_KEY.format(leaf.location): leaf.content}
-        if not_deterministic
-        else {}
-    )
-
-
-def generate_specification(template_tree: TemplateTree, flang_tree: FlangAST) -> dict:
-    if isinstance(flang_tree, FlangRoot):
-        fake_root = TemplateRoot()
-        fake_root.add_node(template_tree)
-        template = fake_root
-    else:
-        template = template_tree.full_search(flang_tree.template_id)
-
-    if template.type == "use":
-        template = resolve_use_node(template)
-
-    specification = {}
-
-    if isinstance(flang_tree, FlangLeaf):
-        specification |= generate_specification_for_leaf(template, flang_tree)
-    elif isinstance(flang_tree, FlangBranch):
-        specification |= generate_specification_for_branch(template, flang_tree)
-
-        for child in flang_tree.children:
-            specification |= generate_specification(template_tree, child)
-    else:
-        raise Exception
-
-    return specification
+from .common import (
+    CHILDREN_KEY,
+    CHOICE_INDEX_KEY,
+    FILENAME_KEY,
+    TEXT_CONTENT_KEY,
+    is_constant_cardinality,
+)
 
 
 class MissingSpecificationError(Exception):
@@ -110,12 +31,12 @@ class MissingSpecificationError(Exception):
 
 def get_cardinality(
     template: TemplateTree,
-    specification: dict,
+    specification: Specification,
     fill_missing: bool,
     node: FlangBranch,
     node_name: str,
 ):
-    if has_deterministic_cardinality(template):
+    if is_constant_cardinality(template):
         return 1
 
     cardinality_dict = specification.get(CHILDREN_KEY.format(node.location), {})
@@ -124,16 +45,12 @@ def get_cardinality(
         return cardinality_dict[node_name]
 
     if not fill_missing:
-        from pprint import pprint
-
-        pprint(specification)
         raise MissingSpecificationError(CHILDREN_KEY.format(node.location), node_name)
 
     number_choice = [1]
 
     if template.get_bool_attrib("multi"):
-        # Adding muliple values makes it so the result tree explodes in branches
-        # number_choice += [2,3]
+        # NOTE: Adding muliple values makes it so the result tree explodes in branches number_choice += [2,3]
         pass
 
     if template.get_bool_attrib("optional"):
@@ -144,7 +61,7 @@ def get_cardinality(
 
 def get_content(
     template: TemplateTree,
-    specification: dict,
+    specification: Specification,
     fill_missing: bool,
     variant: str,
     name: str,
@@ -186,7 +103,7 @@ def get_content(
 
 
 def get_node_and_children(
-    template: TemplateTree, specification: dict, name: str, fill_missing: bool
+    template: TemplateTree, specification: Specification, name: str, fill_missing: bool
 ) -> tuple[FlangAST, list]:
     assert not isinstance(template, TemplateRoot)
 
@@ -195,19 +112,19 @@ def get_node_and_children(
 
     if template.type == "text":
         node = FlangLeaf(
-            name=template.name, template_id=template.location, content=content
+            name=template.get_id(), template_id=template.location, content=content
         )
     elif template.type == "sequence":
-        node = FlangBranch(name=template.name, template_id=template.location)
+        node = FlangBranch(name=template.get_id(), template_id=template.location)
         children = get_available_children(template)
     elif template.type == "file":
         node = FlangBranch(
-            name=template.name, template_id=template.location, filename=content
+            name=template.get_id(), template_id=template.location, filename=content
         )
         children = get_available_children(template)
     elif template.type == "choice":
         # NOTE: trzeba sie upewnic ze wpisywany indeks tez nie bieze pod uwage czy komponent jest ukryty
-        node = FlangBranch(name=template.name, template_id=template.location)
+        node = FlangBranch(name=template.get_id(), template_id=template.location)
         assert not is_flang_node_hidden(child_node := template.children[content])
         children = [child_node]
 
@@ -221,7 +138,7 @@ def get_node_and_children(
 
 def construct_ast(
     template: TemplateTree,
-    specification: dict,
+    specification: Specification,
     parent: FlangBranch | None,
     fill_missing: bool,
     flang_node_location: str,
@@ -230,18 +147,20 @@ def construct_ast(
         node = FlangRoot()
         children = [template]
     else:
-        name = parent.get_next_node_name(
-            template.name
+        index = parent.get_next_node_index(
+            template.get_id()
         )  # node name only for specification
+        node_name = FlangAST.pack(index, template.get_id())
+
         node, children = get_node_and_children(
             template,
             specification,
-            parent.join_paths(parent.location, name),
+            parent.join_paths(parent.location, node_name),
             fill_missing,
         )
         node.template_id = flang_node_location
         parent.add_node(node)
-        assert name.startswith(node.name)
+        assert node.get_id().startswith(node_name)
 
     if not children:
         return node
@@ -253,7 +172,7 @@ def construct_ast(
             child = resolve_use_node(child)
 
         cardinality = get_cardinality(
-            child, specification, fill_missing, node, original_node.name
+            child, specification, fill_missing, node, original_node.get_id()
         )
 
         for _ in range(cardinality):
@@ -272,7 +191,7 @@ def construct_ast(
 
 
 def get_constructed_ast(
-    template: TemplateTree, specification: dict, fill_missing: bool
+    template: TemplateTree, specification: Specification, fill_missing: bool
 ) -> FlangRoot:
     return construct_ast(
         template,
