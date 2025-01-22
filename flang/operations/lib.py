@@ -1,20 +1,16 @@
 from flang.structures import Operation, OperationLog
 
-from .core import OperationState, execute, reverse_operation
+from .core import OperationState, execute
 
 
 # def select(self, template_tree, specification, location) -> list[Operation]:
-def select(state, location):
+def select(state: OperationState, location):
     """
     returns the list of specification of specification at given location query. Location can be fuzzy.
     """
-    before_hash = state.log.get_hash()
-    data = state.log.execute(Operation("select", {"location": location}), state)
-    assert (
-        before_hash == state.log.get_hash()
-    ), "Select operation should not modify the state"
-
-    return data
+    operation = Operation("select", {"location": location})
+    state.log.append(operation)
+    return execute(operation, state)
 
 
 # def insert(self, template_tree, specification, location, change_dict):

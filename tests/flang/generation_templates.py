@@ -94,7 +94,7 @@ JAVASCRIPT_CODE_TEMPLATE = """
     </sequence>
     <sequence alias="construct" hidden="true">
         <choice>
-            <sequence alias="if-statement" name="if-statement">
+            <sequence alias="if-statement">
                 <text value="if"/>
                 <use optional="true" ref="@wspace"/>
                 <text value="("/>
@@ -201,7 +201,7 @@ if (value % 10 == 2) {
 }
 """
 
-JS_CODE_SAMPLE_3 = """
+JS_CODE_SAMPLE_4 = """
 if ( 
   true ) { console.log(1);}
 """

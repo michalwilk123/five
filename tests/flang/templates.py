@@ -180,7 +180,7 @@ TEST_TEMPLATE_RECURSIVE = r"""
         <text regex="true" name="open-tag" value="{xml_open_tag}"/>
         <choice name="xml-content" multi="true">
             <text multi="true" regex="true" name="raw-content" value="{XML_CONTENT_CHAR}"/>
-            <use ref="...xml-node"/>
+            <use multi="true" optional="true" ref="...xml-node"/>
         </choice>
         <text regex="true" name="close-tag" value="{xml_close_tag}"/>
     </sequence>
@@ -195,7 +195,7 @@ TEST_TEMPLATE_CHOICE_TERMINAL = r"""
         <text regex="true" name="open-tag" value="{xml_open_tag}"/>
         <choice name="xml-content" multi="true">
             <text regex="true" name="raw-content" value="{ANY}"/>
-            <use ref="...xml-node"/>
+            <use multi="true" optional="true" ref="...xml-node"/>
             <text terminal="true" regex="true" name="close-tag" value="{xml_close_tag}"/>
         </choice>
     </sequence>
@@ -303,7 +303,7 @@ TEST_TEMPLATE_FUNCTION_3 = r"""
 
 TEST_TEMPLATE_REWRITE = """
 <sequence>
-    <sequence alias="polish" hidden="true">
+    <sequence alias="polish" hidden="true" name="dupa">
         <text value="Dzień dobry! Nazywam się "/>
         <text regex="true" value="\\w+" name="name"/>
     </sequence>
@@ -330,6 +330,9 @@ TEST_TEMPLATE_REWRITE = """
 </sequence>
 """
 
+TEST_TEMPLATE_EDGE_CASES = """
+"""
+
 REWRITE_SAMPLE_1 = """\
 Dzień dobry! Nazywam się Michał.
 Good morning! My name is Alan. How are you?
@@ -337,6 +340,9 @@ Dzień dobry! Nazywam się Piotr.
 Good afternoon! My name is Victor. How was your day?
 Good morning! My name is Ernest.
 dotdot"""
+
+EDGE_CASE_SAMPLE = """
+"""
 
 # END
 ## END

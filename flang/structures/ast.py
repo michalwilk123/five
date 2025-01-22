@@ -26,15 +26,21 @@ class TemplateTree(SearchableTree):
     def add_node(
         self, node: TemplateTree, allow_duplicates: bool = True
     ) -> SearchableTree:
-        node = super().add_node(node, allow_duplicates)
+        if not hasattr(self.root, "alias_record"):
+            self.root.alias_record = {}
+
+        old_record = getattr(node, "alias_record", {})
+
+        super().add_node(node, allow_duplicates)
+
+        for inherited_alias_name, inherited_alias_target in old_record.items():
+            new_target = self.join_paths(self.location, inherited_alias_target)
+            self.root.alias_record[inherited_alias_name] = new_target
 
         if alias := node.get_attrib("alias"):
-            if not hasattr(self.root, "alias_record"):
-                self.root.alias_record = {}
-
-            if alias in self.root.alias_record:
-                raise Exception(f"Trying to set already existing alias: {alias}")
-
+            assert (
+                alias not in self.root.alias_record
+            ), f"Trying to set already existing alias: {alias}"
             self.root.alias_record[alias] = node.location
 
         return node
@@ -42,6 +48,10 @@ class TemplateTree(SearchableTree):
     def normalize_path(self: T, target_path: str) -> str:
         if target_path.startswith("@"):
             alias_name = target_path.removeprefix("@")
+            assert alias_name in self.root.alias_record, (
+                self.root.alias_record,
+                alias_name,
+            )
             return self.root.alias_record[alias_name]
 
         if self.is_relative_path(target_path):

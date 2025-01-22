@@ -36,7 +36,10 @@ def get_cardinality(
     node: FlangBranch,
     node_name: str,
 ):
-    if is_constant_cardinality(template):
+    if is_constant_cardinality(template):  # NOTE: Czy na pewno powinnismy to sprawdzac?
+        assert node_name not in specification.get(
+            CHILDREN_KEY.format(node.location), {}
+        ), f"Node with constant cardinality had it set manually. This {specification.get(CHILDREN_KEY.format(node.location), {})} should not be set in specification {template}"
         return 1
 
     cardinality_dict = specification.get(CHILDREN_KEY.format(node.location), {})
@@ -89,9 +92,8 @@ def get_content(
         raise Exception(variant)
 
     if not fill_missing:
-        from pprint import pprint
-
-        pprint(specification)
+        # from pprint import pprint
+        # pprint(specification)
         raise MissingSpecificationError(variant, name)
 
     if variant == "text":
@@ -103,12 +105,26 @@ def get_content(
 
 
 def get_node_and_children(
-    template: TemplateTree, specification: Specification, name: str, fill_missing: bool
+    template: TemplateTree,
+    specification: Specification,
+    path_to_node: str,
+    fill_missing: bool,
 ) -> tuple[FlangAST, list]:
     assert not isinstance(template, TemplateRoot)
 
+    if template.type == "use":
+        resolved_template = resolve_use_node(template)
+        node, children = get_node_and_children(
+            resolved_template, specification, path_to_node, fill_missing
+        )
+        node.name = template.get_id()
+        node.template_id = template.location
+        return node, children
+
     children = None
-    content = get_content(template, specification, fill_missing, template.type, name)
+    content = get_content(
+        template, specification, fill_missing, template.type, path_to_node
+    )
 
     if template.type == "text":
         node = FlangLeaf(
@@ -141,7 +157,8 @@ def construct_ast(
     specification: Specification,
     parent: FlangBranch | None,
     fill_missing: bool,
-    flang_node_location: str,
+    # flang_node_location: str,
+    # node_name: str,
 ) -> FlangAST:
     if parent is None:
         node = FlangRoot()
@@ -151,6 +168,7 @@ def construct_ast(
             template.get_id()
         )  # node name only for specification
         node_name = FlangAST.pack(index, template.get_id())
+        full_path = parent.join_paths(parent.location, node_name)
 
         node, children = get_node_and_children(
             template,
@@ -158,21 +176,26 @@ def construct_ast(
             parent.join_paths(parent.location, node_name),
             fill_missing,
         )
-        node.template_id = flang_node_location
+        # node.template_id = template.location
         parent.add_node(node)
-        assert node.get_id().startswith(node_name)
+        assert full_path == node.location, (full_path, node.location)
 
     if not children:
         return node
 
     for child in children:
-        original_node = child
+        # original_node = child
 
-        if child.type == "use":
-            child = resolve_use_node(child)
+        # if child.type == "use":
+        #     child = resolve_use_node(child)
 
         cardinality = get_cardinality(
-            child, specification, fill_missing, node, original_node.get_id()
+            child,
+            specification,
+            fill_missing,
+            node,
+            child.get_id(),
+            # child, specification, fill_missing, node, original_template.get_id()
         )
 
         for _ in range(cardinality):
@@ -181,7 +204,8 @@ def construct_ast(
                 specification,
                 node,
                 fill_missing,
-                flang_node_location=original_node.location,
+                # flang_node_location=original_node.location,
+                # node_name=original_node.get_id(),
             )
 
             if hasattr(child_node, "is_terminal"):
@@ -198,5 +222,5 @@ def get_constructed_ast(
         specification,
         None,
         fill_missing=fill_missing,
-        flang_node_location=template.location,
+        # flang_node_location=template.location,
     )

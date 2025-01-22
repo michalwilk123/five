@@ -75,3 +75,9 @@ def create_callable_from_pathname(path: str, function: str) -> Callable:
 
     sys.path.remove(module_path)
     return function
+
+
+def dict_hash(d: dict):
+    if isinstance(d, dict):
+        return hash(frozenset((k, dict_hash(v)) for k, v in d.items()))
+    return hash(d)

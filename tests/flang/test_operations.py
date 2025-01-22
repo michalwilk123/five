@@ -5,6 +5,7 @@ import flang.operations.lib as ops
 from flang.interactive_flang_object import InteractiveFlangObject
 from flang.parsers.xml import parse_text
 from flang.structures import Operation
+from flang.utils.common import dict_hash
 
 from . import templates as t
 
@@ -17,14 +18,21 @@ class OperationsTestCase(unittest.TestCase):
             template_tree, t.REWRITE_SAMPLE_1
         )
         self.baseline = deepcopy(self.interactive_object.flang_tree)
-        self.state = self.interactive_object.get_operation_state()
 
     # def test_insert(self):
     #     self.interactive_object.run()
 
-    # def test_select(self):
-    #     spec = ops.select(self.state, "sequence.greeting.choice.polish")
-    #     spec = ops.select(self.state, "sequence.greeting.choice.polish*")
+    def test_select(self):
+        # spec = ops.select(self.state, "sequence.greeting.choice.polish")
+        before_hash = dict_hash(self.interactive_object.specification)
+
+        with self.interactive_object.run_operation() as state:
+            res1 = ops.select(state, "sequence.greeting.choice.polish")
+            # res2 = ops.select(state, "sequence.greeting.choice.polish*")
+
+        # self.assertEqual(before_hash, dict_hash(self.interactive_object.specification), "Select operation should not modify the state")
+        # self.assertEqual(len(res1), 1)
+        # self.assertEqual(len(res2), 2)
 
     # def test_insert_2(self):
     #     operation_1 = Operation("insert", {"after": "sequence.greeting(4)", "template": "sequence.text"})

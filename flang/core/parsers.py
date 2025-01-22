@@ -57,9 +57,17 @@ def _is_file_matched(filename: str, pattern: str, regex: bool) -> bool:
 def match_on_sequence(
     template_tree: TemplateTree,
     reader: InputReaderInterface,
+    node_name: str,
 ) -> FlangBranch:
     if not (children := get_available_children(template_tree)):
-        raise RuntimeError("Cannot create sequence from empty list of objects")
+        if template_tree.children:
+            raise RuntimeError(
+                "The <sequence> node contains only hidden objects. At least one object must be visible"
+            )
+
+        raise RuntimeError(
+            "The <sequence> node has no content and it does not make sense to exist."
+        )
 
     matches = []
 
@@ -72,14 +80,13 @@ def match_on_sequence(
             f"Could not match sequence of template_trees: {template_tree.type or template_tree.location}"
         ) from e
 
-    return create_branch_with_children(
-        template_tree.get_id(), template_tree.location, matches, None
-    )
+    return create_branch_with_children(node_name, template_tree.location, matches, None)
 
 
 def match_on_choice(
     template_tree: TemplateTree,
     reader: InputReaderInterface,
+    node_name: str,
 ) -> FlangBranch:
     if not (children := get_available_children(template_tree)):
         raise RuntimeError("Cannot choose from empty list of objects")
@@ -105,7 +112,7 @@ def match_on_choice(
         )
 
     match_object = create_branch_with_children(
-        template_tree.get_id(), template_tree.location, max_matches, None
+        node_name, template_tree.location, max_matches, None
     )
 
     if max_child.get_bool_attrib("terminal"):
@@ -115,7 +122,9 @@ def match_on_choice(
     return match_object
 
 
-def match_on_text(template_tree: TemplateTree, reader: InputReaderInterface) -> FlangLeaf:
+def match_on_text(
+    template_tree: TemplateTree, reader: InputReaderInterface, node_name: str
+) -> FlangLeaf:
     if template_tree.type != "text":
         raise UnknownFlangNodeError("Not text template_tree")
 
@@ -133,14 +142,13 @@ def match_on_text(template_tree: TemplateTree, reader: InputReaderInterface) -> 
             f'Could not match text ({is_regex=}) pattern: "{template_tree_text}" with text: "{reader.read()[:15]}"'
         )
 
-    return FlangLeaf(
-        name=template_tree.get_id(), template_id=template_tree.location, content=content
-    )
+    return FlangLeaf(name=node_name, template_id=template_tree.location, content=content)
 
 
 def match_on_file(
     template_tree: TemplateTree,
     reader: InputReaderInterface,
+    node_name: str,
 ) -> FlangBranch:
     assert isinstance(reader, FlangFileInputReader)
 
@@ -167,13 +175,14 @@ def match_on_file(
         raise TextNotParsedError(f"Text left: {out_reader.read()}")
 
     return create_branch_with_children(
-        template_tree.get_id(), template_tree.location, content, filename
+        node_name, template_tree.location, content, filename
     )
 
 
 def match_on_single_node(
     template_tree: TemplateTree,
     reader: InputReaderInterface,
+    node_name: str,
 ) -> FlangAST:
     matchers = {
         "sequence": match_on_sequence,
@@ -186,7 +195,7 @@ def match_on_single_node(
     if match_fn is None:
         raise UnknownFlangNodeError
 
-    match_object = match_fn(template_tree, reader)
+    match_object = match_fn(template_tree, reader, node_name)
 
     if match_object.size() == 0:
         raise MatchNotFoundError(
@@ -209,10 +218,11 @@ def match_template_tree_node(
 
     reader = reader.copy()
     matches = []
+    node_name = original_template_tree.get_id()
     # possible_number_of_samples = template_tree.get_bool_attrib("optional") then [0] <- moze na cos takiego przepisac
 
     try:
-        match_object = match_on_single_node(template_tree, reader)
+        match_object = match_on_single_node(template_tree, reader, node_name)
         matches.append(match_object)
         reader.consume_data(match_object)
     except MatchNotFoundError as e:
@@ -224,7 +234,7 @@ def match_template_tree_node(
     while template_tree.get_bool_attrib("multi"):
         reader = reader.copy()
         try:
-            match_object = match_on_single_node(template_tree, reader)
+            match_object = match_on_single_node(template_tree, reader, node_name)
             matches.append(match_object)
             reader.consume_data(match_object)
 

@@ -1,13 +1,17 @@
 import enum
+from contextlib import contextmanager
 
 from flang.core.evaluation import create_event_store
 from flang.core.parsers import parse_user_language
+from flang.generators.ast_to_specification import generate_specification
+from flang.operations.core import OperationState
 from flang.structures import (
     FileRepresentation,
     FlangFileInputReader,
     FlangRoot,
     FlangTextInputReader,
     InputReaderInterface,
+    OperationLog,
     TemplateTree,
     create_input_reader_from_file_representation,
 )
@@ -23,11 +27,12 @@ class InteractiveFlangObject:
     def __init__(self, template_tree: TemplateTree, flang_tree: FlangRoot) -> None:
         self.template_tree = template_tree
         self.flang_tree = flang_tree
-        self.operation_log = None
+        self.specification = generate_specification(template_tree, flang_tree)
 
         # evaluate here
         self.event_storage = create_event_store(flang_tree, template_tree)
         self.context = {}
+        self.operation_log = OperationLog()
         context = self.event_storage.execute_all(BuiltinEvent.ON_READ.value)
         self.context.update(context)
 
@@ -60,6 +65,16 @@ class InteractiveFlangObject:
         reader = create_input_reader_from_file_representation(fr)
         return cls.from_reader(template_tree, reader)
 
-    def run_operation(self): ...
+    @contextmanager
+    def run_operation(self):
+        state = OperationState(
+            log=self.operation_log,
+            template_tree=self.template_tree,
+            specification=self.specification,
+        )
 
-    def get_operation_state(self): ...
+        yield state
+
+        # TODO: Test out how events work with operations
+        # context = self.event_storage.execute_all(BuiltinEvent.ON_READ.value)
+        # self.context.update(context)

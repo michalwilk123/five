@@ -248,10 +248,10 @@ class SearchableTreeRoot(SearchableTree):
 
     @property
     def root(self) -> Self:
-        return self.children[0]
+        return self.children[0] if self.children else self
 
     def full_search(self, path: str) -> Self | None:
         if not path:
             return self
 
-        return self.children[0].search_down_full_path(path)
+        return self.root.search_down_full_path(path)

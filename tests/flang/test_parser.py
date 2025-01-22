@@ -158,6 +158,9 @@ class ParserTestCase(unittest.TestCase):
     def test_js_code_3(self):
         self._parse_template(gtpl.JAVASCRIPT_CODE_TEMPLATE, gtpl.JS_CODE_SAMPLE_3)
 
+    def test_js_code_4(self):
+        self._parse_template(gtpl.JAVASCRIPT_CODE_TEMPLATE, gtpl.JS_CODE_SAMPLE_4)
+
     def test_rewrite_sample(self):
         self._parse_template(tpl.TEST_TEMPLATE_REWRITE, tpl.REWRITE_SAMPLE_1)
 

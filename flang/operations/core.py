@@ -8,14 +8,13 @@ from typing import NamedTuple
 from flang.generators.common import CHILDREN_KEY
 from flang.structures import (
     FlangAST,
-    FlangBranch,
     Operation,
     OperationLog,
     Specification,
     TemplateTree,
 )
 
-__all__ = ["CORE_OPS", "OperationState", "reverse_operation", "execute"]
+# __all__ = ["CORE_OPS", "OperationState", "reverse_operation", "execute"]
 
 
 class OperationState(NamedTuple):
@@ -44,54 +43,33 @@ def split_location_path(location: str):
     return parent, template_name, index
 
 
-def _select(specification, location):
+def _select(template_tree: TemplateTree, specification: Specification, location):
     """
     returns the list of specification of flang_tree at given location query. Location can be fuzzy.
     """
-    matched = []
+    matched = {}
 
-    for key in specification:
+    # from pprint import pprint
+    # pprint(specification)
+
+    for key, value in specification.items():
         if re.match(location, key):
-            matched.append(key)
+            node_name, _ = key.split(":")
+
+            if node_name not in matched:
+                matched[node_name] = {}
+
+            matched[node_name][key] = value
 
     return matched
 
 
 def _insert(
-    template_tree, specification, target_location
-):  # NOTE: do not remove template_tree
-    """
-    target -> str
-
-    parent, object, target_index = split_insert_path(target)
-    counts = specification.get(CARDINALITY_KEY.format(parent))
-
-    if not counts:
-        raise Exception("nie mozna znalezc lalala")
-
-    counts[object] += 1
-
-    pattern = parent + object
-    new_spec = spec.copy()
-    new_object_name = FlangNode.pack(object, target_index)
-    k_val_pairs = defaultdict(list)
-
-    for k, v in spec.items():
-        if k.startswith(pattern):
-            _, idx = FlangNode.unpack(k.split(":")[0])
-            k_val_pairs[idx].append((k.split(":")[1], val))
-
-            if idx >= target_index:
-                idx += 1
-
-            new_name = FlangNode.pack(idx, object)
-
-            new_spec[new_name] = new_spec.pop(k)
-
-    return new_spec
-    """
+    template_tree: TemplateTree, specification: Specification, target: str
+) -> Specification:
+    # NOTE: do not remove template_tree
     # TODO: SHOULD VALIDATE IF COMPONENT HAS MULTI
-    parent, template_name, target_index = split_location_path(target_location)
+    parent, template_name, target_index = split_location_path(target)
     counts = specification.get(CHILDREN_KEY.format(parent))
 
     if not counts or template_name not in counts:
@@ -110,13 +88,40 @@ def _insert(
     return specification
 
 
-def _update(template_tree, flang_tree, location):
-    # dsad
-    ...
+def _update(
+    template_tree: TemplateTree,
+    specification: Specification,
+    target: str,
+    constants: dict | None = None,
+    transfers: dict | None = None,
+):
+    assert constants is not None or transfers is not None
+
+    for key, value in constants.items():
+        target = FlangAST.join_paths(target, key)
+        # TODO: jakas walidacja moze tutaj?
+        specification[target] = value
+
+    for key, value_from in transfers.items():
+        target = FlangAST.join_paths(target, key)
+
+        try:
+            value = specification[value_from]
+        except KeyError as e:
+            raise Exception(
+                f"Cannot take value from {value_from} because there is no avaliable data"
+            ) from e
+
+        # TODO: jakas walidacja moze tutaj?
+        specification[target] = value
+
+    return specification
 
 
-def _delete(template_tree, specification, target_location):
-    parent, node_name, target_index = split_location_path(target_location)
+def _delete(
+    template_tree: TemplateTree, specification: Specification, target: str
+) -> Specification:
+    parent, node_name, target_index = split_location_path(target)
     counts = specification.get(CHILDREN_KEY.format(parent))
 
     if not counts or node_name not in counts:
@@ -125,6 +130,8 @@ def _delete(template_tree, specification, target_location):
     # TODO: SHOULD VALIDATE IF COMPONENT HAS OPTIONAL OR AMOUT IS ALREADY ZERO
 
     counts[node_name] -= 1
+    assert counts[node_name] >= 0
+
     template_id = TemplateTree.join_paths(parent, node_name)
 
     for key in filter_to_relevant_specification(specification, template_id):
@@ -145,7 +152,7 @@ def _commit(template_tree, flang_tree, location): ...
 def _checkpoint(): ...
 
 
-def reverse_operation(operation: Operation): ...
+# def reverse_operation(operation: Operation): ...
 
 
 CORE_OPS = {
@@ -158,6 +165,7 @@ CORE_OPS = {
 }
 
 
-def execute(operation: Operation, state: OperationState, remember: bool):
-    state.log.append(operation)
-    return operation.execute(CORE_OPS[operation.signature], state)
+def execute(operation: Operation, state: OperationState):
+    return CORE_OPS[operation.signature](
+        state.template_tree, state.specification, **operation.arguments
+    )
