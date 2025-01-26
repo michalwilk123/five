@@ -50,16 +50,22 @@ def _build_tree(
 
     text = element.text or element.attrib.get("value")
     text = text and html.unescape(text)
+    alias_record = {}
+
+    if alias_name := element.attrib.get("alias"):
+        alias_record[alias_name] = node_name
 
     ast_node = TemplateTree(
         name=node_name,
         type=element.tag,
         attributes=element.attrib or {},
         text=text,
+        alias_record=alias_record,
     )
     for child_element in element:
         node = _build_tree(child_element, validate_attributes)
         ast_node.add_node(node)
+        ast_node.inherit_child_aliases(node)
 
     return ast_node
 

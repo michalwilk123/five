@@ -23,16 +23,21 @@ class OperationsTestCase(unittest.TestCase):
     #     self.interactive_object.run()
 
     def test_select(self):
-        # spec = ops.select(self.state, "sequence.greeting.choice.polish")
         before_hash = dict_hash(self.interactive_object.specification)
 
         with self.interactive_object.run_operation() as state:
-            res1 = ops.select(state, "sequence.greeting.choice.polish")
-            # res2 = ops.select(state, "sequence.greeting.choice.polish*")
+            res1 = ops.select(state, "sequence.greeting.choice.polish.name")
+            res2 = ops.select(state, ".*.polish.*")
 
-        # self.assertEqual(before_hash, dict_hash(self.interactive_object.specification), "Select operation should not modify the state")
-        # self.assertEqual(len(res1), 1)
-        # self.assertEqual(len(res2), 2)
+        self.assertEqual(
+            before_hash,
+            dict_hash(self.interactive_object.specification),
+            "Select operation should not modify the state",
+        )
+        self.assertEqual(len(res1), 1)
+        self.assertEqual(len(res2), 2)
+
+    def test_insert(self): ...
 
     # def test_insert_2(self):
     #     operation_1 = Operation("insert", {"after": "sequence.greeting(4)", "template": "sequence.text"})

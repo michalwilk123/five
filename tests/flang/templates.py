@@ -180,7 +180,7 @@ TEST_TEMPLATE_RECURSIVE = r"""
         <text regex="true" name="open-tag" value="{xml_open_tag}"/>
         <choice name="xml-content" multi="true">
             <text multi="true" regex="true" name="raw-content" value="{XML_CONTENT_CHAR}"/>
-            <use multi="true" optional="true" ref="...xml-node"/>
+            <use multi="true" ref="...xml-node"/>
         </choice>
         <text regex="true" name="close-tag" value="{xml_close_tag}"/>
     </sequence>
@@ -195,7 +195,7 @@ TEST_TEMPLATE_CHOICE_TERMINAL = r"""
         <text regex="true" name="open-tag" value="{xml_open_tag}"/>
         <choice name="xml-content" multi="true">
             <text regex="true" name="raw-content" value="{ANY}"/>
-            <use multi="true" optional="true" ref="...xml-node"/>
+            <use multi="true" ref="...xml-node"/>
             <text terminal="true" regex="true" name="close-tag" value="{xml_close_tag}"/>
         </choice>
     </sequence>
@@ -330,9 +330,6 @@ TEST_TEMPLATE_REWRITE = """
 </sequence>
 """
 
-TEST_TEMPLATE_EDGE_CASES = """
-"""
-
 REWRITE_SAMPLE_1 = """\
 Dzień dobry! Nazywam się Michał.
 Good morning! My name is Alan. How are you?
@@ -341,8 +338,35 @@ Good afternoon! My name is Victor. How was your day?
 Good morning! My name is Ernest.
 dotdot"""
 
-EDGE_CASE_SAMPLE = """
+TEST_TEMPLATE_EDGE_CASES = """
+<sequence name="p" alias="parent" multi="true">
+    <text name="foo" alias="foo" value="a"/>
+    <use optional="true" ref="@parent"/>
+    <use ref="@bar"/>
+    <use ref="@bar" multi="true"/>
+    <use ref="@parent" optional="true"/>
+    <sequence optional="true">
+        <sequence optional="true">
+            <sequence>
+            <choice>
+            <text name="foo" alias="bar" value="b"/>
+            </choice>
+            </sequence>
+        </sequence>
+    </sequence>
+    <text value="END"/>
+</sequence>
 """
+
+EDGE_CASE_SAMPLE = "aabbbbbbENDbbbabbENDbEND"
+
+HALTING_TEST_TEMPLATE = """
+<sequence multi="true">
+    <text optional="true" value="A"/>
+</sequence>
+"""
+
+HALTING_TEST_SAMPLE = "AB"
 
 # END
 ## END

@@ -4,6 +4,7 @@ from flang.interactive_flang_object import BuiltinEvent, InteractiveFlangObject
 from flang.parsers.xml import parse_text
 from flang.structures import FlangAST
 from flang.utils.exceptions import MatchNotFoundError, TextNotParsedError
+from tests.test_utils import time_limit
 
 from . import generation_templates as gtpl
 from . import templates as tpl
@@ -149,6 +150,9 @@ class ParserTestCase(unittest.TestCase):
     def test_python_code_4(self):
         self._parse_template(gtpl.PYTHON_CODE_TEMPLATE, gtpl.PYTHON_CODE_SAMPLE_4)
 
+    def test_python_code_fizzbuzz(self):
+        self._parse_template(gtpl.PYTHON_CODE_TEMPLATE, gtpl.PYTHON_CODE_SAMPLE_FIZZBUZZ)
+
     def test_js_code_1(self):
         self._parse_template(gtpl.JAVASCRIPT_CODE_TEMPLATE, gtpl.JS_CODE_SAMPLE_1)
 
@@ -161,8 +165,19 @@ class ParserTestCase(unittest.TestCase):
     def test_js_code_4(self):
         self._parse_template(gtpl.JAVASCRIPT_CODE_TEMPLATE, gtpl.JS_CODE_SAMPLE_4)
 
+    def test_js_code_fizzbuzz(self):
+        self._parse_template(gtpl.JAVASCRIPT_CODE_TEMPLATE, gtpl.JS_CODE_SAMPLE_4)
+
     def test_rewrite_sample(self):
         self._parse_template(tpl.TEST_TEMPLATE_REWRITE, tpl.REWRITE_SAMPLE_1)
+
+    def test_edge_case_sample(self):
+        self._parse_template(tpl.TEST_TEMPLATE_EDGE_CASES, tpl.EDGE_CASE_SAMPLE)
+
+    def test_halting_should_fail(self):
+        with time_limit(1):
+            with self.assertRaises(TextNotParsedError):
+                self._parse_template(tpl.HALTING_TEST_TEMPLATE, tpl.HALTING_TEST_SAMPLE)
 
     def test_file_medium(self):
         ...

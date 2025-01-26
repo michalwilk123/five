@@ -33,6 +33,9 @@ def generate_specification_for_cardinality(
             child = resolve_use_node(child)
 
         if is_constant_cardinality(original_node):
+            assert (
+                ctr.get(original_node.get_id(), 0) <= 1
+            ), f"Node has constant cardinality but shows up wrong amount of times: {ctr.get(original_node.get_id(), 0), original_node}"
             continue
 
         children_card_dict[original_node.get_id()] = ctr.get(original_node.get_id(), 0)

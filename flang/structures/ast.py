@@ -15,7 +15,9 @@ class TemplateTree(SearchableTree):
     type: str
     attributes: dict
     text: str | None
-    # reffers_to = default(None)
+    alias_record: None | dict[str, str] = dataclasses.field(
+        default_factory=dict, repr=False
+    )
 
     def get_attrib(self, key: str, default=None):
         return self.attributes.get(key, default)
@@ -23,27 +25,21 @@ class TemplateTree(SearchableTree):
     def get_bool_attrib(self, key: str, default=False):
         return convert_to_bool(self.attributes.get(key, default))
 
-    def add_node(
-        self, node: TemplateTree, allow_duplicates: bool = True
-    ) -> SearchableTree:
-        if not hasattr(self.root, "alias_record"):
-            self.root.alias_record = {}
-
-        old_record = getattr(node, "alias_record", {})
-
-        super().add_node(node, allow_duplicates)
-
-        for inherited_alias_name, inherited_alias_target in old_record.items():
-            new_target = self.join_paths(self.location, inherited_alias_target)
-            self.root.alias_record[inherited_alias_name] = new_target
-
-        if alias := node.get_attrib("alias"):
+    def inherit_child_aliases(self, node: TemplateTree):
+        for inherited_alias_name, inherited_alias_target in node.alias_record.items():
             assert (
-                alias not in self.root.alias_record
-            ), f"Trying to set already existing alias: {alias}"
-            self.root.alias_record[alias] = node.location
+                inherited_alias_name not in self.alias_record
+            ), f"Trying to inherit already existing alias: {inherited_alias_name} {self.alias_record=}"
 
-        return node
+            if not inherited_alias_target.startswith(node.get_id()):
+                _, *rest_of_path = inherited_alias_target.split(self.PATH_SEPARATOR)
+                inherited_alias_target = self.PATH_SEPARATOR.join(
+                    (node.get_id(), *rest_of_path)
+                )
+
+            self.alias_record[inherited_alias_name] = self.join_paths(
+                self.location, inherited_alias_target
+            )
 
     def normalize_path(self: T, target_path: str) -> str:
         if target_path.startswith("@"):
@@ -75,44 +71,6 @@ class FlangAST(SearchableTree):
 
     def size(self) -> int:
         raise NotImplementedError
-
-    def diff(self, other: FlangAST):
-        if self.get_id() != other.get_id():
-            print(f"NAME DIFFERENT: {self.get_id()=} {other.get_id()=}")
-            return False
-
-        if self.template_id != other.template_id:
-            print(f"PATH DIFFERENT: {self.template_id=} {other.template_id=}")
-            return False
-
-        if self.children:
-            if not other.children:
-                return False
-
-            if len(self.children) != len(other.children):
-                print(
-                    f"CHILDREN DIFFERENT: {self.get_id()=} {other.get_id()=}: \n{self.children=} \n{other.children=}"
-                )
-                print(ast_to_string(self))
-                print("======")
-                print(ast_to_string(other))
-                print(self.location)
-                return False
-
-            return all(
-                child1.diff(child2)
-                for child1, child2 in zip(self.children, other.children)
-            )
-
-        return True
-
-
-def ast_to_string(ast: FlangAST):
-    if hasattr(ast, "content"):
-        return ast.content
-    if ast.children:
-        return "".join(ast_to_string(child) for child in ast.children)
-    return ""
 
 
 @dataclasses.dataclass
@@ -151,6 +109,7 @@ class TemplateRoot(SearchableTreeRoot, TemplateTree):
     type: str = dataclasses.field(default="", init=False, repr=False)
     text: None = dataclasses.field(default=None, init=False, repr=False)
     attributes: dict = dataclasses.field(default_factory=dict, init=False, repr=False)
+    alias_record: None = dataclasses.field(default=None, init=False, repr=False)
 
 
 @dataclasses.dataclass

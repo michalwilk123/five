@@ -20,12 +20,7 @@ from flang.utils.exceptions import (
 )
 from flang.utils.regex import lex_storage
 
-from .utils import (
-    create_branch_with_children,
-    get_available_children,
-    is_flang_node_hidden,
-    resolve_use_node,
-)
+from .utils import create_branch_with_children, get_available_children, resolve_use_node
 
 
 def _match_text_with_regex(text: str, pattern: str) -> str | None:
@@ -36,12 +31,6 @@ def _match_text_with_regex(text: str, pattern: str) -> str | None:
         re_match = re_match.group()
 
     return re_match
-
-
-def _match_text_with_text(text: str, pattern: str) -> str | None:
-    if text.startswith(pattern):
-        return pattern
-    return None
 
 
 def _is_file_matched(filename: str, pattern: str, regex: bool) -> bool:
@@ -77,7 +66,7 @@ def match_on_sequence(
             matches += match_objects
     except MatchNotFoundError as e:
         raise ComplexMatchNotFound(
-            f"Could not match sequence of template_trees: {template_tree.type or template_tree.location}"
+            f"Could not match sequence of template_trees: {template_tree.type} {template_tree.location}"
         ) from e
 
     return create_branch_with_children(node_name, template_tree.location, matches, None)
@@ -135,7 +124,9 @@ def match_on_text(
     if is_regex := template_tree.get_bool_attrib("regex"):
         content = _match_text_with_regex(text_to_match, template_tree_text)
     else:
-        content = _match_text_with_text(text_to_match, template_tree_text)
+        content = (
+            template_tree_text if text_to_match.startswith(template_tree_text) else None
+        )
 
     if content is None:
         raise TextMatchNotFound(
@@ -261,9 +252,9 @@ def parse_user_language(
         raise TextNotParsedError(f"Text left: {out_reader.read()}")
 
     if template_tree.root.type == "file":
+        # TODO: this does not really make sense here. Should return UserASTContainerNode
         assert (
-            len(match_objects)
-            == 1  # TODO: this does not really make sense here. Should return UserASTContainerNode
+            len(match_objects) == 1
         ), "When matching a file tree, we should only return one file (root) as the result"
         # assert isinstance(match_objects[0], UserASTFileMixin)
         return match_objects[0]

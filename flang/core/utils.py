@@ -1,4 +1,4 @@
-from flang.structures import FlangAST, FlangBranch, SearchableTree, TemplateTree
+from flang.structures import FlangAST, FlangBranch, TemplateTree
 from flang.utils.exceptions import SymbolNotFoundError
 
 
@@ -57,19 +57,10 @@ def create_branch_with_children(
         template_id=ast_path,
         filename=filename,
     )
+    user_branch.children = []  # if no children
 
     for child in children:
         assert isinstance(child, FlangAST)
         user_branch.add_node(child)
 
     return user_branch
-
-
-def get_all_tree_children(tree: SearchableTree) -> list[SearchableTree]:
-    pass
-    # TODO: dokoncz
-
-
-def search_tree_glob(tree: SearchableTree, pattern: str):
-    pass
-    # TODO: dokoncz

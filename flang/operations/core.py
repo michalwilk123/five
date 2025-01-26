@@ -45,7 +45,7 @@ def split_location_path(location: str):
 
 def _select(template_tree: TemplateTree, specification: Specification, location):
     """
-    returns the list of specification of flang_tree at given location query. Location can be fuzzy.
+    Returns the list of specification of flang_tree at given location query. Location can be fuzzy.
     """
     matched = {}
 
@@ -53,9 +53,9 @@ def _select(template_tree: TemplateTree, specification: Specification, location)
     # pprint(specification)
 
     for key, value in specification.items():
-        if re.match(location, key):
-            node_name, _ = key.split(":")
+        node_name, _ = key.split(":")
 
+        if re.fullmatch(location, node_name):
             if node_name not in matched:
                 matched[node_name] = {}
 

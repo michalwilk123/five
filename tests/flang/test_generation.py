@@ -3,7 +3,7 @@ import unittest
 from flang.generators import generate_specification, get_constructed_ast
 from flang.interactive_flang_object import InteractiveFlangObject
 from flang.parsers.xml import parse_text
-from flang.structures import ast_to_string
+from flang.tools import ast_to_string, diff
 
 from . import generation_templates as gtpl
 from . import templates as tpl
@@ -20,6 +20,7 @@ TEXT_TEMPLATES = [
     [tpl.TEST_TEMPLATE_LINKING, tpl.TEST_SAMPLE_LINKING],
     [tpl.TEST_TEMPLATE_FUNCTION_1, "say hello_world"],
     [gtpl.JAVASCRIPT_CODE_TEMPLATE, gtpl.JS_CODE_SAMPLE_3],
+    [gtpl.PYTHON_CODE_TEMPLATE, gtpl.PYTHON_CODE_SAMPLE_FIZZBUZZ],
 ]
 
 FILE_TEMPLATES = [
@@ -29,12 +30,14 @@ FILE_TEMPLATES = [
 
 
 class GeneratorTestCase(unittest.TestCase):
+    # does not assert anything
     def test_generate_text_sanity_check(self):
         for template, _ in TEXT_TEMPLATES:
             template_tree = parse_text(template, validate_attributes=True)
             flang_tree = get_constructed_ast(template_tree, {}, fill_missing=True)
             # print(ast_to_string(flang_tree))
 
+    # does not assert anything
     def test_create_specification_sanity_check(self):
         for template, sample in TEXT_TEMPLATES:
             template_tree = parse_text(template, validate_attributes=True)
@@ -60,8 +63,8 @@ class GeneratorTestCase(unittest.TestCase):
             # print("====================== spec:")
             # print(spec)
             # print("====================== diff:")
-            # print(flang_tree.diff(generated))
-            # self.assertEqual(flang_tree, generated)
+            # print(diff(flang_tree, generated))
+            self.assertEqual(flang_tree, generated)
 
     def test_lossless_generation_cycle_files(self):
         for template, filepath in FILE_TEMPLATES:
@@ -75,7 +78,7 @@ class GeneratorTestCase(unittest.TestCase):
                 template_tree, spec, fill_missing=False
             ).first_child  # TODO: wtf dude...
 
-            # print(flang_tree.diff(generated))
+            # print(diff(flang_tree, generated))
             # print("======================")
             # print(flang_tree)
             # print("======================")

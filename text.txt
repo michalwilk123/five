@@ -29,3 +29,16 @@ text
 
 generate will take list of patches to generate code, for interactive 
 mode it will return the patches that it has missing
+
+
+Mozna zrobic cos w stylu pola "count" ktore okresla ile razy dany obiekt moze sie pojawic. Skladnia jaka sie dodaje
+jest podobna do wykresow zw. z kardynalność w grafach systemow rdbms.
+
+Domyslnie ustawiona jest wartość: 1
+
+np.
+0
+0..1
+1..
+3..5
+0..2

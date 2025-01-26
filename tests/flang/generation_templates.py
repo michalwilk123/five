@@ -10,50 +10,56 @@ PYTHON_CODE_TEMPLATE = """
         </sequence>
     </choice>
     <text alias="tab" value="    " hidden="true"/>
-    <choice name="code" multi="true" optional="false" alias="code">
-        <sequence name="for-in-loop">
-            <text value="for "/><text regex="true" value="{vname}" name="index"/><text value=" in range(" />
-            <sequence optional="true">
-                <text regex="true" value="{integer}" name="start"/><text value=", "/>
-            </sequence>
-            <text regex="true" value="{integer}" name="end"/>
-            <text value="):&#xA;"/>
-            <sequence name="for-loop-body" multi="true">
-                <use ref="@tab"/>
-                <use ref="@code"/>
-            </sequence>
-        </sequence>
-        <sequence name="if-stmt">
-            <text value="if "/><use ref="@bool-stmt"/><text value=":&#xA;"/>
-            <choice>
-                <sequence multi="true">
-                    <use ref="@tab"/>
-                    <use ref="@code"/>
-                </sequence>
-                <sequence>
-                    <text value="elif "/><use ref="@bool-stmt"/><text value=":&#xA;"/>
-                    <sequence multi="true">
-                        <use ref="@tab"/>
-                        <use ref="@code"/>
-                    </sequence>
-                </sequence>
-            </choice>
-            <sequence optional="true">
-                <text value="else:&#xA;"/>
-                <sequence>
-                    <use ref="@tab"/>
-                    <use ref="@code"/>
-                </sequence>
-            </sequence>
-        </sequence>
-        <sequence>
-            <text value="print("/>
-            <text regex="true" value="{integer}|{string}|{vname}"/>
-            <text value=")"/>
-        </sequence>
+    <choice name="code" multi="true" alias="code">
+        <use ref="@if-stmt"/>
+        <use ref="@for-in-loop"/>
+        <use ref="@print-fn"/>
         <text value="pass"/>
         <text regex="true" name="wspace">{whitespace}</text>
     </choice>
+
+    <sequence alias="if-stmt" hidden="true">
+        <text value="if "/><use ref="@bool-stmt"/><text value=":&#xA;"/>
+        <use ref="@indent-body"/>
+        <sequence optional="true" multi="true">
+            <text value="elif "/><use ref="@bool-stmt"/><text value=":&#xA;"/>
+            <use ref="@indent-body"/>
+        </sequence>
+        <sequence optional="true">
+            <text value="else:&#xA;"/>
+            <use ref="@indent-body"/>
+        </sequence>
+    </sequence>
+
+    <sequence alias="for-in-loop" hidden="true">
+        <text value="for "/><text regex="true" value="{vname}" name="index"/><text value=" in range(" />
+        <sequence optional="true">
+            <text regex="true" value="{integer}" name="start"/><text value=", "/>
+        </sequence>
+        <text regex="true" value="{integer}" name="end"/>
+        <text value="):&#xA;"/>
+        <use ref="@indent-body"/>
+    </sequence>
+
+    <sequence alias="print-fn" hidden="true">
+        <text value="print("/>
+        <choice>
+            <text regex="true" value="{integer}"/>
+            <text regex="true" value="{string}"/>
+            <text regex="true" value="{vname}"/>
+        </choice>
+        <text value=")"/>
+    </sequence>
+
+    <sequence alias="indent-body" hidden="true">
+        <choice multi="true">
+            <sequence>
+                <use ref="@tab"/>
+                <use ref="@code" multi="true"/>
+            </sequence>
+            <text regex="true" value=" *\\n"/>
+        </choice>
+    </sequence>
 </sequence>
 """
 
@@ -167,6 +173,14 @@ for i in range(10):
 PYTHON_CODE_SAMPLE_3 = """
 if i % 2 == 0:
     print(123)
+elif i % 33 == 0:
+    for i in range(10):
+        print(i)
+elif i % 5 == 0:
+    print("FizzBuzz")
+else:
+
+    pass
 """
 
 PYTHON_CODE_SAMPLE_4 = """
@@ -174,6 +188,18 @@ if i % 2 == 0:
     for value in range(111):
         if i % 10 == 2:
             print("nested")
+"""
+
+PYTHON_CODE_SAMPLE_FIZZBUZZ = """
+for i in range(1, 101):
+    if i % 15 == 0:
+        print("FizzBuzz")
+    elif i % 3 == 0:
+        print("Fizz")
+    elif i % 5 == 0:
+        print("Buzz")
+    else:
+        print(i)
 """
 
 JS_CODE_SAMPLE_1 = """
@@ -204,18 +230,6 @@ if (value % 10 == 2) {
 JS_CODE_SAMPLE_4 = """
 if ( 
   true ) { console.log(1);}
-"""
-
-PYTHON_CODE_SAMPLE_FIZZBUZZ = """
-for i in range(1, 101):
-    if i % 15 == 0:
-        print("FizzBuzz")
-    elif i % 3 == 0:
-        print("Fizz")
-    elif i % 5 == 0:
-        print("Buzz")
-    else:
-        print(i)
 """
 
 JAVASCRIPT_CODE_SAMPLE_FIZZBUZZ = """

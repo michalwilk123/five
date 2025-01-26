@@ -157,8 +157,6 @@ def construct_ast(
     specification: Specification,
     parent: FlangBranch | None,
     fill_missing: bool,
-    # flang_node_location: str,
-    # node_name: str,
 ) -> FlangAST:
     if parent is None:
         node = FlangRoot()
@@ -176,7 +174,6 @@ def construct_ast(
             parent.join_paths(parent.location, node_name),
             fill_missing,
         )
-        # node.template_id = template.location
         parent.add_node(node)
         assert full_path == node.location, (full_path, node.location)
 
@@ -184,18 +181,12 @@ def construct_ast(
         return node
 
     for child in children:
-        # original_node = child
-
-        # if child.type == "use":
-        #     child = resolve_use_node(child)
-
         cardinality = get_cardinality(
             child,
             specification,
             fill_missing,
             node,
             child.get_id(),
-            # child, specification, fill_missing, node, original_template.get_id()
         )
 
         for _ in range(cardinality):
@@ -204,8 +195,6 @@ def construct_ast(
                 specification,
                 node,
                 fill_missing,
-                # flang_node_location=original_node.location,
-                # node_name=original_node.get_id(),
             )
 
             if hasattr(child_node, "is_terminal"):
@@ -217,10 +206,14 @@ def construct_ast(
 def get_constructed_ast(
     template: TemplateTree, specification: Specification, fill_missing: bool
 ) -> FlangRoot:
+    """
+    TODO: Powinno sie zamienic to fill_missing na cos innego, na przyklad moze na funkcje czy cos takiego?
+    Domyslnie powinno wyrzucac exception MissingSpecificationError, ale w tym miejscu powinno sie
+    dac mozliwosc dodania logiki do generowania wlasnych komponentow
+    """
     return construct_ast(
         template,
         specification,
         None,
         fill_missing=fill_missing,
-        # flang_node_location=template.location,
     )
