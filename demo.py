@@ -1,4 +1,4 @@
-from flang.interactive_flang_object import InteractiveFlangObject
+from flang.flang_object import FlangObject
 from flang.parsers.xml import parse_text
 from flang.structures import FlangAST, TemplateTree, FlangLeaf, FlangRoot
 # from flang.structures.ast import UserASTRootContainerNode
@@ -61,7 +61,7 @@ if __name__ == "__main__":
     template = TEST_TEMPLATE_RECURSIVE
 
     template_tree = parse_text(template, validate_attributes=True)
-    interactive_object = InteractiveFlangObject.from_string(template_tree, TEST_SAMPLE_RECURSIVE_3)
+    interactive_object = FlangObject.from_string(template_tree, TEST_SAMPLE_RECURSIVE_3)
 
     generated = generate_patches(interactive_object.flang_tree, interactive_object.template_tree)
     # print()
@@ -73,7 +73,7 @@ def rewrite():
     template_tree_python = parse_text("some")
     template_tree_javascript = parse_text("some")
 
-    python_flang_tree = InteractiveFlangObject.from_string(template_tree, TEST_SAMPLE_RECURSIVE_3).flang_tree
+    python_flang_tree = FlangObject.from_string(template_tree, TEST_SAMPLE_RECURSIVE_3).flang_tree
     rewrite_language()
 
 

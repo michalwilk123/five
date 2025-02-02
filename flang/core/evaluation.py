@@ -87,6 +87,7 @@ def prepare_kwargs_for_event(
     flang_tree: FlangAST, template_tree: TemplateTree
 ) -> dict[str, Any]:
     # NOTE: Maybe should use better name?
+    # NOTE: This is very awkward, change if can
     flang_tree_kwargs = {
         f"local_{f}": value for f, value in flang_tree.to_shallow_dict().items()
     }

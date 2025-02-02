@@ -303,7 +303,7 @@ TEST_TEMPLATE_FUNCTION_3 = r"""
 
 TEST_TEMPLATE_REWRITE = """
 <sequence>
-    <sequence alias="polish" hidden="true" name="dupa">
+    <sequence alias="polish" hidden="true">
         <text value="Dzień dobry! Nazywam się "/>
         <text regex="true" value="\\w+" name="name"/>
     </sequence>

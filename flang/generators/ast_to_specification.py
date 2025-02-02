@@ -20,7 +20,7 @@ from .common import (
 )
 
 
-def generate_specification_for_cardinality(
+def create_specification_for_cardinality(
     template: TemplateTree, branch: FlangBranch
 ) -> Specification:
     ctr = Counter([item.name for item in branch.children])
@@ -47,10 +47,10 @@ def generate_specification_for_cardinality(
     )
 
 
-def generate_specification_for_branch(
+def create_specification_for_branch(
     template: TemplateTree, branch: FlangBranch
 ) -> Specification:
-    specs = generate_specification_for_cardinality(template, branch)
+    specs = create_specification_for_cardinality(template, branch)
 
     if template.type == "choice":
         specs[CHOICE_INDEX_KEY.format(branch.location)] = [
@@ -62,7 +62,7 @@ def generate_specification_for_branch(
     return specs
 
 
-def generate_specification_for_leaf(
+def create_specification_for_leaf(
     template: TemplateTree, leaf: FlangLeaf
 ) -> Specification:
     not_deterministic = template.get_bool_attrib(
@@ -76,7 +76,7 @@ def generate_specification_for_leaf(
     )
 
 
-def generate_specification(
+def create_specification(
     template_tree: TemplateTree, flang_ast: FlangAST
 ) -> Specification:
     if isinstance(flang_ast, FlangRoot):
@@ -92,12 +92,12 @@ def generate_specification(
     specification = {}
 
     if isinstance(flang_ast, FlangLeaf):
-        specification |= generate_specification_for_leaf(template, flang_ast)
+        specification |= create_specification_for_leaf(template, flang_ast)
     elif isinstance(flang_ast, FlangBranch):
-        specification |= generate_specification_for_branch(template, flang_ast)
+        specification |= create_specification_for_branch(template, flang_ast)
 
         for child in flang_ast.children:
-            specification |= generate_specification(template_tree, child)
+            specification |= create_specification(template_tree, child)
     else:
         raise Exception
 

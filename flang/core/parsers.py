@@ -256,7 +256,6 @@ def parse_user_language(
         assert (
             len(match_objects) == 1
         ), "When matching a file tree, we should only return one file (root) as the result"
-        # assert isinstance(match_objects[0], UserASTFileMixin)
         return match_objects[0]
 
     if match_objects == []:

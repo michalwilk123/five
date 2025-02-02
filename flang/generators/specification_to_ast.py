@@ -1,5 +1,3 @@
-import random
-
 from flang.core.utils import (
     get_available_children,
     is_flang_node_hidden,
@@ -14,117 +12,99 @@ from flang.structures import (
     TemplateRoot,
     TemplateTree,
 )
-from flang.utils.regex import lex_storage
+from flang.utils.exceptions import ImpossibleOperationError
 
 from .common import (
     CHILDREN_KEY,
     CHOICE_INDEX_KEY,
     FILENAME_KEY,
     TEXT_CONTENT_KEY,
+    MissingSpecificationValueEvent,
+    generate_random_value_for_key,
     is_constant_cardinality,
+    raise_exception_value_for_key,
 )
-
-
-class MissingSpecificationError(Exception):
-    pass
 
 
 def get_cardinality(
     template: TemplateTree,
     specification: Specification,
-    fill_missing: bool,
+    on_missing_value: MissingSpecificationValueEvent,
     node: FlangBranch,
     node_name: str,
 ):
+    key = CHILDREN_KEY.format(node.location)
+
     if is_constant_cardinality(template):  # NOTE: Czy na pewno powinnismy to sprawdzac?
         assert node_name not in specification.get(
-            CHILDREN_KEY.format(node.location), {}
-        ), f"Node with constant cardinality had it set manually. This {specification.get(CHILDREN_KEY.format(node.location), {})} should not be set in specification {template}"
+            key, {}
+        ), f"Node with constant cardinality had it set manually. This {specification.get(key, {})} should not be set in specification {template}"
         return 1
 
-    cardinality_dict = specification.get(CHILDREN_KEY.format(node.location), {})
+    cardinality_dict = specification.get(key, {})
 
     if node_name in cardinality_dict:
         return cardinality_dict[node_name]
 
-    if not fill_missing:
-        raise MissingSpecificationError(CHILDREN_KEY.format(node.location), node_name)
-
-    number_choice = [1]
-
-    if template.get_bool_attrib("multi"):
-        # NOTE: Adding muliple values makes it so the result tree explodes in branches number_choice += [2,3]
-        pass
-
-    if template.get_bool_attrib("optional"):
-        number_choice += [0]
-
-    return random.choice(number_choice)
+    return on_missing_value(template, key)
 
 
 def get_content(
     template: TemplateTree,
     specification: Specification,
-    fill_missing: bool,
-    variant: str,
+    on_missing_value: MissingSpecificationValueEvent,
     name: str,
 ):
-    if variant == "text":
-        if custom_content := specification.get(TEXT_CONTENT_KEY.format(name)):
+    key = None
+
+    if template.type == "text":
+        key = TEXT_CONTENT_KEY.format(name)
+        if custom_content := specification.get(key):
             return custom_content
         elif not template.get_bool_attrib("regex"):
             return template.get_attrib("value", template.text)
         elif "default" in template.attributes:
             return template.attributes["default"]
-    elif variant == "file":
-        if filename := specification.get(FILENAME_KEY.format(name)):
+    elif template.type == "file":
+        key = FILENAME_KEY.format(name)
+        if filename := specification.get(key):
             return filename
         elif not template.get_bool_attrib("regex"):
             return template.get_attrib("pattern")
         elif "default" in template.attributes:
             return template.attributes["default"]
-    elif variant == "choice":
-        if (chosen_index := specification.get(CHOICE_INDEX_KEY.format(name))) is not None:
+    elif template.type == "choice":
+        key = CHOICE_INDEX_KEY.format(name)
+        if (chosen_index := specification.get(key)) is not None:
             return chosen_index
-    elif variant in ("sequence", ""):
+    elif template.type in ("sequence", ""):
         return
-    else:
-        raise Exception(variant)
 
-    if not fill_missing:
-        # from pprint import pprint
-        # pprint(specification)
-        raise MissingSpecificationError(variant, name)
+    if key is not None:
+        return on_missing_value(template, key)
 
-    if variant == "text":
-        return lex_storage.generate_example(template.get_attrib("value", template.text))
-    elif variant == "file":
-        return lex_storage.generate_example(template.get_attrib("pattern"))
-    elif variant == "choice":
-        return random.randrange(len(template.children))
+    raise ImpossibleOperationError(template.type)
 
 
 def get_node_and_children(
     template: TemplateTree,
     specification: Specification,
     path_to_node: str,
-    fill_missing: bool,
+    on_missing_value: MissingSpecificationValueEvent,
 ) -> tuple[FlangAST, list]:
     assert not isinstance(template, TemplateRoot)
 
     if template.type == "use":
         resolved_template = resolve_use_node(template)
         node, children = get_node_and_children(
-            resolved_template, specification, path_to_node, fill_missing
+            resolved_template, specification, path_to_node, on_missing_value
         )
         node.name = template.get_id()
         node.template_id = template.location
         return node, children
 
     children = None
-    content = get_content(
-        template, specification, fill_missing, template.type, path_to_node
-    )
+    content = get_content(template, specification, on_missing_value, path_to_node)
 
     if template.type == "text":
         node = FlangLeaf(
@@ -152,11 +132,11 @@ def get_node_and_children(
     return node, children
 
 
-def construct_ast(
+def create_ast(
     template: TemplateTree,
     specification: Specification,
     parent: FlangBranch | None,
-    fill_missing: bool,
+    on_missing_value: MissingSpecificationValueEvent,
 ) -> FlangAST:
     if parent is None:
         node = FlangRoot()
@@ -171,8 +151,8 @@ def construct_ast(
         node, children = get_node_and_children(
             template,
             specification,
-            parent.join_paths(parent.location, node_name),
-            fill_missing,
+            full_path,
+            on_missing_value,
         )
         parent.add_node(node)
         assert full_path == node.location, (full_path, node.location)
@@ -184,17 +164,17 @@ def construct_ast(
         cardinality = get_cardinality(
             child,
             specification,
-            fill_missing,
+            on_missing_value,
             node,
             child.get_id(),
         )
 
         for _ in range(cardinality):
-            child_node = construct_ast(
+            child_node = create_ast(
                 child,
                 specification,
                 node,
-                fill_missing,
+                on_missing_value,
             )
 
             if hasattr(child_node, "is_terminal"):
@@ -203,17 +183,28 @@ def construct_ast(
     return node
 
 
-def get_constructed_ast(
-    template: TemplateTree, specification: Specification, fill_missing: bool
-) -> FlangRoot:
-    """
-    TODO: Powinno sie zamienic to fill_missing na cos innego, na przyklad moze na funkcje czy cos takiego?
-    Domyslnie powinno wyrzucac exception MissingSpecificationError, ale w tym miejscu powinno sie
-    dac mozliwosc dodania logiki do generowania wlasnych komponentow
-    """
-    return construct_ast(
+def _create_ast_root(
+    template: TemplateTree,
+    specification: Specification,
+    on_missing_value: MissingSpecificationValueEvent,
+):
+    return create_ast(
         template,
         specification,
         None,
-        fill_missing=fill_missing,
+        on_missing_value,
     )
+
+
+def create_ast_with_patched_values(
+    template: TemplateTree,
+    specification: Specification,
+) -> FlangRoot:
+    return _create_ast_root(template, specification, generate_random_value_for_key)
+
+
+def create_ast_strict(
+    template: TemplateTree,
+    specification: Specification,
+) -> FlangRoot:
+    return _create_ast_root(template, specification, raise_exception_value_for_key)

@@ -1,4 +1,4 @@
-from flang.generators.specification_to_ast import get_constructed_ast
+from flang.generators.specification_to_ast import create_ast_with_patched_values
 from flang.structures import FlangAST, TemplateTree
 
 
@@ -42,5 +42,5 @@ def ast_to_string(ast: FlangAST):
 
 def generate_text(template_tree: TemplateTree, path: str) -> str:
     subtree = template_tree.resolve_path(path)
-    flang_tree = get_constructed_ast(subtree, {}, fill_missing=True)
+    flang_tree = create_ast_with_patched_values(subtree, {}, fill_missing=True)
     return ast_to_string(flang_tree)

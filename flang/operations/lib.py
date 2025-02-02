@@ -14,12 +14,12 @@ def select(state: OperationState, location):
 
 
 # def insert(self, template_tree, specification, location, change_dict):
-def insert(state, location):
+def insert(state: OperationState, location):
     """
     Modifies the
     """
     before_hash = state.log.get_hash()
-    result = execute(state.log, Operation("insert", {"location": location}), state)
+    result = execute(Operation("insert", {"target": location}), state)
     assert result is None
 
     return before_hash

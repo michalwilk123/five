@@ -2,9 +2,9 @@ import unittest
 from copy import deepcopy
 
 import flang.operations.lib as ops
-from flang.interactive_flang_object import InteractiveFlangObject
+from flang.flang_object import FlangObject, FlangObjectBuilder
+from flang.generators.common import CHOICE_INDEX_KEY, TEXT_CONTENT_KEY
 from flang.parsers.xml import parse_text
-from flang.structures import Operation
 from flang.utils.common import dict_hash
 
 from . import templates as t
@@ -13,36 +13,56 @@ from . import templates as t
 class OperationsTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(self) -> None:
-        template_tree = parse_text(t.TEST_TEMPLATE_REWRITE, validate_attributes=True)
-        self.interactive_object = InteractiveFlangObject.from_string(
-            template_tree, t.REWRITE_SAMPLE_1
+        self.flang_object = (
+            FlangObjectBuilder()
+            .xml_template(t.TEST_TEMPLATE_REWRITE, True)
+            .text_sample(t.REWRITE_SAMPLE_1)
+            .build()
         )
-        self.baseline = deepcopy(self.interactive_object.flang_tree)
-
-    # def test_insert(self):
-    #     self.interactive_object.run()
+        self.baseline = deepcopy(self.flang_object.flang_tree)
 
     def test_select(self):
-        before_hash = dict_hash(self.interactive_object.specification)
+        before_hash = dict_hash(self.flang_object.specification)
 
-        with self.interactive_object.run_operation() as state:
+        with self.flang_object.run_operation() as state:
             res1 = ops.select(state, "sequence.greeting.choice.polish.name")
             res2 = ops.select(state, ".*.polish.*")
 
         self.assertEqual(
             before_hash,
-            dict_hash(self.interactive_object.specification),
+            dict_hash(self.flang_object.specification),
             "Select operation should not modify the state",
         )
         self.assertEqual(len(res1), 1)
         self.assertEqual(len(res2), 2)
 
-    def test_insert(self): ...
+    def test_insert(self):
+        before_hash = dict_hash(self.flang_object.specification)
+
+        # with self.interactive_object.run_operation() as state:
+        #     res1 = ops.insert(state, "sequence.greeting(4).choice.english.extra-message.text[1]")
 
     # def test_insert_2(self):
-    #     operation_1 = Operation("insert", {"after": "sequence.greeting(4)", "template": "sequence.text"})
-    #     operation_2 = Operation("insert", {"after": "sequence.greeting(4)", "template": "sequence.text"})
-    #     operation_3 = Operation("insert", {"after": "sequence.text", "template": "sequence.text"})
+    #     before_hash = dict_hash(self.flang_object.specification)
+
+    #     with self.flang_object.run_operation() as state:
+    #         res1 = ops.insert(state, "sequence.greeting(5)")
+    #         res1 = ops.insert(state, "sequence.greeting(5).choice")
+    #         res1 = ops.update(
+    #             state,
+    #             "sequence.greeting(5).choice",
+    #             {CHOICE_INDEX_KEY.format("sequence.greeting(5).choice"): 1},
+    #         )
+    #         res1 = ops.insert(state, "sequence.greeting(5).choice.polish.name")
+    #         res1 = ops.update(
+    #             state,
+    #             "sequence.greeting(5).choice.polish.name",
+    #             {
+    #                 TEXT_CONTENT_KEY.format(
+    #                     "sequence.greeting(5).choice.polish.name"
+    #                 ): "kolejna wartosc"
+    #             },
+    #         )
 
     #     id_1 = insert(self.state, "sequence.greeting(4)", "sequence.text")
 

@@ -1,6 +1,3 @@
-from utils import some_utilities
-
-
 def test1(context, **kwargs):
     context["result"] = "success"
     return None
