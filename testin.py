@@ -3,7 +3,7 @@ from flang.flang_object import FlangObjectBuilder
 from flang.operations import lib
 from flang.structures import OperationState
 
-from flang.generators.specification_to_ast import _create_ast_root
+from flang.generators.specification_to_ast import create_root_ast
 
 
 def new_insert(state: OperationState, location):

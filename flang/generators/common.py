@@ -1,7 +1,7 @@
 import random
 from typing import Callable
 
-from flang.structures import TemplateTree
+from flang.structures import FlangAST, TemplateTree
 from flang.utils.exceptions import ImpossibleOperationError, MissingSpecificationError
 from flang.utils.regex import lex_storage
 
