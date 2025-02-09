@@ -244,19 +244,11 @@ def match_template_tree_node(
 
 def parse_user_language(
     template_tree: TemplateTree, reader: InputReaderInterface
-) -> tuple[list[FlangAST], InputReaderInterface]:
-
+) -> FlangRoot:
     match_objects, out_reader = match_template_tree_node(template_tree.root, reader)
 
     if not out_reader.is_empty():
         raise TextNotParsedError(f"Text left: {out_reader.read()}")
-
-    if template_tree.root.type == "file":
-        # TODO: this does not really make sense here. Should return UserASTContainerNode
-        assert (
-            len(match_objects) == 1
-        ), "When matching a file tree, we should only return one file (root) as the result"
-        return match_objects[0]
 
     if match_objects == []:
         raise RuntimeError(
@@ -264,7 +256,6 @@ def parse_user_language(
         )
 
     assert isinstance(match_objects, list), isinstance(match_objects, list)
-
     root = FlangRoot()
 
     for match in match_objects:

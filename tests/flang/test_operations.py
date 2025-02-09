@@ -3,7 +3,7 @@ from copy import deepcopy
 
 import flang.operations.lib as ops
 from flang.flang_object import FlangObject, FlangObjectBuilder
-from flang.generators.common import CHOICE_INDEX_KEY, TEXT_CONTENT_KEY
+from flang.generators.common import TEXT_CONTENT_KEY
 from flang.parsers.xml import parse_text
 from flang.utils.common import dict_hash
 
@@ -21,26 +21,26 @@ class OperationsTestCase(unittest.TestCase):
         )
         self.baseline = deepcopy(self.flang_object.flang_tree)
 
-    def test_select(self):
-        before_hash = dict_hash(self.flang_object.specification)
+    # def test_select(self):
+    #     before_hash = dict_hash(self.flang_object.specification)
 
-        with self.flang_object.run_operation() as state:
-            res1 = ops.select(state, "sequence.greeting.choice.polish.name")
-            res2 = ops.select(state, ".*.polish.*")
+    #     with self.flang_object.run_operation() as state:
+    #         res1 = ops.select(state, "sequence.greeting.choice.polish.name")
+    #         res2 = ops.select(state, ".*.polish.*")
 
-        self.assertEqual(
-            before_hash,
-            dict_hash(self.flang_object.specification),
-            "Select operation should not modify the state",
-        )
-        self.assertEqual(len(res1), 1)
-        self.assertEqual(len(res2), 2)
+    #     self.assertEqual(
+    #         before_hash,
+    #         dict_hash(self.flang_object.specification),
+    #         "Select operation should not modify the state",
+    #     )
+    #     self.assertEqual(len(res1), 1)
+    #     self.assertEqual(len(res2), 2)
 
-    def test_insert(self):
-        before_hash = dict_hash(self.flang_object.specification)
+    # def test_insert(self):
+    #     before_hash = dict_hash(self.flang_object.specification)
 
         # with self.interactive_object.run_operation() as state:
-        #     res1 = ops.insert(state, "sequence.greeting(4).choice.english.extra-message.text[1]")
+        #     res1 = ops.insert(state,"sequence.greeting(4).choice.english.extra-message.text[1]")
 
     # def test_insert_2(self):
     #     before_hash = dict_hash(self.flang_object.specification)

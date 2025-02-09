@@ -69,4 +69,5 @@ class FlangObjectBuilder:
 
     def build(self) -> FlangObject:
         flang_tree = parse_user_language(self.template_tree, self.reader)
+        assert isinstance(flang_tree, FlangRoot)
         return FlangObject(self.template_tree, flang_tree)

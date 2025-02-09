@@ -1,3 +1,4 @@
+import random
 import unittest
 
 from flang.flang_object import FlangObjectBuilder
@@ -7,6 +8,7 @@ from flang.generators import (
     create_specification,
 )
 from flang.parsers.xml import parse_text
+from flang.tools import ast_to_string, diff
 
 from . import generation_templates as gtpl
 from . import templates as tpl
@@ -33,8 +35,12 @@ FILE_TEMPLATES = [
 
 
 class GeneratorTestCase(unittest.TestCase):
-    # does not assert anything
     def test_generate_text_sanity_check(self):
+        """
+        Sometimes may not pass because `tpl.TEST_TEMPLATE_RECURSIVE` can generate infinite trees.
+        No easy way to fix for now :/
+        """
+
         for template, _ in TEXT_TEMPLATES:
             template_tree = parse_text(template, validate_attributes=True)
             flang_tree = create_ast_with_patched_values(template_tree, {})
@@ -62,14 +68,21 @@ class GeneratorTestCase(unittest.TestCase):
             spec = create_specification(fo.template_tree, fo.flang_tree)
             generated = create_ast_strict(fo.template_tree, spec)
 
+            from pprint import pprint
+
             # print("====================== original:")
-            # print(flang_tree)
+            # print(ast_to_string(fo.flang_tree))
             # print("====================== generated:")
-            # print(generated)
+            # print(ast_to_string(generated))
             # print("====================== spec:")
             # print(spec)
             # print("====================== diff:")
-            # print(diff(flang_tree, generated))
+            # print(diff(fo.flang_tree, generated))
+            # print("======================")
+            # print(fo.flang_tree)
+            # print("======================")
+            # print(generated)
+
             self.assertEqual(fo.flang_tree, generated)
 
     def test_lossless_generation_cycle_files(self):
@@ -83,7 +96,7 @@ class GeneratorTestCase(unittest.TestCase):
             spec = create_specification(fo.template_tree, fo.flang_tree)
             generated = create_ast_strict(
                 fo.template_tree, spec
-            ).first_child  # TODO: wtf dude...
+            )
 
             # print(diff(flang_tree, generated))
             # print("======================")
