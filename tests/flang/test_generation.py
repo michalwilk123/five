@@ -1,7 +1,12 @@
+import random
 import unittest
 
-from flang.generators import generate_specification, get_constructed_ast
-from flang.interactive_flang_object import InteractiveFlangObject
+from flang.flang_object import FlangObjectBuilder
+from flang.generators import (
+    create_ast_strict,
+    create_ast_with_patched_values,
+    create_specification,
+)
 from flang.parsers.xml import parse_text
 from flang.tools import ast_to_string, diff
 
@@ -10,8 +15,8 @@ from . import templates as tpl
 
 TEXT_TEMPLATES = [
     [tpl.TEST_BASIC_TEMPLATE, tpl.TEST_BASIC_SAMPLE],
-    [tpl.TEST_TEMPLATE_CHOICE_NESTED, tpl.TEST_CHOICE_NESTED_SAMPLE],
     [tpl.TEST_TEMPLATE_OPTIONAL, tpl.TEST_OPTIONAL_SAMPLE_2],
+    [tpl.TEST_TEMPLATE_CHOICE_NESTED, tpl.TEST_CHOICE_NESTED_SAMPLE],
     [tpl.TEST_TEMPLATE_CHOICE_AND_MULTI, tpl.TEST_CHOICE_AND_MULTI_SAMPLE],
     [tpl.TEST_TEMPLATE_USE, "foo"],
     [tpl.TEST_TEMPLATE_MULTI, tpl.TEST_SAMPLE_MULTI],
@@ -30,53 +35,68 @@ FILE_TEMPLATES = [
 
 
 class GeneratorTestCase(unittest.TestCase):
-    # does not assert anything
     def test_generate_text_sanity_check(self):
+        """
+        Sometimes may not pass because `tpl.TEST_TEMPLATE_RECURSIVE` can generate infinite trees.
+        No easy way to fix for now :/
+        """
+
         for template, _ in TEXT_TEMPLATES:
             template_tree = parse_text(template, validate_attributes=True)
-            flang_tree = get_constructed_ast(template_tree, {}, fill_missing=True)
+            flang_tree = create_ast_with_patched_values(template_tree, {})
             # print(ast_to_string(flang_tree))
 
     # does not assert anything
     def test_create_specification_sanity_check(self):
         for template, sample in TEXT_TEMPLATES:
-            template_tree = parse_text(template, validate_attributes=True)
-            flang_tree = InteractiveFlangObject.from_string(
-                template_tree, sample
-            ).flang_tree
-            generate_specification(template_tree, flang_tree)
+            fo = (
+                FlangObjectBuilder()
+                .xml_template(template, True)
+                .text_sample(sample)
+                .build()
+            )
+            create_specification(fo.template_tree, fo.flang_tree)
 
     def test_lossless_generation_cycle_text(self):
         for template, sample in TEXT_TEMPLATES:
-            template_tree = parse_text(template, validate_attributes=True)
-            flang_tree = InteractiveFlangObject.from_string(
-                template_tree, sample
-            ).flang_tree
+            fo = (
+                FlangObjectBuilder()
+                .xml_template(template, True)
+                .text_sample(sample)
+                .build()
+            )
+            spec = create_specification(fo.template_tree, fo.flang_tree)
+            generated = create_ast_strict(fo.template_tree, spec)
+
+            from pprint import pprint
+
             # print("====================== original:")
-            # print(flang_tree)
-
-            spec = generate_specification(template_tree, flang_tree)
-            generated = get_constructed_ast(template_tree, spec, fill_missing=False)
-
+            # print(ast_to_string(fo.flang_tree))
             # print("====================== generated:")
-            # print(generated)
+            # print(ast_to_string(generated))
             # print("====================== spec:")
             # print(spec)
             # print("====================== diff:")
-            # print(diff(flang_tree, generated))
-            self.assertEqual(flang_tree, generated)
+            # print(diff(fo.flang_tree, generated))
+            # print("======================")
+            # print(fo.flang_tree)
+            # print("======================")
+            # print(generated)
+
+            self.assertEqual(fo.flang_tree, generated)
 
     def test_lossless_generation_cycle_files(self):
         for template, filepath in FILE_TEMPLATES:
-            template_tree = parse_text(template, validate_attributes=True)
-            flang_tree = InteractiveFlangObject.from_filenames(
-                template_tree, [filepath]
-            ).flang_tree
-
-            spec = generate_specification(template_tree, flang_tree)
-            generated = get_constructed_ast(
-                template_tree, spec, fill_missing=False
-            ).first_child  # TODO: wtf dude...
+            fo = (
+                FlangObjectBuilder()
+                .xml_template(template, True)
+                .filenames_sample([filepath])
+                .build()
+            )
+            spec = create_specification(fo.template_tree, fo.flang_tree)
+            generated = create_ast_strict(
+                fo.template_tree, spec
+            )
 
             # print(diff(flang_tree, generated))
             # print("======================")
@@ -86,4 +106,4 @@ class GeneratorTestCase(unittest.TestCase):
             # print("======================")
             # print(spec)
 
-            self.assertEqual(flang_tree, generated)
+            self.assertEqual(fo.flang_tree, generated)

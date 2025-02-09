@@ -1,7 +1,14 @@
 from __future__ import annotations
 
 import dataclasses
+import enum
 from collections import ChainMap
+
+
+class BuiltinEvent(enum.Enum):
+    ON_READ = "read"
+    ON_DELETE = "delete"
+    ON_MODIFY = "modify"
 
 
 @dataclasses.dataclass

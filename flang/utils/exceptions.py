@@ -61,3 +61,7 @@ class NoMoreDataException(Exception): ...
 
 
 class ImpossibleOperationError(Exception): ...
+
+
+class MissingSpecificationError(Exception):
+    pass

@@ -3,24 +3,17 @@ Do not use the operations from this file if you don't have to
 """
 
 import re
-from typing import NamedTuple
 
 from flang.generators.common import CHILDREN_KEY
 from flang.structures import (
     FlangAST,
     Operation,
-    OperationLog,
+    OperationState,
     Specification,
     TemplateTree,
 )
 
 # __all__ = ["CORE_OPS", "OperationState", "reverse_operation", "execute"]
-
-
-class OperationState(NamedTuple):
-    log: OperationLog
-    template_tree: TemplateTree
-    specification: Specification
 
 
 def filter_to_relevant_specification(
@@ -79,9 +72,10 @@ def _insert(
     template_id = TemplateTree.join_paths(parent, template_name)
 
     for key in filter_to_relevant_specification(specification, template_id):
+        location, key_type = key.split(":")
+        index, template_name = FlangAST.unpack(location)
+
         if index >= target_index:
-            location, key_type = key.split(":")
-            index, template_name = FlangAST.unpack(location)
             new_key = ":".join(FlangAST.pack(index + 1, template_name), key_type)
             specification[new_key] = specification.pop(key)
 

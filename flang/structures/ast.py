@@ -63,6 +63,8 @@ class FlangAST(SearchableTree):
     only use the specification data structures
     """
 
+    # links: dict[str, dict[str, list[str]]]
+    # connection: str
     DUPLICATE_NODE_BRACKETS: ClassVar[tuple[str, str]] = ("(", ")")
     template_id: str
 

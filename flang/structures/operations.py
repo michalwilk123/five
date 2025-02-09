@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import dataclasses
 import datetime
-from typing import Any
+from typing import Any, NamedTuple
+
+from .ast import TemplateTree
+from .specification import Specification
 
 
 @dataclasses.dataclass
@@ -39,3 +42,9 @@ class OperationLog:
     def get_hash(self):
         log = self.get_log()
         return log[0] if log else ""
+
+
+class OperationState(NamedTuple):
+    log: OperationLog
+    template_tree: TemplateTree
+    specification: Specification

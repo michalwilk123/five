@@ -1,7 +1,6 @@
 import unittest
 
-from flang.interactive_flang_object import BuiltinEvent, InteractiveFlangObject
-from flang.parsers.xml import parse_text
+from flang.flang_object import BuiltinEvent, FlangObject, FlangObjectBuilder
 from flang.structures import FlangAST
 from flang.utils.exceptions import MatchNotFoundError, TextNotParsedError
 from tests.test_utils import time_limit
@@ -13,17 +12,15 @@ from . import templates as tpl
 class ParserTestCase(unittest.TestCase):
     def _parse_template(
         self, template: str, sample: str, file: bool = False
-    ) -> InteractiveFlangObject:
-        template_tree = parse_text(template, validate_attributes=True)
+    ) -> FlangObject:
+        builder = FlangObjectBuilder().xml_template(template, True)
 
         if file:
-            interactive_object = InteractiveFlangObject.from_filenames(
-                template_tree, paths=[sample]
-            )
+            builder = builder.filenames_sample([sample])
         else:
-            interactive_object = InteractiveFlangObject.from_string(template_tree, sample)
+            builder = builder.text_sample(sample)
 
-        return interactive_object
+        return builder.build()
 
     def test_basic(self):
         self._parse_template(tpl.TEST_BASIC_TEMPLATE, tpl.TEST_BASIC_SAMPLE)
@@ -37,14 +34,14 @@ class ParserTestCase(unittest.TestCase):
             self._parse_template(tpl.TEST_BASIC_TEMPLATE, tpl.TEST_BASIC_SAMPLE_FAILURE_2)
 
     def test_choice(self):
-        interactive_object = self._parse_template(tpl.TEST_TEMPLATE_CHOICE, "AAA")
-        flang_tree_node: FlangAST = interactive_object.flang_tree.full_search(
+        flang_object = self._parse_template(tpl.TEST_TEMPLATE_CHOICE, "AAA")
+        flang_tree_node: FlangAST = flang_object.flang_tree.full_search(
             "import.choice"
         ).first_child
         self.assertEqual(flang_tree_node.name, "text-val")
 
-        interactive_object = self._parse_template(tpl.TEST_TEMPLATE_CHOICE, "SOMEVALUE")
-        flang_tree_node: FlangAST = interactive_object.flang_tree.full_search(
+        flang_object = self._parse_template(tpl.TEST_TEMPLATE_CHOICE, "SOMEVALUE")
+        flang_tree_node: FlangAST = flang_object.flang_tree.full_search(
             "import.choice"
         ).first_child
         self.assertEqual(flang_tree_node.name, "regex")
@@ -103,26 +100,24 @@ class ParserTestCase(unittest.TestCase):
         self._parse_template(tpl.TEST_TEMPLATE_LINKING, tpl.TEST_SAMPLE_LINKING)
 
     def test_event(self):
-        interactive_object = self._parse_template(
+        flang_object = self._parse_template(
             tpl.TEST_TEMPLATE_FUNCTION_1, "say hello_world"
         )
-        self.assertDictEqual(interactive_object.context, {"result": "hello_world"})
+        self.assertDictEqual(flang_object.context, {"result": "hello_world"})
 
     def test_event_remote_with_alias(self):
-        interactive_object = self._parse_template(
+        flang_object = self._parse_template(
             tpl.TEST_TEMPLATE_FUNCTION_2, "say witaj_swiecie"
         )
-        self.assertDictEqual(interactive_object.context, {"result": "witaj_swiecie1"})
+        self.assertDictEqual(flang_object.context, {"result": "witaj_swiecie1"})
 
     def test_multiple_events_priorities(self):
-        interactive_object = self._parse_template(
-            tpl.TEST_TEMPLATE_FUNCTION_3, "second first"
-        )
+        flang_object = self._parse_template(tpl.TEST_TEMPLATE_FUNCTION_3, "second first")
 
         contexts = [
             ctx
             for ctx in iter(
-                interactive_object.event_storage.execute_iter(BuiltinEvent.ON_READ.value)
+                flang_object.event_storage.execute_iter(BuiltinEvent.ON_READ.value)
             )
         ]
         self.assertDictEqual(contexts[0], {"message": "first"})

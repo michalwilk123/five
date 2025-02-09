@@ -2,7 +2,7 @@ from flang.structures import FlangAST, FlangBranch, TemplateTree
 from flang.utils.exceptions import SymbolNotFoundError
 
 
-def resolve_use_node(template_tree: TemplateTree):
+def resolve_use_node(template_tree: TemplateTree) -> TemplateTree:
     target_location = template_tree.get_attrib("ref")
     location = template_tree.location
 

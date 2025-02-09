@@ -13,56 +13,36 @@ from flang.structures import (
 
 from .common import (
     CHILDREN_KEY,
-    CHOICE_INDEX_KEY,
     FILENAME_KEY,
     TEXT_CONTENT_KEY,
     is_constant_cardinality,
 )
 
 
-def generate_specification_for_cardinality(
+def create_specification_for_branch(
     template: TemplateTree, branch: FlangBranch
 ) -> Specification:
     ctr = Counter([item.name for item in branch.children])
     children_card_dict = {}
 
     for child in get_available_children(template):
-        original_node = child
-
-        if child.type == "use":
-            child = resolve_use_node(child)
-
-        if is_constant_cardinality(original_node):
+        if is_constant_cardinality(child):
             assert (
-                ctr.get(original_node.get_id(), 0) <= 1
-            ), f"Node has constant cardinality but shows up wrong amount of times: {ctr.get(original_node.get_id(), 0), original_node}"
+                ctr.get(child.get_id(), 0) <= 1
+            ), f"Node has constant cardinality but shows up wrong amount of times: {ctr.get(child.get_id(), 0), child}"
             continue
 
-        children_card_dict[original_node.get_id()] = ctr.get(original_node.get_id(), 0)
+        children_card_dict[child.get_id()] = ctr.get(child.get_id(), 0)
 
-    return (
-        {CHILDREN_KEY.format(branch.location): children_card_dict}
-        if children_card_dict
-        else {}
-    )
+    specs = {CHILDREN_KEY.format(branch.location): children_card_dict}
 
-
-def generate_specification_for_branch(
-    template: TemplateTree, branch: FlangBranch
-) -> Specification:
-    specs = generate_specification_for_cardinality(template, branch)
-
-    if template.type == "choice":
-        specs[CHOICE_INDEX_KEY.format(branch.location)] = [
-            item.location for item in get_available_children(template)
-        ].index(branch.children[0].template_id)
-    elif template.type == "file":
+    if template.type == "file":
         specs[FILENAME_KEY.format(branch.location)] = branch.filename
 
     return specs
 
 
-def generate_specification_for_leaf(
+def create_specification_for_leaf(
     template: TemplateTree, leaf: FlangLeaf
 ) -> Specification:
     not_deterministic = template.get_bool_attrib(
@@ -76,7 +56,7 @@ def generate_specification_for_leaf(
     )
 
 
-def generate_specification(
+def create_specification(
     template_tree: TemplateTree, flang_ast: FlangAST
 ) -> Specification:
     if isinstance(flang_ast, FlangRoot):
@@ -92,12 +72,12 @@ def generate_specification(
     specification = {}
 
     if isinstance(flang_ast, FlangLeaf):
-        specification |= generate_specification_for_leaf(template, flang_ast)
+        specification |= create_specification_for_leaf(template, flang_ast)
     elif isinstance(flang_ast, FlangBranch):
-        specification |= generate_specification_for_branch(template, flang_ast)
+        specification |= create_specification_for_branch(template, flang_ast)
 
         for child in flang_ast.children:
-            specification |= generate_specification(template_tree, child)
+            specification |= create_specification(template_tree, child)
     else:
         raise Exception
 
