@@ -52,7 +52,7 @@ def _select(template_tree: TemplateTree, specification: Specification, location)
             if node_name not in matched:
                 matched[node_name] = {}
 
-            matched[node_name][key] = value
+            matched[node_name][key.removeprefix(node_name)] = value
 
     return matched
 

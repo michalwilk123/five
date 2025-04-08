@@ -64,3 +64,8 @@ def create_branch_with_children(
         user_branch.add_node(child)
 
     return user_branch
+
+
+# Do i really need this?
+# def full_search_with_refs() -> TemplateTree | FlangAST:
+#     ...

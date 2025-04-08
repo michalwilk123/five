@@ -52,7 +52,7 @@ def create_ast_node(
     node_path: str,
     on_missing_value: MissingSpecificationValueEvent,
 ) -> FlangAST:
-    assert not isinstance(template, TemplateRoot)
+    assert not isinstance(template, TemplateRoot) and template is not None
 
     if template.type == "use":
         resolved_template = resolve_use_node(template)

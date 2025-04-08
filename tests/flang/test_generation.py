@@ -1,4 +1,3 @@
-import random
 import unittest
 
 from flang.flang_object import FlangObjectBuilder

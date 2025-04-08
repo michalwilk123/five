@@ -2,7 +2,7 @@ import random
 from typing import Callable
 
 from flang.core.utils import is_flang_node_hidden
-from flang.structures import FlangAST, TemplateTree
+from flang.structures import TemplateTree
 from flang.utils.exceptions import ImpossibleOperationError, MissingSpecificationError
 from flang.utils.regex import lex_storage
 
@@ -12,7 +12,6 @@ FILENAME_KEY = "{}:filename"
 
 MissingSpecificationValueEvent = Callable[[TemplateTree, str], str | int | dict[str, int]]
 
-
 def is_constant_cardinality(template: TemplateTree) -> bool:
     if template.parent and template.parent.type == "choice":
         return False
@@ -20,23 +19,6 @@ def is_constant_cardinality(template: TemplateTree) -> bool:
     return template.get_bool_attrib("hidden") or not (
         "multi" in template.attributes or "optional" in template.attributes
     )
-
-
-def generate_cardinality_dictionary(template: TemplateTree, key: str): ...
-
-
-# elif CHOICE_INDEX_KEY.endswith(key_suffix):
-#     return random.randrange(len(template.children))
-# number_choice = [1]
-
-# if template.get_bool_attrib("multi"):
-#     # NOTE: Adding muliple values makes it so the result tree explodes in branches number_choice += [2,3]
-#     pass
-
-# if template.get_bool_attrib("optional"):
-#     number_choice += [0]
-
-# return random.choice(number_choice)
 
 
 def generate_random_value_for_key(template: TemplateTree, key: str):
