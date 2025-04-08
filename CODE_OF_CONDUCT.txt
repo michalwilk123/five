@@ -1,0 +1,9 @@
+
+RULES FOR FIVE CODEBASE:
+
+1. Prefer functional coding style over adding classes
+2. Functions should have most simple input arguments and should return most simple result
+3. Functions should be as pure as its possible
+4. Avoid global state
+5. Minimize setup of data structures. Make setup part of code as explicit and modifiable as possible
+

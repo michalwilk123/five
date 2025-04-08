@@ -1,13 +1,16 @@
-from .input import *
-from .spec import *
+from .ast import FlangAST, FlangBranch, FlangLeaf, FlangRoot, TemplateRoot, TemplateTree
+from .event_storage import Event, EventStorage
+from .events import BuiltinEvent, ScopeTree
+from .input import (
+    FlangFileInputReader,
+    FlangTextInputReader,
+    InputReaderInterface,
+    create_input_reader_from_file_representation,
+)
+from .lex import LexicalAnalysisPattern, LexicalAnalysisPatternStorage
+from .operations import Operation, OperationLog, OperationState
+from .searchable_tree import SearchableTree
+from .specification import Specification
+from .virtual_file import FileOperation, FileRepresentation, VirtualFileRepresentation
 
-__all__ = [
-    "BaseFlangInputReader",
-    "FlangTextInputReader",
-    "FlangFileInputReader",
-    "IntermediateFileObject",
-    "FlangFileMatchObject",
-    "FlangTextMatchObject",
-    "FlangMatchObject",
-    "FlangConstruct",
-]
+# TODO: add __all__ variable!

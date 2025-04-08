@@ -14,6 +14,7 @@ My name is Tom.
 My name is empty.
 My name is some, other, things.
 """
+
 TEST_SAMPLE_MULTI = """\
 AAAAAAAAAAAA
 AAA
@@ -21,16 +22,19 @@ AAAAAA
 variable: somevalue;
 variable: someothervalue;
 """
+
 TEST_SAMPLE_RECURSIVE_1 = """\
 <html>
 foo
 </html>\
 """
+
 TEST_SAMPLE_RECURSIVE_2 = """\
 <html>
 <body><strong>some bolded text</strong></body>
 </html>\
 """
+
 TEST_SAMPLE_RECURSIVE_3 = """\
 <html>
 <head><link some="attribute">some link</link><link>some other link</link></head>
@@ -42,6 +46,22 @@ some <em>fancy</em> text
     nested
 </div>
 </div>
+</body>
+</html>\
+"""
+
+TEST_SAMPLE_TERMINAL_PARSING = """
+<html>
+<body>
+    <strong>this is text with < and > symbols</strong>
+</body>
+</html>\
+"""
+
+TEST_SAMPLE_TERMINAL_PARSING_INVALID = """
+<html>
+<body>
+    <strong>this is double strong tag</strong></strong>
 </body>
 </html>\
 """
@@ -61,14 +81,15 @@ cos(pi)
 
 TEST_BASIC_TEMPLATE = """
 <sequence>
-    <text value="hello "/><regex name="subject" value="{vname}"/>
+    <text value="hello "/><text regex="true" name="subject" value="{vname}"/>
 </sequence>
 """
+
 TEST_TEMPLATE_CHOICE = """
 <sequence name="import">
 <choice>
-<text name="text">AAA</text>
-<regex name="regex">{vname}</regex>
+<text name="text-val">AAA</text>
+<text regex="true" name="regex">{vname}</text>
 <text name="wrong">
 THIS IS WRONG
 </text>
@@ -90,10 +111,10 @@ TEST_TEMPLATE_CHOICE_NESTED = r"""
 <text value="sit"/>
 </choice>
 <choice name="my-regexes">
-<regex name="whitespace">\s</regex>
-<regex name="separators">[,.]</regex>
-<regex name="wrong">[:;%$]+</regex>
-<regex name="number">{number}</regex>
+<text regex="true" name="whitespace">\s</text>
+<text regex="true" name="separators">[,.]</text>
+<text regex="true" name="wrong">[:;%$]+</text>
+<text regex="true" name="number">{number}</text>
 </choice>
 <text name="wrong">wrong</text>
 </choice>
@@ -105,10 +126,10 @@ TEST_TEMPLATE_OPTIONAL = """
 <sequence name="opt">
 <text value="this is a "/>
 <sequence name="num" optional="true">
-<text value="number: "/><regex value="{number}"/>
+<text value="number: "/><text regex="true" value="{number}"/>
 </sequence>
 <sequence name="txt" optional="true">
-<text value="text: "/><regex value="{string}"/>
+<text value="text: "/><text regex="true" value="{string}"/>
 </sequence>
 </sequence>
 """
@@ -121,17 +142,17 @@ TEST_TEMPLATE_CHOICE_AND_MULTI = r"""
 <text value="Tom"/>
 <text value="Zoe"/>
 <sequence multi="true">
-<regex name="other" value="[a-z]+(, )?" multi="true"/>
+<text regex="true" name="other" value="[a-z]+(, )?" multi="true"/>
 </sequence>
 </choice>
 <text value="."/>
-<regex value="\s"/>
+<text regex="true" value="\s"/>
 </sequence>
 """
 
 TEST_TEMPLATE_USE = """
 <sequence name="import">
-<sequence name="foo" visible="false">
+<sequence name="foo" hidden="true">
 <text>foo</text>
 </sequence>
 <sequence name="bar">
@@ -140,61 +161,80 @@ TEST_TEMPLATE_USE = """
 </sequence>
 """
 
-"""
-Wiadomo ze jezeli chcialbys sparsowac cokolwiek to wszystko mozna owinac
-w regexy i sobie znacznie ulatwic sprawe.
-Zapominasz tylko po co tak naprawde istnieje ta klazura multi
-
-bardziej w tym chodzi o to aby okreslic ze zwracana jest lista jakis
-obiektow, np sequenceow ze zmatchowanym tekstem. Jakby musisz wciaz o tym
-pamietac
-"""
 TEST_TEMPLATE_MULTI = r"""
 <sequence name="import">
 <sequence name="header" multi="true">
 <text multi="true">AAA</text>
-<regex>\s</regex>
+<text regex="true">\s</text>
 </sequence>
 <sequence name="variable" multi="true">
-<text value="variable: "/><regex name="name" value="{vname}"/><regex value=";\n?"/>
+<text value="variable: "/><text regex="true" name="name" value="{vname}"/><text regex="true" value=";\n?"/>
 </sequence>
 </sequence>
 """
 
 TEST_TEMPLATE_RECURSIVE = r"""
-<choice name="xml-body" multi="true">
-    <regex name="wspace">\s+</regex>
-    <sequence name="xml-node" multi="true">
-        <regex name="open-tag" value="{xml_open_tag}"/>
+<sequence name="xml-body" multi="true">
+    <text optional="true" regex="true" name="top-level-whitespace">\s+</text>
+    <sequence optional="true" name="xml-node" multi="true">
+        <text regex="true" name="open-tag" value="{xml_open_tag}"/>
         <choice name="xml-content" multi="true">
-            <regex name="raw-content" value="[^{lt}{rt}]+"/>
-            <use ref="....xml-body"/>
+            <text multi="true" regex="true" name="raw-content" value="{XML_CONTENT_CHAR}"/>
+            <use multi="true" ref="...xml-node"/>
         </choice>
-        <regex name="close-tag" value="{xml_close_tag}"/>
+        <text regex="true" name="close-tag" value="{xml_close_tag}"/>
     </sequence>
-</choice>
+</sequence>
+"""
+
+# Slower version of above parser that uses explicit terminal symbols
+TEST_TEMPLATE_CHOICE_TERMINAL = r"""
+<sequence name="xml-body" multi="true">
+    <text optional="true" regex="true" name="top-level-whitespace">\s+</text>
+    <sequence optional="true" name="xml-node" multi="true">
+        <text regex="true" name="open-tag" value="{xml_open_tag}"/>
+        <choice name="xml-content" multi="true">
+            <text regex="true" name="raw-content" value="{ANY}"/>
+            <use multi="true" ref="...xml-node"/>
+            <text terminal="true" regex="true" name="close-tag" value="{xml_close_tag}"/>
+        </choice>
+    </sequence>
+</sequence>
+"""
+
+"""
+<-- terse preprocessor -->
+<s n=xml-body multi>
+    <t optional regex n=top-level-whitespace>\s+/>
+    <s optional n=xml-node multi>
+        <t regex n=open-tag v={xml_open_tag}/>
+        <c n=xml-content multi="true">
+            <t regex n=raw-content v={ANY}/>
+            <u ref=...xml-node/>
+            <t terminal regex n=close-tag v={xml_close_tag}/>
+        />
+    />
+/>
 """
 
 TEST_TEMPLATE_FILES_EASY = r"""
-<file pattern="easy" variant="filename" name="html-project">
-<file multi="true" pattern="*.html" variant="glob">
-<sequence name="html">
-<text name="content" value="some text "/>
-<regex name="number" value="{number}"/>
-</sequence>
-</file>
+<file pattern="easy" name="html-project">
+    <file multi="true" pattern="{filename}.html" regex="true">
+        <sequence name="html">
+            <text name="content" value="some text "/>
+            <text regex="true" name="number" value="{number}"/>
+        </sequence>
+    </file>
 </file>
 """
 
-TEST_TEMPLATE_FILES_XML = r"""
-<file pattern="xml" variant="filename" name="html-project">
-<file multi="true" pattern="*.html" variant="glob">
-{template}
+TEST_TEMPLATE_FILES_XML = rf"""
+<file pattern="xml" name="html-project">
+<file multi="true" pattern="{{filename}}.html" regex="true">
+{TEST_TEMPLATE_RECURSIVE}
 </file>
 </file>
-""".format(
-    template=TEST_TEMPLATE_RECURSIVE
-)
+"""
 TEST_TEMPLATE_FILES_MEDIUM = r"""
 """
 
@@ -203,19 +243,19 @@ TEST_TEMPLATE_LINKING = r"""
 <sequence name="code" multi="true">
 <choice name="code-parts">
 <sequence name="import">
-  <text value="from "/><regex name="module" value="{vname}"/>
-  <text value=" import "/><regex name="object" value="{vname}"
-    link-definition="imported" scope="..code-parts"/>
+  <text value="from "/><text regex="true" name="module" value="{vname}"/>
+  <text value=" import "/><text regex="true" name="object" value="{vname}"
+    link-name="imported" scope-start="..code-parts"/>
   <use ref="..nl"/>
 </sequence>
-<regex name="nl" value="\s"/>
+<text regex="true" name="nl" value="\s"/>
 <sequence name="function-call">
-    <regex name="reference" value="{vname}"/>
+    <text regex="true" name="reference" value="{vname}"/>
     <text value="("/>
-    <regex name="argument" value="{vname}|{number}" 
-        optional="true" link-from="imported"/>
+    <text regex="true" name="argument" value="{vname}|{number}" 
+        optional="true" refers-to-link="imported"/>
     <sequence multi="true" optional="true">
-        <regex name="separator" value="\s*,\s*"/>
+        <text regex="true" name="separator" value="\s*,\s*"/>
         <use ref="..argument" optional="false"/>
     </sequence>
     <text value=")"/>
@@ -225,33 +265,108 @@ TEST_TEMPLATE_LINKING = r"""
 </sequence>
 """
 
-TEST_TEMPLATE_FUNCTION = r"""
+TEST_TEMPLATE_FUNCTION_1 = r"""
 <sequence multi="true">
-<event name="print-message" alias="func">
-    print("hello")
+<event name="add-message">
+    context["result"] = kwargs["local_content"]
 </event>
-<sequence event=".print-message">
-<text value="say"/><regex value="{string|vname|number}" name="value"/>
+<sequence>
+<text value="say "/><text regex="true" event_5_read="..add-message" value="{string}|{vname}|{number}" name="value"/>
 </sequence>
 </sequence>
 """
 
-DUMMY_TEST_TEMPLATE_EVENT = r"""
-<sequence name="code">
-<sequence name="import" multi="true">
-<text value="import "/><regex name="import_name" value="{vname}"/><text value="\n"/>
-</sequence>
-<sequence name="function-call" on-create=".">
-<event args="tree">
-function_name = tree.get("name")
-tree.parent().get("import").insert(name=function_name)
-</event>
-<regex name="name" value="({vname}(\.{vname}))"/><text value="("/>
-<regex name="arguments" value="[^)]*"/>
-<text value=")"/>
+TEST_TEMPLATE_FUNCTION_2 = r"""
+<sequence>
+<event alias="func" source="tests/flang/test_files/test_module/sample_events.py:event2"/>
+<sequence>
+<text value="say "/><text regex="true" value="{string}|{vname}|{number}" name="value" event_10_read="@func"/>
 </sequence>
 </sequence>
 """
+
+TEST_TEMPLATE_FUNCTION_3 = r"""
+<sequence>
+<event alias="func">
+    if "executed" not in context:
+        context["message"] = kwargs["local_content"]
+    else:
+        context["message"] = kwargs["local_content"]
+</event>
+<sequence>
+<text regex="true" value="{vname}" event_5_read="@func" name="value1"/>
+<text value=" "/>
+<text regex="true" value="{vname}" event_10_read="@func" name="value2"/>
+</sequence>
+</sequence>
+"""
+
+TEST_TEMPLATE_REWRITE = """
+<sequence>
+    <sequence alias="polish" hidden="true">
+        <text value="Dzień dobry! Nazywam się "/>
+        <text regex="true" value="\\w+" name="name"/>
+    </sequence>
+    <sequence alias="english" hidden="true">
+        <choice>
+            <text value="Good morning!"/>
+            <text value="Good afternoon!"/>
+        </choice>
+        <text value=" My name is "/>
+        <text regex="true" value="\\w+" name="name"/>
+        <sequence name="extra-message" optional="true">
+            <text value=". "/>
+            <text regex="true" value="[A-Z].+"/>
+        </sequence>
+    </sequence>
+    <sequence name="greeting" multi="true">
+        <choice>
+            <use name="polish" ref="@polish"/>
+            <use name="english" ref="@english"/>
+        </choice>
+        <text regex="true" value="\\.?\\n"/>
+    </sequence>
+    <text optional="true" multi="true" value="dot"/>
+</sequence>
+"""
+
+REWRITE_SAMPLE_1 = """\
+Dzień dobry! Nazywam się Michał.
+Good morning! My name is Alan. How are you?
+Dzień dobry! Nazywam się Piotr.
+Good afternoon! My name is Victor. How was your day?
+Good morning! My name is Ernest.
+dotdot"""
+
+TEST_TEMPLATE_EDGE_CASES = """
+<sequence name="p" alias="parent" multi="true">
+    <text name="foo" alias="foo" value="a"/>
+    <use optional="true" ref="@parent"/>
+    <use ref="@bar"/>
+    <use ref="@bar" multi="true"/>
+    <use ref="@parent" optional="true"/>
+    <sequence optional="true">
+        <sequence optional="true">
+            <sequence>
+            <choice>
+            <text name="foo" alias="bar" value="b"/>
+            </choice>
+            </sequence>
+        </sequence>
+    </sequence>
+    <text value="END"/>
+</sequence>
+"""
+
+EDGE_CASE_SAMPLE = "aabbbbbbENDbbbabbENDbEND"
+
+HALTING_TEST_TEMPLATE = """
+<sequence multi="true">
+    <text optional="true" value="A"/>
+</sequence>
+"""
+
+HALTING_TEST_SAMPLE = "AB"
 
 # END
 ## END
@@ -311,40 +426,40 @@ tree.parent().get("import").insert(name=function_name)
 #################################### END
 ##################################### END
 
-DUMMY_TEST_TEMPLATE_EVENT = r"""
-<sequence name="code">
-<sequence name="import">
-<text value="import "/><regex value="{vname}"/><text value="\\n"/>
-</sequence>
-<sequence name="function-call" on-create=".">
-<event args="tree">
-print("hello world")
-</event>
-<regex name="name" value="({vname}(\.{vname}))"/><text value="("/>
-<regex name="arguments" value="[^)]*"/>
-<text value=")"/>
-</sequence>
-</sequence>
-"""
+# DUMMY_TEST_TEMPLATE_EVENT = r"""
+# <sequence name="code">
+# <sequence name="import">
+# <text value="import "/><regex value="{vname}"/><text value="\\n"/>
+# </sequence>
+# <sequence name="function-call" on-create=".">
+# <event args="tree">
+# print("hello world")
+# </event>
+# <regex name="name" value="({vname}(\.{vname}))"/><text value="("/>
+# <regex name="arguments" value="[^)]*"/>
+# <text value=")"/>
+# </sequence>
+# </sequence>
+# """
 
 SAMPLE_CHOICE = "AAAAAA"
 SPEC_EVENT = None
 
-DUMMY_TEST_TEMPLATE_EVENT = r"""
-<sequence name="code">
-<sequence name="import">
-<text value="import "/><regex value="{vname}"/><text value="\\n"/>
-</sequence>
-<sequence name="function-call" on-create=".">
-<event args="tree">
-print("hello world")
-</event>
-<regex name="name" value="({vname}(\.{vname}))"/><text value="("/>
-<regex name="arguments" value="[^)]*"/>
-<text value=")"/>
-</sequence>
-</sequence>
-"""
+# DUMMY_TEST_TEMPLATE_EVENT = r"""
+# <sequence name="code">
+# <sequence name="import">
+# <text value="import "/><regex value="{vname}"/><text value="\\n"/>
+# </sequence>
+# <sequence name="function-call" on-create=".">
+# <event args="tree">
+# print("hello world")
+# </event>
+# <regex name="name" value="({vname}(\.{vname}))"/><text value="("/>
+# <regex name="arguments" value="[^)]*"/>
+# <text value=")"/>
+# </sequence>
+# </sequence>
+# """
 
 
 # def main():
