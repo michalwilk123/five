@@ -1,0 +1,11 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+- prefer functional coding style over adding classes
+- functions should have most simple input arguments and should return most simple result
+- functions should be as pure as its possible
+- avoid global state
+- minimize setup of data structures. Make setup part of code as explicit and modifiable as possible
+- project uses `uv` for managing packages, so when running an app use `uv run ...`, when installing package use `uv add ...` and so on

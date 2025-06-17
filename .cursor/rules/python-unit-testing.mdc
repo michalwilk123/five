@@ -1,0 +1,11 @@
+---
+description: Rules for creating python unit tests
+globs: 
+alwaysApply: false
+---
+- tests are saved in `tests/` directory
+- test filenames start with `test_*.py`
+- tests are using ONLY standard python unittest library
+- test clasess names end with `TestCase` for example `ProjectSearchEngineTestCase`
+- minimize the usage of mocks and MagicMock
+- do not add unittest.main() call with `if __name__ == "__main__"` at the bottom
