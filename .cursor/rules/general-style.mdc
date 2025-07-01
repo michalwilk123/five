@@ -7,5 +7,8 @@ alwaysApply: true
 - functions should have most simple input arguments and should return most simple result
 - functions should be as pure as its possible
 - avoid global state
+- avoid comments and docstrings if possible. Code should be an documentation itself
 - minimize setup of data structures. Make setup part of code as explicit and modifiable as possible
 - project uses `uv` for managing packages, so when running an app use `uv run ...`, when installing package use `uv add ...` and so on
+- use builtin bash commands or git if possible, rather than reinventing some known feature
+- if possible to to implement builtin python types: list not typing.List, dict not typing.Dict, | not typing.Union, etc.

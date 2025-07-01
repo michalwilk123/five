@@ -1,5 +1,5 @@
 ---
-description: Rules for creating python unit tests
+description: Rules when creating python unit test cases
 globs: 
 alwaysApply: false
 ---
