@@ -1,0 +1,1169 @@
+language = "python"
+last_updated = "2025-07-02T22:30:41.819155+00:00"
+
+[[symbols]]
+name = "process_definitions_tinydb"
+file_path = "depr_demo.py"
+line_number = 24
+symbol_type = "function/method"
+
+[[symbols]]
+name = "process_imports_tinydb"
+file_path = "depr_demo.py"
+line_number = 76
+symbol_type = "function/method"
+
+[[symbols]]
+name = "resolve_imports_tinydb"
+file_path = "depr_demo.py"
+line_number = 117
+symbol_type = "function/method"
+
+[[symbols]]
+name = "filter_unignored_files"
+file_path = "indexer/files.py"
+line_number = 10
+symbol_type = "function/method"
+
+[[symbols]]
+name = "get_project_files"
+file_path = "indexer/files.py"
+line_number = 43
+symbol_type = "function/method"
+
+[[symbols]]
+name = "filter_file_language"
+file_path = "indexer/files.py"
+line_number = 65
+symbol_type = "function/method"
+
+[[symbols]]
+name = "get_files_for_indexing"
+file_path = "indexer/files.py"
+line_number = 70
+symbol_type = "function/method"
+
+[[symbols]]
+name = "FileOperation"
+file_path = "indexer/files.py"
+line_number = 83
+symbol_type = "class/structure"
+
+[[symbols]]
+name = "get_file_hash"
+file_path = "indexer/files.py"
+line_number = 89
+symbol_type = "function/method"
+
+[[symbols]]
+name = "get_file_hashes"
+file_path = "indexer/files.py"
+line_number = 94
+symbol_type = "function/method"
+
+[[symbols]]
+name = "get_merkle_hashes"
+file_path = "indexer/files.py"
+line_number = 104
+symbol_type = "function/method"
+
+[[symbols]]
+name = "get_merkle_diff"
+file_path = "indexer/files.py"
+line_number = 118
+symbol_type = "function/method"
+
+[[symbols]]
+name = "parse_source"
+file_path = "indexer/parsers/python.py"
+line_number = 10
+symbol_type = "function/method"
+
+[[symbols]]
+name = "parse"
+file_path = "indexer/parsers/python.py"
+line_number = 76
+symbol_type = "function/method"
+
+[[symbols]]
+name = "_is_global_scope"
+file_path = "indexer/parsers/python.py"
+line_number = 95
+symbol_type = "function/method"
+
+[[symbols]]
+name = "_node_in_parent"
+file_path = "indexer/parsers/python.py"
+line_number = 106
+symbol_type = "function/method"
+
+[[symbols]]
+name = "ProcessProjectTestCase"
+file_path = "indexer/tests/test_core.py"
+line_number = 10
+symbol_type = "class/structure"
+
+[[symbols]]
+name = "ProcessAllRepositoriesTestCase"
+file_path = "indexer/tests/test_core.py"
+line_number = 90
+symbol_type = "class/structure"
+
+[[symbols]]
+name = "setUp"
+file_path = "indexer/tests/test_core.py"
+line_number = 13
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_process_project_extracts_symbols"
+file_path = "indexer/tests/test_core.py"
+line_number = 17
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_process_project_symbol_types"
+file_path = "indexer/tests/test_core.py"
+line_number = 29
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_process_project_file_paths"
+file_path = "indexer/tests/test_core.py"
+line_number = 42
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_process_project_line_numbers"
+file_path = "indexer/tests/test_core.py"
+line_number = 51
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_process_project_empty_directory"
+file_path = "indexer/tests/test_core.py"
+line_number = 59
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_process_project_default_language"
+file_path = "indexer/tests/test_core.py"
+line_number = 73
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_process_project_unsupported_language"
+file_path = "indexer/tests/test_core.py"
+line_number = 84
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_all_repositories"
+file_path = "indexer/tests/test_core.py"
+line_number = 93
+symbol_type = "function/method"
+
+[[symbols]]
+name = "ProcessProjectTestCase.setUp"
+file_path = "indexer/tests/test_core.py"
+line_number = 13
+symbol_type = "function/method"
+
+[[symbols]]
+name = "ProcessProjectTestCase.test_process_project_extracts_symbols"
+file_path = "indexer/tests/test_core.py"
+line_number = 17
+symbol_type = "function/method"
+
+[[symbols]]
+name = "ProcessProjectTestCase.test_process_project_symbol_types"
+file_path = "indexer/tests/test_core.py"
+line_number = 29
+symbol_type = "function/method"
+
+[[symbols]]
+name = "ProcessProjectTestCase.test_process_project_file_paths"
+file_path = "indexer/tests/test_core.py"
+line_number = 42
+symbol_type = "function/method"
+
+[[symbols]]
+name = "ProcessProjectTestCase.test_process_project_line_numbers"
+file_path = "indexer/tests/test_core.py"
+line_number = 51
+symbol_type = "function/method"
+
+[[symbols]]
+name = "ProcessProjectTestCase.test_process_project_empty_directory"
+file_path = "indexer/tests/test_core.py"
+line_number = 59
+symbol_type = "function/method"
+
+[[symbols]]
+name = "ProcessProjectTestCase.test_process_project_default_language"
+file_path = "indexer/tests/test_core.py"
+line_number = 73
+symbol_type = "function/method"
+
+[[symbols]]
+name = "ProcessProjectTestCase.test_process_project_unsupported_language"
+file_path = "indexer/tests/test_core.py"
+line_number = 84
+symbol_type = "function/method"
+
+[[symbols]]
+name = "ProcessAllRepositoriesTestCase.test_all_repositories"
+file_path = "indexer/tests/test_core.py"
+line_number = 93
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TEST_REPOSITORIES_PATH"
+file_path = "indexer/tests/test_indexer.py"
+line_number = 7
+symbol_type = "constant/variable"
+
+[[symbols]]
+name = "TestIndexer"
+file_path = "indexer/tests/test_indexer.py"
+line_number = 10
+symbol_type = "class/structure"
+
+[[symbols]]
+name = "test_filter_unignored_files_babi"
+file_path = "indexer/tests/test_indexer.py"
+line_number = 11
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_filter_unignored_files_flask"
+file_path = "indexer/tests/test_indexer.py"
+line_number = 38
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_filter_unignored_files_pre_commit"
+file_path = "indexer/tests/test_indexer.py"
+line_number = 67
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_filter_unignored_files_empty_list"
+file_path = "indexer/tests/test_indexer.py"
+line_number = 94
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_filter_unignored_files_all_ignored"
+file_path = "indexer/tests/test_indexer.py"
+line_number = 100
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_get_project_files_babi"
+file_path = "indexer/tests/test_indexer.py"
+line_number = 114
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_get_project_files_non_git_directory"
+file_path = "indexer/tests/test_indexer.py"
+line_number = 132
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestIndexer.test_filter_unignored_files_babi"
+file_path = "indexer/tests/test_indexer.py"
+line_number = 11
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestIndexer.test_filter_unignored_files_flask"
+file_path = "indexer/tests/test_indexer.py"
+line_number = 38
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestIndexer.test_filter_unignored_files_pre_commit"
+file_path = "indexer/tests/test_indexer.py"
+line_number = 67
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestIndexer.test_filter_unignored_files_empty_list"
+file_path = "indexer/tests/test_indexer.py"
+line_number = 94
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestIndexer.test_filter_unignored_files_all_ignored"
+file_path = "indexer/tests/test_indexer.py"
+line_number = 100
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestIndexer.test_get_project_files_babi"
+file_path = "indexer/tests/test_indexer.py"
+line_number = 114
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestIndexer.test_get_project_files_non_git_directory"
+file_path = "indexer/tests/test_indexer.py"
+line_number = 132
+symbol_type = "function/method"
+
+[[symbols]]
+name = "SymbolParsingTestCase"
+file_path = "indexer/tests/test_symbol_parsing.py"
+line_number = 8
+symbol_type = "class/structure"
+
+[[symbols]]
+name = "test_parse_source_and_parse_equivalence"
+file_path = "indexer/tests/test_symbol_parsing.py"
+line_number = 11
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_parse_source_with_various_symbols"
+file_path = "indexer/tests/test_symbol_parsing.py"
+line_number = 60
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_parse_source_with_syntax_error"
+file_path = "indexer/tests/test_symbol_parsing.py"
+line_number = 128
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_parse_source_empty_content"
+file_path = "indexer/tests/test_symbol_parsing.py"
+line_number = 138
+symbol_type = "function/method"
+
+[[symbols]]
+name = "SymbolParsingTestCase.test_parse_source_and_parse_equivalence"
+file_path = "indexer/tests/test_symbol_parsing.py"
+line_number = 11
+symbol_type = "function/method"
+
+[[symbols]]
+name = "SymbolParsingTestCase.test_parse_source_with_various_symbols"
+file_path = "indexer/tests/test_symbol_parsing.py"
+line_number = 60
+symbol_type = "function/method"
+
+[[symbols]]
+name = "SymbolParsingTestCase.test_parse_source_with_syntax_error"
+file_path = "indexer/tests/test_symbol_parsing.py"
+line_number = 128
+symbol_type = "function/method"
+
+[[symbols]]
+name = "SymbolParsingTestCase.test_parse_source_empty_content"
+file_path = "indexer/tests/test_symbol_parsing.py"
+line_number = 138
+symbol_type = "function/method"
+
+[[symbols]]
+name = "load_env"
+file_path = "prompt_engineering/__init__.py"
+line_number = 5
+symbol_type = "function/method"
+
+[[symbols]]
+name = "LITE_MODEL"
+file_path = "prompt_engineering/connection.py"
+line_number = 18
+symbol_type = "constant/variable"
+
+[[symbols]]
+name = "MEDIUM_MODEL"
+file_path = "prompt_engineering/connection.py"
+line_number = 19
+symbol_type = "constant/variable"
+
+[[symbols]]
+name = "BIG_MODEL"
+file_path = "prompt_engineering/connection.py"
+line_number = 20
+symbol_type = "constant/variable"
+
+[[symbols]]
+name = "LanguageModelQuery"
+file_path = "prompt_engineering/connection.py"
+line_number = 24
+symbol_type = "class/structure"
+
+[[symbols]]
+name = "prepare_prompt"
+file_path = "prompt_engineering/connection.py"
+line_number = 30
+symbol_type = "function/method"
+
+[[symbols]]
+name = "is_retryable_error"
+file_path = "prompt_engineering/connection.py"
+line_number = 39
+symbol_type = "function/method"
+
+[[symbols]]
+name = "_execute_prompt_internal"
+file_path = "prompt_engineering/connection.py"
+line_number = 55
+symbol_type = "function/method"
+
+[[symbols]]
+name = "execute_prompt"
+file_path = "prompt_engineering/connection.py"
+line_number = 97
+symbol_type = "function/method"
+
+[[symbols]]
+name = "FIND_SYMBOLS_IN_FILE_PROMPT"
+file_path = "prompt_engineering/templates/indexer/prompts.py"
+line_number = 3
+symbol_type = "constant/variable"
+
+[[symbols]]
+name = "FIND_SYMBOLS_IN_FILE_SYSTEM_PROMPT"
+file_path = "prompt_engineering/templates/indexer/prompts.py"
+line_number = 14
+symbol_type = "constant/variable"
+
+[[symbols]]
+name = "FindSymbolsInFileConfig"
+file_path = "prompt_engineering/templates/indexer/prompts.py"
+line_number = 60
+symbol_type = "class/structure"
+
+[[symbols]]
+name = "PARSE_IMPORT_STATEMENTS_PROMPT"
+file_path = "prompt_engineering/templates/indexer/prompts.py"
+line_number = 66
+symbol_type = "constant/variable"
+
+[[symbols]]
+name = "PARSE_IMPORT_STATEMENTS_SYSTEM_PROMPT"
+file_path = "prompt_engineering/templates/indexer/prompts.py"
+line_number = 77
+symbol_type = "constant/variable"
+
+[[symbols]]
+name = "ParseImportStatementsConfig"
+file_path = "prompt_engineering/templates/indexer/prompts.py"
+line_number = 181
+symbol_type = "class/structure"
+
+[[symbols]]
+name = "logfile"
+file_path = "prompt_engineering/templates/indexer/setup.py"
+line_number = 19
+symbol_type = "constant/variable"
+
+[[symbols]]
+name = "prompt_parse_import_statements"
+file_path = "prompt_engineering/templates/indexer/setup.py"
+line_number = 22
+symbol_type = "function/method"
+
+[[symbols]]
+name = "prompt_find_symbols_in_file"
+file_path = "prompt_engineering/templates/indexer/setup.py"
+line_number = 34
+symbol_type = "function/method"
+
+[[symbols]]
+name = "black"
+file_path = "tasks.py"
+line_number = 5
+symbol_type = "function/method"
+
+[[symbols]]
+name = "isort"
+file_path = "tasks.py"
+line_number = 11
+symbol_type = "function/method"
+
+[[symbols]]
+name = "lint"
+file_path = "tasks.py"
+line_number = 16
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test"
+file_path = "tasks.py"
+line_number = 21
+symbol_type = "function/method"
+
+[[symbols]]
+name = "FileChangeDetectionTestCase"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 18
+symbol_type = "class/structure"
+
+[[symbols]]
+name = "IndexConfigUpdateTestCase"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 117
+symbol_type = "class/structure"
+
+[[symbols]]
+name = "AllRepositoriesFileChangeTestCase"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 221
+symbol_type = "class/structure"
+
+[[symbols]]
+name = "setUp"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 21
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_get_file_hashes_returns_dict"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 25
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_get_merkle_hashes_returns_dict"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 38
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_get_merkle_diff_no_changes"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 51
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_get_merkle_diff_added_files"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 61
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_get_merkle_diff_modified_files"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 78
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_get_merkle_diff_deleted_files"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 97
+symbol_type = "function/method"
+
+[[symbols]]
+name = "setUp"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 120
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_update_index_config_no_changes"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 124
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_update_index_config_added_file"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 133
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_update_index_config_modified_file"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 157
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_update_index_config_deleted_file"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 185
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_update_index_config_preserves_language"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 213
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_all_repositories_file_hashes"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 224
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_all_repositories_merkle_diff_consistency"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 247
+symbol_type = "function/method"
+
+[[symbols]]
+name = "FileChangeDetectionTestCase.setUp"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 21
+symbol_type = "function/method"
+
+[[symbols]]
+name = "FileChangeDetectionTestCase.test_get_file_hashes_returns_dict"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 25
+symbol_type = "function/method"
+
+[[symbols]]
+name = "FileChangeDetectionTestCase.test_get_merkle_hashes_returns_dict"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 38
+symbol_type = "function/method"
+
+[[symbols]]
+name = "FileChangeDetectionTestCase.test_get_merkle_diff_no_changes"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 51
+symbol_type = "function/method"
+
+[[symbols]]
+name = "FileChangeDetectionTestCase.test_get_merkle_diff_added_files"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 61
+symbol_type = "function/method"
+
+[[symbols]]
+name = "FileChangeDetectionTestCase.test_get_merkle_diff_modified_files"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 78
+symbol_type = "function/method"
+
+[[symbols]]
+name = "FileChangeDetectionTestCase.test_get_merkle_diff_deleted_files"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 97
+symbol_type = "function/method"
+
+[[symbols]]
+name = "IndexConfigUpdateTestCase.setUp"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 120
+symbol_type = "function/method"
+
+[[symbols]]
+name = "IndexConfigUpdateTestCase.test_update_index_config_no_changes"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 124
+symbol_type = "function/method"
+
+[[symbols]]
+name = "IndexConfigUpdateTestCase.test_update_index_config_added_file"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 133
+symbol_type = "function/method"
+
+[[symbols]]
+name = "IndexConfigUpdateTestCase.test_update_index_config_modified_file"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 157
+symbol_type = "function/method"
+
+[[symbols]]
+name = "IndexConfigUpdateTestCase.test_update_index_config_deleted_file"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 185
+symbol_type = "function/method"
+
+[[symbols]]
+name = "IndexConfigUpdateTestCase.test_update_index_config_preserves_language"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 213
+symbol_type = "function/method"
+
+[[symbols]]
+name = "AllRepositoriesFileChangeTestCase.test_all_repositories_file_hashes"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 224
+symbol_type = "function/method"
+
+[[symbols]]
+name = "AllRepositoriesFileChangeTestCase.test_all_repositories_merkle_diff_consistency"
+file_path = "indexer/tests/test_file_changes.py"
+line_number = 247
+symbol_type = "function/method"
+
+[[symbols]]
+name = "_process_files_with_parser"
+file_path = "indexer/core.py"
+line_number = 22
+symbol_type = "function/method"
+
+[[symbols]]
+name = "process_project"
+file_path = "indexer/core.py"
+line_number = 46
+symbol_type = "function/method"
+
+[[symbols]]
+name = "process_specific_files"
+file_path = "indexer/core.py"
+line_number = 55
+symbol_type = "function/method"
+
+[[symbols]]
+name = "update_index_config"
+file_path = "indexer/core.py"
+line_number = 70
+symbol_type = "function/method"
+
+[[symbols]]
+name = "build_index_config"
+file_path = "indexer/core.py"
+line_number = 117
+symbol_type = "function/method"
+
+[[symbols]]
+name = "save_index_config_to_file"
+file_path = "indexer/core.py"
+line_number = 134
+symbol_type = "function/method"
+
+[[symbols]]
+name = "build_and_save_index_config"
+file_path = "indexer/core.py"
+line_number = 152
+symbol_type = "function/method"
+
+[[symbols]]
+name = "load_index_config"
+file_path = "indexer/core.py"
+line_number = 159
+symbol_type = "function/method"
+
+[[symbols]]
+name = "update_and_save_index_config"
+file_path = "indexer/core.py"
+line_number = 165
+symbol_type = "function/method"
+
+[[symbols]]
+name = "get_config_path"
+file_path = "indexer/__main__.py"
+line_number = 14
+symbol_type = "function/method"
+
+[[symbols]]
+name = "create_index"
+file_path = "indexer/__main__.py"
+line_number = 19
+symbol_type = "function/method"
+
+[[symbols]]
+name = "_print_file_changes"
+file_path = "indexer/__main__.py"
+line_number = 27
+symbol_type = "function/method"
+
+[[symbols]]
+name = "_handle_changes"
+file_path = "indexer/__main__.py"
+line_number = 37
+symbol_type = "function/method"
+
+[[symbols]]
+name = "update_index"
+file_path = "indexer/__main__.py"
+line_number = 53
+symbol_type = "function/method"
+
+[[symbols]]
+name = "main"
+file_path = "indexer/__main__.py"
+line_number = 76
+symbol_type = "function/method"
+
+[[symbols]]
+name = "_calculate_similarity"
+file_path = "indexer/search.py"
+line_number = 9
+symbol_type = "function/method"
+
+[[symbols]]
+name = "_calculate_combined_score"
+file_path = "indexer/search.py"
+line_number = 24
+symbol_type = "function/method"
+
+[[symbols]]
+name = "_should_skip_by_length"
+file_path = "indexer/search.py"
+line_number = 28
+symbol_type = "function/method"
+
+[[symbols]]
+name = "_search_symbols"
+file_path = "indexer/search.py"
+line_number = 34
+symbol_type = "function/method"
+
+[[symbols]]
+name = "fuzzy_search_symbols"
+file_path = "indexer/search.py"
+line_number = 82
+symbol_type = "function/method"
+
+[[symbols]]
+name = "BackgroundSearch"
+file_path = "indexer/search.py"
+line_number = 91
+symbol_type = "class/structure"
+
+[[symbols]]
+name = "fuzzy_search_symbols_optimized"
+file_path = "indexer/search.py"
+line_number = 195
+symbol_type = "constant/variable"
+
+[[symbols]]
+name = "__init__"
+file_path = "indexer/search.py"
+line_number = 92
+symbol_type = "function/method"
+
+[[symbols]]
+name = "start_search"
+file_path = "indexer/search.py"
+line_number = 98
+symbol_type = "function/method"
+
+[[symbols]]
+name = "_search_worker"
+file_path = "indexer/search.py"
+line_number = 118
+symbol_type = "function/method"
+
+[[symbols]]
+name = "_get_sorted_results"
+file_path = "indexer/search.py"
+line_number = 174
+symbol_type = "function/method"
+
+[[symbols]]
+name = "cancel"
+file_path = "indexer/search.py"
+line_number = 184
+symbol_type = "function/method"
+
+[[symbols]]
+name = "is_running"
+file_path = "indexer/search.py"
+line_number = 190
+symbol_type = "function/method"
+
+[[symbols]]
+name = "BackgroundSearch.__init__"
+file_path = "indexer/search.py"
+line_number = 92
+symbol_type = "function/method"
+
+[[symbols]]
+name = "BackgroundSearch.start_search"
+file_path = "indexer/search.py"
+line_number = 98
+symbol_type = "function/method"
+
+[[symbols]]
+name = "BackgroundSearch._search_worker"
+file_path = "indexer/search.py"
+line_number = 118
+symbol_type = "function/method"
+
+[[symbols]]
+name = "BackgroundSearch._get_sorted_results"
+file_path = "indexer/search.py"
+line_number = 174
+symbol_type = "function/method"
+
+[[symbols]]
+name = "BackgroundSearch.cancel"
+file_path = "indexer/search.py"
+line_number = 184
+symbol_type = "function/method"
+
+[[symbols]]
+name = "BackgroundSearch.is_running"
+file_path = "indexer/search.py"
+line_number = 190
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestSearchPerformance"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 16
+symbol_type = "class/structure"
+
+[[symbols]]
+name = "TestBackgroundSearch"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 100
+symbol_type = "class/structure"
+
+[[symbols]]
+name = "setUp"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 18
+symbol_type = "function/method"
+
+[[symbols]]
+name = "create_test_config"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 21
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_should_skip_by_length"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 40
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_calculate_similarity"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 46
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_calculate_combined_score"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 53
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_optimized_search_exact_matches_priority"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 58
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_search_results_consistency"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 67
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_performance_improvement"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 84
+symbol_type = "function/method"
+
+[[symbols]]
+name = "setUp"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 102
+symbol_type = "function/method"
+
+[[symbols]]
+name = "create_test_config"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 106
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_background_search_start_and_cancel"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 125
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_background_search_completion"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 153
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_background_search_empty_config"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 180
+symbol_type = "function/method"
+
+[[symbols]]
+name = "test_background_search_multiple_starts"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 205
+symbol_type = "function/method"
+
+[[symbols]]
+name = "callback"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 129
+symbol_type = "function/method"
+
+[[symbols]]
+name = "callback"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 156
+symbol_type = "function/method"
+
+[[symbols]]
+name = "callback"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 192
+symbol_type = "function/method"
+
+[[symbols]]
+name = "callback"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 208
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestSearchPerformance.setUp"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 18
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestSearchPerformance.create_test_config"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 21
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestSearchPerformance.test_should_skip_by_length"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 40
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestSearchPerformance.test_calculate_similarity"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 46
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestSearchPerformance.test_calculate_combined_score"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 53
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestSearchPerformance.test_optimized_search_exact_matches_priority"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 58
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestSearchPerformance.test_search_results_consistency"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 67
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestSearchPerformance.test_performance_improvement"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 84
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestBackgroundSearch.setUp"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 102
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestBackgroundSearch.create_test_config"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 106
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestBackgroundSearch.test_background_search_start_and_cancel"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 125
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestBackgroundSearch.test_background_search_completion"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 153
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestBackgroundSearch.test_background_search_empty_config"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 180
+symbol_type = "function/method"
+
+[[symbols]]
+name = "TestBackgroundSearch.test_background_search_multiple_starts"
+file_path = "indexer/tests/test_search_performance.py"
+line_number = 205
+symbol_type = "function/method"
+
+[[symbols]]
+name = "SymbolType"
+file_path = "indexer/utils.py"
+line_number = 8
+symbol_type = "class/structure"
+
+[[symbols]]
+name = "SymbolDeclaration"
+file_path = "indexer/utils.py"
+line_number = 32
+symbol_type = "class/structure"
+
+[[symbols]]
+name = "SearchResult"
+file_path = "indexer/utils.py"
+line_number = 40
+symbol_type = "class/structure"
+
+[[symbols]]
+name = "IndexConfig"
+file_path = "indexer/utils.py"
+line_number = 48
+symbol_type = "class/structure"
+
+[[symbols]]
+name = "index_config_to_toml"
+file_path = "indexer/utils.py"
+line_number = 56
+symbol_type = "function/method"
+
+[[symbols]]
+name = "toml_to_index_config"
+file_path = "indexer/utils.py"
+line_number = 70
+symbol_type = "function/method"
+
+[file_hashes]
+"depr_demo.py" = "248935e64848682b7da82a35f23d4ee8"
+"indexer/__main__.py" = "1885ab553c7298bdaba4969481224201"
+"indexer/core.py" = "1e17741836b16115e2fd56f392031733"
+"indexer/files.py" = "f69ccd1da7d8f3fb02bfffba3e862d99"
+"indexer/parsers/python.py" = "0f619b0501ad66d95ed0e0b5917ad50b"
+"indexer/search.py" = "3bb43b9279d2f6daf3b53c863bcb3927"
+"indexer/tests/test_core.py" = "8f79327b298eec47227820031041f4a1"
+"indexer/tests/test_file_changes.py" = "15db90254a76cda739afd7fbedfffa5b"
+"indexer/tests/test_indexer.py" = "83e2dc1bd58b2de1da8a7f973595315c"
+"indexer/tests/test_search_performance.py" = "43df6a427ff68d10ba826f263a7eedc0"
+"indexer/tests/test_symbol_parsing.py" = "f1763aa7a8cbe07cdccc3a3a8d052110"
+"indexer/utils.py" = "aee61c3d4168f46ee1f162733a17e8f9"
+"prompt_engineering/__init__.py" = "e81edc3f5a0935a05c2b0385340052cd"
+"prompt_engineering/connection.py" = "c13caac195ad4b8c398809dd3b09c3a1"
+"prompt_engineering/templates/indexer/prompts.py" = "19a247d2c2083956a279eca88b1ce52c"
+"prompt_engineering/templates/indexer/setup.py" = "06b7ce21c5408d48c1f1b9bc1381a9d3"
+"tasks.py" = "2b635db34a78298d3902338662a9f712"
+
+[merkle_hashes]
+"." = "39b7f59ecec6e11cbb63e9766fc9b7ff"
+indexer = "a8d080ebd761e209e1cb53a47f7962a3"
+"indexer/parsers" = "61399e2d48175dbcf87eccbc1073e82b"
+"indexer/tests" = "33eed08dbebf424b4377494c19a849ba"
+prompt_engineering = "b539582b9f83419b2dc6313cd9b24105"
+"prompt_engineering/templates/indexer" = "3dbc6808a84987aa146370e79d06138f"

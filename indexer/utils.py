@@ -1,5 +1,8 @@
-from dataclasses import dataclass
+import tomllib
+from dataclasses import asdict, dataclass
 from enum import Enum
+
+import tomli_w
 
 
 class SymbolType(Enum):
@@ -34,9 +37,51 @@ class SymbolDeclaration:
 
 
 @dataclass
+class SearchResult:
+    symbol: SymbolDeclaration
+    symbol_score: float
+    file_score: float
+    combined_score: float
+
+
+@dataclass
 class IndexConfig:
     symbols: list[SymbolDeclaration]
     file_hashes: dict[str, str]
     merkle_hashes: dict[str, str]
     language: str
-    last_updated: int
+    last_updated: str
+
+
+def index_config_to_toml(config: IndexConfig) -> str:
+    data = asdict(config)
+    data["symbols"] = [
+        {
+            "name": symbol["name"],
+            "file_path": symbol["file_path"],
+            "line_number": symbol["line_number"],
+            "symbol_type": symbol["symbol_type"].value,
+        }
+        for symbol in data["symbols"]
+    ]
+    return tomli_w.dumps(data)
+
+
+def toml_to_index_config(toml_content: str) -> IndexConfig:
+    data = tomllib.loads(toml_content)
+    symbols = [
+        SymbolDeclaration(
+            name=symbol["name"],
+            file_path=symbol["file_path"],
+            line_number=symbol["line_number"],
+            symbol_type=SymbolType(symbol["symbol_type"]),
+        )
+        for symbol in data["symbols"]
+    ]
+    return IndexConfig(
+        symbols=symbols,
+        file_hashes=data["file_hashes"],
+        merkle_hashes=data["merkle_hashes"],
+        language=data["language"],
+        last_updated=data["last_updated"],
+    )

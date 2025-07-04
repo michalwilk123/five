@@ -5,12 +5,14 @@ import unittest
 
 from tqdm import tqdm
 
+from indexer.core import build_index_config, update_index_config
 from indexer.files import (
     FileOperation,
     get_file_hashes,
     get_merkle_diff,
     get_merkle_hashes,
 )
+from indexer.utils import IndexConfig
 
 
 class FileChangeDetectionTestCase(unittest.TestCase):
@@ -110,6 +112,110 @@ class FileChangeDetectionTestCase(unittest.TestCase):
 
             self.assertIn(first_file, changes)
             self.assertEqual(changes[first_file], FileOperation.DELETED)
+
+
+class IndexConfigUpdateTestCase(unittest.TestCase):
+    """Test cases for IndexConfig update functionality."""
+
+    def setUp(self):
+        """Set up test using an existing test repository."""
+        self.project_path = "test_repositories/tinydb"
+
+    def test_update_index_config_no_changes(self):
+        """Test that update_index_config returns same config when no files changed."""
+        original_config = build_index_config(self.project_path, "python")
+        updated_config = update_index_config(original_config, self.project_path)
+
+        self.assertEqual(len(original_config.symbols), len(updated_config.symbols))
+        self.assertEqual(original_config.file_hashes, updated_config.file_hashes)
+        self.assertEqual(original_config.merkle_hashes, updated_config.merkle_hashes)
+
+    def test_update_index_config_added_file(self):
+        """Test that update_index_config handles added files correctly."""
+        original_config = build_index_config(self.project_path, "python")
+
+        # Simulate adding a new file by modifying the config
+        new_file_hashes = original_config.file_hashes.copy()
+        new_file_hashes["new_test_file.py"] = "d41d8cd98f00b204e9800998ecf8427e"
+        new_merkle_hashes = get_merkle_hashes(new_file_hashes)
+
+        modified_config = IndexConfig(
+            symbols=original_config.symbols,
+            file_hashes=new_file_hashes,
+            merkle_hashes=new_merkle_hashes,
+            language=original_config.language,
+            last_updated=original_config.last_updated,
+        )
+
+        updated_config = update_index_config(modified_config, self.project_path)
+
+        # Should revert to original state since the file doesn't actually exist
+        self.assertEqual(len(original_config.symbols), len(updated_config.symbols))
+        self.assertEqual(original_config.file_hashes, updated_config.file_hashes)
+        self.assertEqual(original_config.merkle_hashes, updated_config.merkle_hashes)
+
+    def test_update_index_config_modified_file(self):
+        """Test that update_index_config handles modified files correctly."""
+        original_config = build_index_config(self.project_path, "python")
+
+        if not original_config.file_hashes:
+            self.skipTest("No files found in test repository")
+
+        # Simulate modifying a file by changing its hash
+        first_file = list(original_config.file_hashes.keys())[0]
+        new_file_hashes = original_config.file_hashes.copy()
+        new_file_hashes[first_file] = "d41d8cd98f00b204e9800998ecf8427e"
+        new_merkle_hashes = get_merkle_hashes(new_file_hashes)
+
+        modified_config = IndexConfig(
+            symbols=original_config.symbols,
+            file_hashes=new_file_hashes,
+            merkle_hashes=new_merkle_hashes,
+            language=original_config.language,
+            last_updated=original_config.last_updated,
+        )
+
+        updated_config = update_index_config(modified_config, self.project_path)
+
+        # Should revert to original state since the file wasn't actually modified
+        self.assertEqual(len(original_config.symbols), len(updated_config.symbols))
+        self.assertEqual(original_config.file_hashes, updated_config.file_hashes)
+        self.assertEqual(original_config.merkle_hashes, updated_config.merkle_hashes)
+
+    def test_update_index_config_deleted_file(self):
+        """Test that update_index_config handles deleted files correctly."""
+        original_config = build_index_config(self.project_path, "python")
+
+        if not original_config.file_hashes:
+            self.skipTest("No files found in test repository")
+
+        # Simulate deleting a file by removing it from hashes
+        first_file = list(original_config.file_hashes.keys())[0]
+        new_file_hashes = original_config.file_hashes.copy()
+        del new_file_hashes[first_file]
+        new_merkle_hashes = get_merkle_hashes(new_file_hashes)
+
+        modified_config = IndexConfig(
+            symbols=original_config.symbols,
+            file_hashes=new_file_hashes,
+            merkle_hashes=new_merkle_hashes,
+            language=original_config.language,
+            last_updated=original_config.last_updated,
+        )
+
+        updated_config = update_index_config(modified_config, self.project_path)
+
+        # Should revert to original state since the file wasn't actually deleted
+        self.assertEqual(len(original_config.symbols), len(updated_config.symbols))
+        self.assertEqual(original_config.file_hashes, updated_config.file_hashes)
+        self.assertEqual(original_config.merkle_hashes, updated_config.merkle_hashes)
+
+    def test_update_index_config_preserves_language(self):
+        """Test that update_index_config preserves the language setting."""
+        original_config = build_index_config(self.project_path, "python")
+        updated_config = update_index_config(original_config, self.project_path)
+
+        self.assertEqual(original_config.language, updated_config.language)
 
 
 class AllRepositoriesFileChangeTestCase(unittest.TestCase):

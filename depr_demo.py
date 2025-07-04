@@ -1,11 +1,11 @@
 import json
 
 import tqdm
-
 from five_persistance.core import (
     get_symbol_declarations_db,
     get_symbol_file_locations_db,
 )
+
 from indexer.files import (
     create_chunk_with_line_numbers,
     get_file_chunks,

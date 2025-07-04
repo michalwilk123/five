@@ -12,7 +12,6 @@ class ProcessProjectTestCase(unittest.TestCase):
 
     def setUp(self):
         """Set up test using an existing test repository."""
-        # Use the tinydb test repository which has a .git directory
         self.project_path = "test_repositories/tinydb"
 
     def test_process_project_extracts_symbols(self):
@@ -22,11 +21,8 @@ class ProcessProjectTestCase(unittest.TestCase):
         # Should find symbols from the Python files in the repository
         self.assertGreater(len(symbols), 0)
 
-        # Check that we have various types of symbols
-        symbol_names = [s.name for s in symbols]
         symbol_types = [s.symbol_type for s in symbols]
 
-        # Should have some functions and classes
         self.assertIn(SymbolType.FUNCTION, symbol_types)
         self.assertIn(SymbolType.CLASS, symbol_types)
 
@@ -86,18 +82,9 @@ class ProcessProjectTestCase(unittest.TestCase):
         )
 
     def test_process_project_unsupported_language(self):
-        """Test that process_project handles unsupported languages gracefully."""
-        symbols = process_project(self.project_path, language="unsupported")
-
-        # Should return empty list for unsupported language
-        self.assertEqual(symbols, [])
-
-    def test_process_project_javascript_language(self):
-        """Test that process_project can handle javascript language parameter."""
-        symbols = process_project(self.project_path, language="javascript")
-
-        # Should return empty list since no JS files in tinydb repo
-        self.assertEqual(symbols, [])
+        """Test that process_project raises on unsupported languages."""
+        with self.assertRaises(AssertionError):
+            process_project(self.project_path, language="unsupported")
 
 
 class ProcessAllRepositoriesTestCase(unittest.TestCase):
