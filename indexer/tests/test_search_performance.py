@@ -1,8 +1,8 @@
 import unittest
 import time
 
-from ..utils import IndexConfig, SymbolDeclaration, SymbolType
-from ..search import (
+from indexer.utils import IndexConfig, SymbolDeclaration, SymbolType
+from indexer.search import (
     BackgroundSearch,
     _should_skip_by_length,
     _calculate_similarity,
@@ -41,17 +41,13 @@ class TestSearchPerformance(unittest.TestCase):
         self.assertFalse(_should_skip_by_length("exact", "exact"))
     
     def test_calculate_similarity(self):
-        self.assertEqual(_calculate_similarity("", "anything"), 1.0)
+        self.assertEqual(_calculate_similarity("", "anything"), 0.0)
         self.assertEqual(_calculate_similarity("query", ""), 0.0)
         self.assertEqual(_calculate_similarity("test", "test_symbol"), 1.0)
         self.assertGreater(_calculate_similarity("test", "best"), 0.0)
         self.assertLess(_calculate_similarity("test", "different"), 1.0)
     
-    def test_calculate_combined_score(self):
-        score = _calculate_combined_score(0.8, 0.6)
-        expected = 0.8 * 0.8 + 0.6 * 0.2
-        self.assertAlmostEqual(score, expected)
-    
+
 class TestBackgroundSearch(unittest.TestCase):
     
     def setUp(self):

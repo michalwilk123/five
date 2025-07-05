@@ -12,6 +12,7 @@ from indexer.core import (
     update_index_config,
 )
 from indexer.search import BackgroundSearch
+from indexer.utils import get_symbol_text
 
 
 def get_config_path(project_path: str, language: str) -> str:
@@ -76,7 +77,7 @@ def update_index(
         _handle_changes(has_changes, file_changes, updated_path, dry_run=False)
 
 
-def _display_results(results, max_display: int = 10):
+def _display_results(results, max_display: int = 10, show_code: bool = False, project_path: str = "", config=None):
     if not results:
         print("No results found")
         return
@@ -88,18 +89,29 @@ def _display_results(results, max_display: int = 10):
         score = result.combined_score
         symbol_type = f" [{symbol.symbol_type.value}]" if symbol.symbol_type else ""
         print(f"{i+1:2d}. {symbol.name} ({score:.2f}) - {symbol.file_path}:{symbol.line_number}{symbol_type}")
+        
+        if show_code and config:
+            try:
+                code_content = get_symbol_text(result, config.symbols, project_path)
+                if code_content.strip():
+                    print("   " + "─" * 60)
+                    for line in code_content.rstrip().split('\n'):
+                        print(f"   {line}")
+                    print("   " + "─" * 60)
+            except Exception as e:
+                print(f"   Error reading code: {e}")
 
 
-def _interactive_search(config, max_results: int = 50):
+def _interactive_search(config, project_path: str, max_results: int = 50, show_code: bool = False):
     background_search = BackgroundSearch(config)
     current_results = []
     
     def on_results_update(results):
         nonlocal current_results
         current_results = results
-        os.system('clear' if os.name == 'posix' else 'cls')
+        # os.system('clear' if os.name == 'posix' else 'cls')
         print("Symbol Search (type to search, Ctrl+C to exit)")
-        _display_results(results)
+        _display_results(results, show_code=show_code, project_path=project_path, config=config)
         print("Query: ", end='', flush=True)
     
     print("Symbol Search (type to search, Ctrl+C to exit)")
@@ -114,7 +126,7 @@ def _interactive_search(config, max_results: int = 50):
                 os.system('clear' if os.name == 'posix' else 'cls')
                 print("Interactive Symbol Search (type to search, Ctrl+C to exit)")
                 print("=" * 60)
-                _display_results([])
+                _display_results([], show_code=show_code, project_path=project_path, config=config)
                 print("Query: ", end='', flush=True)
                 continue
             
@@ -134,7 +146,8 @@ def search_symbols(
     language: str, 
     max_results: int = 50,
     interactive: bool = True,
-    query: str = ""
+    query: str = "",
+    show_code: bool = False
 ) -> None:
     config_path = get_config_path(project_path, language)
 
@@ -146,11 +159,11 @@ def search_symbols(
     config = load_index_config(config_path)
     
     if interactive:
-        _interactive_search(config, max_results)
+        _interactive_search(config, project_path, max_results, show_code)
     else:
         from indexer.search import fuzzy_search_symbols
         results = fuzzy_search_symbols(config, symbol_query=query, max_results=max_results)
-        _display_results(results, max_results)
+        _display_results(results, max_results, show_code, project_path, config)
 
 
 def main():
@@ -188,6 +201,11 @@ def main():
         "--query",
         help="Search query (for non-interactive mode)",
     )
+    parser.add_argument(
+        "--show-code",
+        action="store_true",
+        help="Display code content for symbols in search results",
+    )
 
     args = parser.parse_args()
 
@@ -210,7 +228,8 @@ def main():
             args.language, 
             args.max_results,
             not args.no_interactive,
-            args.query or ""
+            args.query or "",
+            args.show_code
         )
 
 

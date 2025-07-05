@@ -1,14 +1,12 @@
 from difflib import SequenceMatcher
 from threading import Thread, Event
-from typing import Callable, Optional
+from typing import Callable
 
 from .utils import IndexConfig, SymbolDeclaration, SearchResult
 
 
 def _calculate_similarity(query: str, text: str) -> float:
-    if not query:
-        return 1.0
-    if not text:
+    if not query or not text:
         return 0.0
     
     is_case_insensitive = query.islower()
@@ -23,11 +21,35 @@ def _calculate_similarity(query: str, text: str) -> float:
     if query_normalized in text_normalized:
         return 1.0
     
-    return SequenceMatcher(None, query_normalized, text_normalized).ratio()
+    if len(query_normalized) > len(text_normalized):
+        return 0.0
+    
+    matcher = SequenceMatcher(None, query_normalized, text_normalized)
+    matches = matcher.get_matching_blocks()
+    
+    total_matched = sum(size for _, _, size in matches)
+    if total_matched == 0:
+        return 0.0
+    
+    query_length = len(query_normalized)
+    text_length = len(text_normalized)
+    
+    if total_matched == query_length:
+        return 1.0
+    
+    match_ratio = total_matched / query_length
+    
+    penalty = 0.0
+    for i, j, size in matches:
+        if size > 0:
+            penalty += (i + j) * 0.1
+    
+    final_score = match_ratio - penalty / max(query_length, text_length)
+    return max(0.0, final_score)
 
 
 def _calculate_combined_score(symbol_score: float, file_score: float) -> float:
-    return symbol_score * 0.8 + file_score * 0.2
+    return symbol_score + file_score / 10
 
 
 def _should_skip_by_length(query: str, symbol_name: str) -> bool:
@@ -36,37 +58,38 @@ def _should_skip_by_length(query: str, symbol_name: str) -> bool:
     return len(query) > len(symbol_name)
 
 
-def _search_symbols(
+def _search_symbols_core(
     symbols: list[SymbolDeclaration],
-    symbol_query: str = "",
-    filepath_query: str = "",
-    max_results: int = 50
+    symbol_query: str,
+    filepath_query: str,
+    max_results: int = 50,
+    should_cancel: Callable | None = None,
+    batch_callback: Callable | None = None,
+    batch_size: int = 1000
 ) -> list[SearchResult]:
-    if not symbols:
+    if not symbols or (not symbol_query and not filepath_query):
         return []
     
-    if not symbol_query and not filepath_query:
-        return [SearchResult(symbol=s, symbol_score=1.0, file_score=1.0, combined_score=1.0) 
-                for s in symbols[:max_results]]
-    
-    results = []
     exact_matches = []
     partial_matches = []
     
-    for symbol in symbols:
+    for i, symbol in enumerate(symbols):
+        if should_cancel and should_cancel():
+            break
+            
         if _should_skip_by_length(symbol_query, symbol.name):
             continue
             
-        symbol_score = _calculate_similarity(symbol_query, symbol.name)
-        if symbol_score == 0:
-            continue
-            
-        file_score = _calculate_similarity(filepath_query, symbol.file_path)
+        symbol_score = symbol_query and _calculate_similarity(symbol_query, symbol.name) or 0.0
+        file_score = filepath_query and _calculate_similarity(filepath_query, symbol.file_path) or 0.0
+
         combined_score = _calculate_combined_score(symbol_score, file_score)
         
-        if symbol_score > 0.1 or (file_score > 0.3 and symbol_score > 0.05):
+        if symbol_score > 0.7:
+            symbol_index = symbols.index(symbol)
             result = SearchResult(
                 symbol=symbol,
+                symbol_index=symbol_index,
                 symbol_score=symbol_score,
                 file_score=file_score,
                 combined_score=combined_score
@@ -76,12 +99,34 @@ def _search_symbols(
                 exact_matches.append(result)
             else:
                 partial_matches.append(result)
+            
+            if len(exact_matches) + len(partial_matches) >= max_results:
+                break
+        
+        if batch_callback and i % batch_size == 0 and (exact_matches or partial_matches):
+            batch_results = _get_sorted_results(exact_matches, partial_matches, max_results)
+            batch_callback(batch_results)
     
+    return _get_sorted_results(exact_matches, partial_matches, max_results)
+
+
+def _get_sorted_results(
+    exact_matches: list[SearchResult], 
+    partial_matches: list[SearchResult], 
+    max_results: int
+) -> list[SearchResult]:
     exact_matches.sort(key=lambda x: (-x.combined_score, -x.symbol_score, x.symbol.name))
     partial_matches.sort(key=lambda x: (-x.combined_score, -x.symbol_score, x.symbol.name))
-    
-    results = exact_matches + partial_matches
-    return results[:max_results]
+    return (exact_matches + partial_matches)[:max_results]
+
+
+def _search_symbols(
+    symbols: list[SymbolDeclaration],
+    symbol_query: str = "",
+    filepath_query: str = "",
+    max_results: int = 50
+) -> list[SearchResult]:
+    return _search_symbols_core(symbols, symbol_query, filepath_query, max_results)
 
 
 def fuzzy_search_symbols(
@@ -97,7 +142,7 @@ class BackgroundSearch:
     def __init__(self, config: IndexConfig):
         self.config = config
         self._cancel_event = Event()
-        self._thread: Optional[Thread] = None
+        self._thread: (Thread | None) = None
         self._is_running = False
     
     def start_search(
@@ -106,7 +151,7 @@ class BackgroundSearch:
         filepath_query: str = "",
         max_results: int = 50,
         batch_size: int = 1000,
-        callback: Optional[Callable[[list[SearchResult]], None]] = None
+        callback: Callable | None = None
     ) -> None:
         if self._is_running:
             self.cancel()
@@ -126,65 +171,33 @@ class BackgroundSearch:
         filepath_query: str,
         max_results: int,
         batch_size: int,
-        callback: Optional[Callable[[list[SearchResult]], None]]
+        callback: Callable | None
     ) -> None:
         if not self.config.symbols:
             self._is_running = False
             return
         
-        results = []
-        exact_matches = []
-        partial_matches = []
+        def should_cancel() -> bool:
+            return self._cancel_event.is_set()
         
-        for i, symbol in enumerate(self.config.symbols):
-            if self._cancel_event.is_set():
-                break
-                
-            if _should_skip_by_length(symbol_query, symbol.name):
-                continue
-                
-            symbol_score = _calculate_similarity(symbol_query, symbol.name)
-            if symbol_score == 0:
-                continue
-                
-            file_score = _calculate_similarity(filepath_query, symbol.file_path)
-            combined_score = _calculate_combined_score(symbol_score, file_score)
-            
-            if symbol_score > 0.1 or (file_score > 0.3 and symbol_score > 0.05):
-                result = SearchResult(
-                    symbol=symbol,
-                    symbol_score=symbol_score,
-                    file_score=file_score,
-                    combined_score=combined_score
-                )
-                
-                if symbol_score == 1.0:
-                    exact_matches.append(result)
-                else:
-                    partial_matches.append(result)
-                
-                if len(exact_matches) + len(partial_matches) >= max_results:
-                    break
-            
-            if i % batch_size == 0 and callback and (exact_matches or partial_matches):
-                batch_results = self._get_sorted_results(exact_matches, partial_matches, max_results)
-                callback(batch_results)
+        def batch_callback(results: list[SearchResult]) -> None:
+            if callback and not self._cancel_event.is_set():
+                callback(results)
+        
+        final_results = _search_symbols_core(
+            self.config.symbols,
+            symbol_query,
+            filepath_query,
+            max_results,
+            should_cancel,
+            batch_callback,
+            batch_size
+        )
         
         if not self._cancel_event.is_set() and callback:
-            final_results = self._get_sorted_results(exact_matches, partial_matches, max_results)
             callback(final_results)
         
         self._is_running = False
-    
-    def _get_sorted_results(
-        self, 
-        exact_matches: list[SearchResult], 
-        partial_matches: list[SearchResult], 
-        max_results: int
-    ) -> list[SearchResult]:
-        exact_matches.sort(key=lambda x: (-x.combined_score, -x.symbol_score, x.symbol.name))
-        partial_matches.sort(key=lambda x: (-x.combined_score, -x.symbol_score, x.symbol.name))
-        return (exact_matches + partial_matches)[:max_results]
     
     def cancel(self) -> None:
         self._cancel_event.set()

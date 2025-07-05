@@ -1,6 +1,7 @@
 import tomllib
 from dataclasses import asdict, dataclass
 from enum import Enum
+import os
 
 import tomli_w
 
@@ -39,9 +40,12 @@ class SymbolDeclaration:
 @dataclass
 class SearchResult:
     symbol: SymbolDeclaration
+    symbol_index: int
     symbol_score: float
     file_score: float
     combined_score: float
+    # Może sie przyda :) Zadecyduj na podstawie empirycznych testów
+    # symbol_occurrences: int
 
 
 @dataclass
@@ -85,3 +89,22 @@ def toml_to_index_config(toml_content: str) -> IndexConfig:
         language=data["language"],
         last_updated=data["last_updated"],
     )
+
+
+def get_symbol_text(result: SearchResult, symbols: list[SymbolDeclaration], project_path: str) -> str:
+    symbol = result.symbol
+    symbol_index = result.symbol_index
+    file_path = os.path.join(project_path, symbol.file_path)
+
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+
+    start_line = symbol.line_number - 1
+    end_line = len(lines)
+
+    for next_symbol in symbols[symbol_index + 1:]:
+        if next_symbol.file_path == symbol.file_path:
+            end_line = next_symbol.line_number - 1
+            break
+
+    return "".join(lines[start_line:end_line])

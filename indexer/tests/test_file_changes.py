@@ -124,7 +124,7 @@ class IndexConfigUpdateTestCase(unittest.TestCase):
     def test_update_index_config_no_changes(self):
         """Test that update_index_config returns same config when no files changed."""
         original_config = build_index_config(self.project_path, "python")
-        updated_config = update_index_config(original_config, self.project_path)
+        updated_config= update_index_config(original_config, self.project_path)[0]
 
         self.assertEqual(len(original_config.symbols), len(updated_config.symbols))
         self.assertEqual(original_config.file_hashes, updated_config.file_hashes)
@@ -147,7 +147,7 @@ class IndexConfigUpdateTestCase(unittest.TestCase):
             last_updated=original_config.last_updated,
         )
 
-        updated_config = update_index_config(modified_config, self.project_path)
+        updated_config = update_index_config(modified_config, self.project_path)[0]
 
         # Should revert to original state since the file doesn't actually exist
         self.assertEqual(len(original_config.symbols), len(updated_config.symbols))
@@ -175,7 +175,7 @@ class IndexConfigUpdateTestCase(unittest.TestCase):
             last_updated=original_config.last_updated,
         )
 
-        updated_config = update_index_config(modified_config, self.project_path)
+        updated_config = update_index_config(modified_config, self.project_path)[0]
 
         # Should revert to original state since the file wasn't actually modified
         self.assertEqual(len(original_config.symbols), len(updated_config.symbols))
@@ -203,7 +203,7 @@ class IndexConfigUpdateTestCase(unittest.TestCase):
             last_updated=original_config.last_updated,
         )
 
-        updated_config = update_index_config(modified_config, self.project_path)
+        updated_config = update_index_config(modified_config, self.project_path)[0]
 
         # Should revert to original state since the file wasn't actually deleted
         self.assertEqual(len(original_config.symbols), len(updated_config.symbols))
@@ -213,7 +213,7 @@ class IndexConfigUpdateTestCase(unittest.TestCase):
     def test_update_index_config_preserves_language(self):
         """Test that update_index_config preserves the language setting."""
         original_config = build_index_config(self.project_path, "python")
-        updated_config = update_index_config(original_config, self.project_path)
+        updated_config = update_index_config(original_config, self.project_path)[0]
 
         self.assertEqual(original_config.language, updated_config.language)
 

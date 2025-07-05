@@ -134,7 +134,15 @@ def build_index_config(
 def save_index_config_to_file(
     config: IndexConfig, config_path: str, language: str, overwrite: bool = True
 ) -> str:
-    toml_content = index_config_to_toml(config)
+    sorted_symbols = sorted(config.symbols, key=lambda s: (s.file_path, s.line_number))
+    sorted_config = IndexConfig(
+        symbols=sorted_symbols,
+        file_hashes=config.file_hashes,
+        merkle_hashes=config.merkle_hashes,
+        language=config.language,
+        last_updated=config.last_updated,
+    )
+    toml_content = index_config_to_toml(sorted_config)
 
     filename = f"index_{language.lower()}.toml"
     full_path = os.path.join(config_path, filename)
