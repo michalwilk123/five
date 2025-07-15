@@ -6,7 +6,6 @@ from indexer.search import (
     BackgroundSearch,
     _should_skip_by_length,
     _calculate_similarity,
-    _calculate_combined_score
 )
 
 

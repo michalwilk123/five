@@ -1,0 +1,79 @@
+{
+  "name": "five-code-agent",
+  "displayName": "five-code-agent",
+  "description": "Write and edit code using Large language models",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.102.0"
+  },
+  "categories": [
+    "AI",
+    "Chat",
+    "Programming Languages",
+    "Education",
+    "Snippets",
+    "Testing"
+  ],
+  "keywords": [
+    "five",
+    "mcp",
+    "coding",
+    "agent",
+    "autonomous",
+    "chatgpt",
+    "sonnet",
+    "ai",
+    "llama"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "five-code-agent",
+          "title": "Five Code Agent",
+          "icon": "$(code)"
+        }
+      ]
+    },
+    "views": {
+      "five-code-agent": [
+        {
+          "id": "five-code-agent.panel",
+          "name": "Five Code Agent",
+          "type": "webview"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "five-code-agent.helloWorld",
+        "title": "Hello World"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "pnpm run build",
+    "build": "vite build && cd webview && pnpm run build",
+    "dev": "vite build --watch",
+    "watch": "vite build --watch",
+    "pretest": "pnpm run build && pnpm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test",
+    "webview:build": "cd webview && pnpm run build",
+    "webview:dev": "cd webview && pnpm run dev"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "~20.19.8",
+    "@types/vscode": "^1.102.0",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.25.1",
+    "typescript": "^5.8.3",
+    "vite": "^5.4.19"
+  }
+}

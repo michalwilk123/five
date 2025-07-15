@@ -3,3 +3,7 @@ __pycache__/
 .pdm-python
 .venv
 .env
+node_modules
+out
+dist
+webview-dist

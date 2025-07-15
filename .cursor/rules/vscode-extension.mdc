@@ -1,0 +1,9 @@
+---
+globs: five-vscode/**
+alwaysApply: false
+---
+
+- The extension is a vscode extension that allows you to generate code for the project
+- The interface is a webview that is rendered using the react framework
+- it uses the @vscode-elements/elements component library for the UI
+- it communicates with the five project using gRPC protocol
