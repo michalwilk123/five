@@ -2,17 +2,11 @@ from invoke import task
 
 
 @task
-def black(c):
-    print("Running black...")
-    c.run('black . --extend-exclude "test_repositories"')
+def ruff(c):
+    c.run("ruff format indexer")
 
 
-@task
-def isort(c):
-    c.run('isort . --extend-skip-glob "test_repositories"')
-
-
-@task(black, isort)
+@task(ruff)
 def lint(_):
     pass
 

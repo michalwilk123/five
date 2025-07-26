@@ -2,8 +2,6 @@
 import argparse
 import os
 import sys
-import threading
-import time
 
 from indexer.core import (
     build_and_save_index_config,
@@ -17,7 +15,7 @@ from indexer.utils import get_symbol_text
 
 def get_config_path(project_path: str, language: str) -> str:
     config_dir = os.path.join(project_path, ".five")
-    return os.path.join(config_dir, f"index_{language.lower()}.toml")
+    return os.path.join(config_dir, f"index_{language.lower()}.json")
 
 
 def create_index(project_path: str, language: str, show_progress: bool) -> None:
@@ -39,7 +37,10 @@ def _print_file_changes(file_changes: dict) -> None:
 
 
 def _handle_changes(
-    has_changes: bool, file_changes: dict, updated_path: str = None, dry_run: bool = False
+    has_changes: bool,
+    file_changes: dict,
+    updated_path: str = None,
+    dry_run: bool = False,
 ) -> None:
     if has_changes:
         if dry_run:
@@ -77,77 +78,89 @@ def update_index(
         _handle_changes(has_changes, file_changes, updated_path, dry_run=False)
 
 
-def _display_results(results, max_display: int = 10, show_code: bool = False, project_path: str = "", config=None):
+def _display_results(
+    results,
+    max_display: int = 10,
+    show_code: bool = False,
+    project_path: str = "",
+    config=None,
+):
     if not results:
         print("No results found")
         return
-    
+
     print(f"Found {len(results)} results:")
-    
+
     for i, result in enumerate(results[:max_display]):
         symbol = result.symbol
         score = result.combined_score
         symbol_type = f" [{symbol.symbol_type.value}]" if symbol.symbol_type else ""
-        print(f"{i+1:2d}. {symbol.name} ({score:.2f}) - {symbol.file_path}:{symbol.line_number}{symbol_type}")
-        
+        print(
+            f"{i + 1:2d}. {symbol.name} ({score:.2f}) - {symbol.file_path}:{symbol.line_number}{symbol_type}"
+        )
+
         if show_code and config:
             try:
                 code_content = get_symbol_text(result, config.symbols, project_path)
                 if code_content.strip():
                     print("   " + "─" * 60)
-                    for line in code_content.rstrip().split('\n'):
+                    for line in code_content.rstrip().split("\n"):
                         print(f"   {line}")
                     print("   " + "─" * 60)
             except Exception as e:
                 print(f"   Error reading code: {e}")
 
 
-def _interactive_search(config, project_path: str, max_results: int = 50, show_code: bool = False):
+def _interactive_search(
+    config, project_path: str, max_results: int = 50, show_code: bool = False
+):
     background_search = BackgroundSearch(config)
     current_results = []
-    
+
     def on_results_update(results):
         nonlocal current_results
         current_results = results
         # os.system('clear' if os.name == 'posix' else 'cls')
         print("Symbol Search (type to search, Ctrl+C to exit)")
-        _display_results(results, show_code=show_code, project_path=project_path, config=config)
-        print("Query: ", end='', flush=True)
-    
+        _display_results(
+            results, show_code=show_code, project_path=project_path, config=config
+        )
+        print("Query: ", end="", flush=True)
+
     print("Symbol Search (type to search, Ctrl+C to exit)")
-    print("Query: ", end='', flush=True)
-    
+    print("Query: ", end="", flush=True)
+
     try:
         while True:
             query = input().strip()
             if not query:
                 background_search.cancel()
                 current_results = []
-                os.system('clear' if os.name == 'posix' else 'cls')
+                os.system("clear" if os.name == "posix" else "cls")
                 print("Interactive Symbol Search (type to search, Ctrl+C to exit)")
                 print("=" * 60)
-                _display_results([], show_code=show_code, project_path=project_path, config=config)
-                print("Query: ", end='', flush=True)
+                _display_results(
+                    [], show_code=show_code, project_path=project_path, config=config
+                )
+                print("Query: ", end="", flush=True)
                 continue
-            
+
             background_search.start_search(
-                symbol_query=query,
-                max_results=max_results,
-                callback=on_results_update
+                symbol_query=query, max_results=max_results, callback=on_results_update
             )
-            
+
     except KeyboardInterrupt:
         background_search.cancel()
         print("\nSearch cancelled. Exiting...")
 
 
 def search_symbols(
-    project_path: str, 
-    language: str, 
+    project_path: str,
+    language: str,
     max_results: int = 50,
     interactive: bool = True,
     query: str = "",
-    show_code: bool = False
+    show_code: bool = False,
 ) -> None:
     config_path = get_config_path(project_path, language)
 
@@ -157,12 +170,15 @@ def search_symbols(
         sys.exit(1)
 
     config = load_index_config(config_path)
-    
+
     if interactive:
         _interactive_search(config, project_path, max_results, show_code)
     else:
         from indexer.search import fuzzy_search_symbols
-        results = fuzzy_search_symbols(config, symbol_query=query, max_results=max_results)
+
+        results = fuzzy_search_symbols(
+            config, symbol_query=query, max_results=max_results
+        )
         _display_results(results, max_results, show_code, project_path, config)
 
 
@@ -224,12 +240,12 @@ def main():
             print("Error: --query is required when using --no-interactive")
             sys.exit(1)
         search_symbols(
-            project_path, 
-            args.language, 
+            project_path,
+            args.language,
             args.max_results,
             not args.no_interactive,
             args.query or "",
-            args.show_code
+            args.show_code,
         )
 
 

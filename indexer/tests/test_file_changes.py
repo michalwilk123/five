@@ -53,7 +53,9 @@ class FileChangeDetectionTestCase(unittest.TestCase):
         file_hashes = get_file_hashes(self.project_path)
         merkle_hashes = get_merkle_hashes(file_hashes)
 
-        changes = get_merkle_diff(merkle_hashes, merkle_hashes, file_hashes, file_hashes)
+        changes = get_merkle_diff(
+            merkle_hashes, merkle_hashes, file_hashes, file_hashes
+        )
 
         self.assertIsInstance(changes, dict)
         self.assertEqual(len(changes), 0)
@@ -124,7 +126,7 @@ class IndexConfigUpdateTestCase(unittest.TestCase):
     def test_update_index_config_no_changes(self):
         """Test that update_index_config returns same config when no files changed."""
         original_config = build_index_config(self.project_path, "python")
-        updated_config= update_index_config(original_config, self.project_path)[0]
+        updated_config = update_index_config(original_config, self.project_path)[0]
 
         self.assertEqual(len(original_config.symbols), len(updated_config.symbols))
         self.assertEqual(original_config.file_hashes, updated_config.file_hashes)

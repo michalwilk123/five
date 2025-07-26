@@ -1,9 +1,7 @@
-import tomllib
+import json
+import os
 from dataclasses import asdict, dataclass
 from enum import Enum
-import os
-
-import tomli_w
 
 
 class SymbolType(Enum):
@@ -57,7 +55,7 @@ class IndexConfig:
     last_updated: str
 
 
-def index_config_to_toml(config: IndexConfig) -> str:
+def index_config_to_json(config: IndexConfig) -> str:
     data = asdict(config)
     data["symbols"] = [
         {
@@ -68,11 +66,11 @@ def index_config_to_toml(config: IndexConfig) -> str:
         }
         for symbol in data["symbols"]
     ]
-    return tomli_w.dumps(data)
+    return json.dumps(data, indent=2)
 
 
-def toml_to_index_config(toml_content: str) -> IndexConfig:
-    data = tomllib.loads(toml_content)
+def json_to_index_config(json_content: str) -> IndexConfig:
+    data = json.loads(json_content)
     symbols = [
         SymbolDeclaration(
             name=symbol["name"],
@@ -91,18 +89,20 @@ def toml_to_index_config(toml_content: str) -> IndexConfig:
     )
 
 
-def get_symbol_text(result: SearchResult, symbols: list[SymbolDeclaration], project_path: str) -> str:
+def get_symbol_text(
+    result: SearchResult, symbols: list[SymbolDeclaration], project_path: str
+) -> str:
     symbol = result.symbol
     symbol_index = result.symbol_index
     file_path = os.path.join(project_path, symbol.file_path)
 
-    with open(file_path, 'r') as f:
+    with open(file_path, "r") as f:
         lines = f.readlines()
 
     start_line = symbol.line_number - 1
     end_line = len(lines)
 
-    for next_symbol in symbols[symbol_index + 1:]:
+    for next_symbol in symbols[symbol_index + 1 :]:
         if next_symbol.file_path == symbol.file_path:
             end_line = next_symbol.line_number - 1
             break

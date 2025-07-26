@@ -14,8 +14,8 @@ from indexer.parsers.python import parse as parse_python
 from indexer.utils import (
     IndexConfig,
     SymbolDeclaration,
-    index_config_to_toml,
-    toml_to_index_config,
+    index_config_to_json,
+    json_to_index_config,
 )
 
 
@@ -142,9 +142,9 @@ def save_index_config_to_file(
         language=config.language,
         last_updated=config.last_updated,
     )
-    toml_content = index_config_to_toml(sorted_config)
+    json_content = index_config_to_json(sorted_config)
 
-    filename = f"index_{language.lower()}.toml"
+    filename = f"index_{language.lower()}.json"
     full_path = os.path.join(config_path, filename)
 
     if not overwrite and os.path.exists(full_path):
@@ -152,7 +152,7 @@ def save_index_config_to_file(
 
     os.makedirs(config_path, exist_ok=True)
     with open(full_path, "w") as f:
-        f.write(toml_content)
+        f.write(json_content)
 
     return full_path
 
@@ -166,8 +166,8 @@ def build_and_save_index_config(
 
 def load_index_config(config_path: str) -> IndexConfig:
     with open(config_path, "r") as f:
-        toml_content = f.read()
-    return toml_to_index_config(toml_content)
+        json_content = f.read()
+    return json_to_index_config(json_content)
 
 
 def update_and_save_index_config(

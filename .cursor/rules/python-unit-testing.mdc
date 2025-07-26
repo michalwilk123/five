@@ -1,6 +1,5 @@
 ---
-description: Rules when creating python unit test cases
-globs: 
+globs: **/test_*.py
 alwaysApply: false
 ---
 - tests are saved in `tests/` directory
