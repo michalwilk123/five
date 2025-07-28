@@ -27,12 +27,31 @@ class SymbolType(Enum):
     OTHER = "other"
 
 
-@dataclass
+class SymbolScope(Enum):
+    """
+    Enumeration of different scopes of code declarations.
+    """
+
+    GLOBAL = "global"
+    CLASS = "class"
+
+
+@dataclass(frozen=True)
 class SymbolDeclaration:
     name: str
     file_path: str
     line_number: int
     symbol_type: SymbolType
+    scope: SymbolScope
+
+
+@dataclass
+class IndexConfig:
+    symbols: list[SymbolDeclaration]
+    file_hashes: dict[str, str]
+    merkle_hashes: dict[str, str]
+    language: str
+    last_updated: str
 
 
 @dataclass
@@ -46,15 +65,6 @@ class SearchResult:
     # symbol_occurrences: int
 
 
-@dataclass
-class IndexConfig:
-    symbols: list[SymbolDeclaration]
-    file_hashes: dict[str, str]
-    merkle_hashes: dict[str, str]
-    language: str
-    last_updated: str
-
-
 def index_config_to_json(config: IndexConfig) -> str:
     data = asdict(config)
     data["symbols"] = [
@@ -63,6 +73,7 @@ def index_config_to_json(config: IndexConfig) -> str:
             "file_path": symbol["file_path"],
             "line_number": symbol["line_number"],
             "symbol_type": symbol["symbol_type"].value,
+            "scope": symbol["scope"].value,
         }
         for symbol in data["symbols"]
     ]
@@ -71,15 +82,19 @@ def index_config_to_json(config: IndexConfig) -> str:
 
 def json_to_index_config(json_content: str) -> IndexConfig:
     data = json.loads(json_content)
-    symbols = [
-        SymbolDeclaration(
-            name=symbol["name"],
-            file_path=symbol["file_path"],
-            line_number=symbol["line_number"],
-            symbol_type=SymbolType(symbol["symbol_type"]),
+    symbols = []
+    for symbol in data["symbols"]:
+        symbol_type = SymbolType(symbol["symbol_type"])
+
+        symbols.append(
+            SymbolDeclaration(
+                name=symbol["name"],
+                file_path=symbol["file_path"],
+                line_number=symbol["line_number"],
+                symbol_type=symbol_type,
+                scope=SymbolScope(symbol["scope"]),
+            )
         )
-        for symbol in data["symbols"]
-    ]
     return IndexConfig(
         symbols=symbols,
         file_hashes=data["file_hashes"],
@@ -87,6 +102,13 @@ def json_to_index_config(json_content: str) -> IndexConfig:
         language=data["language"],
         last_updated=data["last_updated"],
     )
+
+
+def load_index_config_from_file(config_path: str) -> IndexConfig:
+    """Universal function to load IndexConfig from a JSON file."""
+    with open(config_path, "r", encoding="utf-8") as f:
+        json_content = f.read()
+    return json_to_index_config(json_content)
 
 
 def get_symbol_text(

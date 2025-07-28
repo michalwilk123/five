@@ -70,16 +70,13 @@ class ProcessProjectTestCase(unittest.TestCase):
         finally:
             shutil.rmtree(empty_dir)
 
-    def test_process_project_default_language(self):
-        """Test that process_project defaults to python language."""
-        symbols_default = process_project(self.project_path)
+    def test_process_project_python_language(self):
+        """Test that process_project works with python language."""
         symbols_python = process_project(self.project_path, language="python")
 
-        # Should return the same results
-        self.assertEqual(len(symbols_default), len(symbols_python))
-        self.assertEqual(
-            [s.name for s in symbols_default], [s.name for s in symbols_python]
-        )
+        # Should return some symbols
+        self.assertIsInstance(symbols_python, list)
+        self.assertGreater(len(symbols_python), 0)
 
     def test_process_project_unsupported_language(self):
         """Test that process_project raises on unsupported languages."""

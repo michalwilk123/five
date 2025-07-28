@@ -4,1135 +4,1471 @@
       "name": "process_definitions_tinydb",
       "file_path": "depr_demo.py",
       "line_number": 24,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "process_imports_tinydb",
       "file_path": "depr_demo.py",
       "line_number": 76,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "resolve_imports_tinydb",
       "file_path": "depr_demo.py",
       "line_number": 117,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "get_config_path",
-      "file_path": "indexer/__main__.py",
-      "line_number": 18,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "create_index",
-      "file_path": "indexer/__main__.py",
-      "line_number": 23,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "_print_file_changes",
-      "file_path": "indexer/__main__.py",
-      "line_number": 31,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "_handle_changes",
       "file_path": "indexer/__main__.py",
-      "line_number": 41,
-      "symbol_type": "function/method"
+      "line_number": 19,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
-      "name": "update_index",
+      "name": "_handle_fold",
       "file_path": "indexer/__main__.py",
-      "line_number": 57,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "_display_results",
-      "file_path": "indexer/__main__.py",
-      "line_number": 80,
-      "symbol_type": "function/method"
+      "line_number": 38,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "_interactive_search",
       "file_path": "indexer/__main__.py",
-      "line_number": 105,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "on_results_update",
-      "file_path": "indexer/__main__.py",
-      "line_number": 109,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "search_symbols",
-      "file_path": "indexer/__main__.py",
-      "line_number": 144,
-      "symbol_type": "function/method"
+      "line_number": 51,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "main",
       "file_path": "indexer/__main__.py",
-      "line_number": 169,
-      "symbol_type": "function/method"
+      "line_number": 101,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "_process_files_with_parser",
       "file_path": "indexer/core.py",
       "line_number": 22,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "process_project",
       "file_path": "indexer/core.py",
       "line_number": 46,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "process_specific_files",
       "file_path": "indexer/core.py",
       "line_number": 55,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "update_index_config",
       "file_path": "indexer/core.py",
       "line_number": 70,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "build_index_config",
       "file_path": "indexer/core.py",
       "line_number": 117,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "save_index_config_to_file",
       "file_path": "indexer/core.py",
       "line_number": 134,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "build_and_save_index_config",
       "file_path": "indexer/core.py",
       "line_number": 160,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "load_index_config",
-      "file_path": "indexer/core.py",
-      "line_number": 167,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "update_and_save_index_config",
       "file_path": "indexer/core.py",
-      "line_number": 173,
-      "symbol_type": "function/method"
+      "line_number": 167,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "filter_unignored_files",
       "file_path": "indexer/files.py",
-      "line_number": 10,
-      "symbol_type": "function/method"
+      "line_number": 9,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "get_project_files",
       "file_path": "indexer/files.py",
-      "line_number": 43,
-      "symbol_type": "function/method"
+      "line_number": 42,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "filter_file_language",
       "file_path": "indexer/files.py",
-      "line_number": 65,
-      "symbol_type": "function/method"
+      "line_number": 64,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "get_files_for_indexing",
       "file_path": "indexer/files.py",
-      "line_number": 70,
-      "symbol_type": "function/method"
+      "line_number": 69,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "FileOperation",
       "file_path": "indexer/files.py",
+      "line_number": 82,
+      "symbol_type": "class/structure",
+      "scope": "global"
+    },
+    {
+      "name": "FileOperation.ADDED",
+      "file_path": "indexer/files.py",
       "line_number": 83,
-      "symbol_type": "class/structure"
+      "symbol_type": "constant/variable",
+      "scope": "class"
+    },
+    {
+      "name": "FileOperation.MODIFIED",
+      "file_path": "indexer/files.py",
+      "line_number": 84,
+      "symbol_type": "constant/variable",
+      "scope": "class"
+    },
+    {
+      "name": "FileOperation.DELETED",
+      "file_path": "indexer/files.py",
+      "line_number": 85,
+      "symbol_type": "constant/variable",
+      "scope": "class"
     },
     {
       "name": "get_file_hash",
       "file_path": "indexer/files.py",
-      "line_number": 89,
-      "symbol_type": "function/method"
+      "line_number": 88,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "get_file_hashes",
       "file_path": "indexer/files.py",
-      "line_number": 94,
-      "symbol_type": "function/method"
+      "line_number": 93,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "get_merkle_hashes",
       "file_path": "indexer/files.py",
-      "line_number": 104,
-      "symbol_type": "function/method"
+      "line_number": 103,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "get_merkle_diff",
       "file_path": "indexer/files.py",
+      "line_number": 117,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "Range",
+      "file_path": "indexer/folding.py",
+      "line_number": 10,
+      "symbol_type": "constant/variable",
+      "scope": "global"
+    },
+    {
+      "name": "LineContent",
+      "file_path": "indexer/folding.py",
+      "line_number": 11,
+      "symbol_type": "constant/variable",
+      "scope": "global"
+    },
+    {
+      "name": "get_code_range",
+      "file_path": "indexer/folding.py",
+      "line_number": 14,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "get_file_symbols",
+      "file_path": "indexer/folding.py",
+      "line_number": 24,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "find_parent_symbols",
+      "file_path": "indexer/folding.py",
+      "line_number": 31,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "is_in_folded_parent",
+      "file_path": "indexer/folding.py",
+      "line_number": 53,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "process_line",
+      "file_path": "indexer/folding.py",
+      "line_number": 73,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "fold_file",
+      "file_path": "indexer/folding.py",
+      "line_number": 107,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "filter_symbols_by_level",
+      "file_path": "indexer/folding.py",
+      "line_number": 150,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "Range",
+      "file_path": "indexer/lib.py",
+      "line_number": 13,
+      "symbol_type": "constant/variable",
+      "scope": "global"
+    },
+    {
+      "name": "LineContent",
+      "file_path": "indexer/lib.py",
+      "line_number": 14,
+      "symbol_type": "constant/variable",
+      "scope": "global"
+    },
+    {
+      "name": "parse_file_spec",
+      "file_path": "indexer/lib.py",
+      "line_number": 17,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "Indexer",
+      "file_path": "indexer/lib.py",
+      "line_number": 27,
+      "symbol_type": "class/structure",
+      "scope": "global"
+    },
+    {
+      "name": "Indexer.__init__",
+      "file_path": "indexer/lib.py",
+      "line_number": 28,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "Indexer._get_config_path",
+      "file_path": "indexer/lib.py",
+      "line_number": 34,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "Indexer.create_index",
+      "file_path": "indexer/lib.py",
+      "line_number": 38,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "Indexer.update_index",
+      "file_path": "indexer/lib.py",
+      "line_number": 46,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "Indexer.search_symbols",
+      "file_path": "indexer/lib.py",
+      "line_number": 65,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "Indexer.get_symbol_text",
+      "file_path": "indexer/lib.py",
+      "line_number": 73,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "Indexer.create_background_search",
+      "file_path": "indexer/lib.py",
+      "line_number": 81,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "create_index",
+      "file_path": "indexer/lib.py",
+      "line_number": 90,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "update_index",
+      "file_path": "indexer/lib.py",
+      "line_number": 98,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "search_symbols",
+      "file_path": "indexer/lib.py",
+      "line_number": 110,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "get_config_path",
+      "file_path": "indexer/lib.py",
       "line_number": 118,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "format_file_changes",
+      "file_path": "indexer/lib.py",
+      "line_number": 124,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "format_search_results",
+      "file_path": "indexer/lib.py",
+      "line_number": 138,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "create_symbol_declaration",
+      "file_path": "indexer/parsers/python.py",
+      "line_number": 6,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "process_function_def",
+      "file_path": "indexer/parsers/python.py",
+      "line_number": 22,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "process_class_def",
+      "file_path": "indexer/parsers/python.py",
+      "line_number": 39,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "process_assign",
+      "file_path": "indexer/parsers/python.py",
+      "line_number": 52,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "process_ann_assign",
+      "file_path": "indexer/parsers/python.py",
+      "line_number": 83,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "process_node",
+      "file_path": "indexer/parsers/python.py",
+      "line_number": 113,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "parse_source",
       "file_path": "indexer/parsers/python.py",
-      "line_number": 10,
-      "symbol_type": "function/method"
+      "line_number": 128,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "parse",
       "file_path": "indexer/parsers/python.py",
-      "line_number": 76,
-      "symbol_type": "function/method"
+      "line_number": 142,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
-      "name": "_is_global_scope",
-      "file_path": "indexer/parsers/python.py",
-      "line_number": 95,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "_node_in_parent",
-      "file_path": "indexer/parsers/python.py",
-      "line_number": 106,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "_calculate_similarity",
+      "name": "_matches_regex",
       "file_path": "indexer/search.py",
       "line_number": 8,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "_calculate_combined_score",
-      "file_path": "indexer/search.py",
-      "line_number": 51,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "_should_skip_by_length",
-      "file_path": "indexer/search.py",
-      "line_number": 55,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "_search_symbols_core",
       "file_path": "indexer/search.py",
-      "line_number": 61,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "_get_sorted_results",
-      "file_path": "indexer/search.py",
-      "line_number": 113,
-      "symbol_type": "function/method"
+      "line_number": 19,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "_search_symbols",
       "file_path": "indexer/search.py",
-      "line_number": 123,
-      "symbol_type": "function/method"
+      "line_number": 59,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
-      "name": "fuzzy_search_symbols",
+      "name": "regex_search_symbols",
       "file_path": "indexer/search.py",
-      "line_number": 132,
-      "symbol_type": "function/method"
+      "line_number": 68,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "BackgroundSearch",
       "file_path": "indexer/search.py",
-      "line_number": 141,
-      "symbol_type": "class/structure"
-    },
-    {
-      "name": "__init__",
-      "file_path": "indexer/search.py",
-      "line_number": 142,
-      "symbol_type": "function/method"
+      "line_number": 77,
+      "symbol_type": "class/structure",
+      "scope": "global"
     },
     {
       "name": "BackgroundSearch.__init__",
       "file_path": "indexer/search.py",
-      "line_number": 142,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "start_search",
-      "file_path": "indexer/search.py",
-      "line_number": 148,
-      "symbol_type": "function/method"
+      "line_number": 78,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "BackgroundSearch.start_search",
       "file_path": "indexer/search.py",
-      "line_number": 148,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "_search_worker",
-      "file_path": "indexer/search.py",
-      "line_number": 168,
-      "symbol_type": "function/method"
+      "line_number": 84,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "BackgroundSearch._search_worker",
       "file_path": "indexer/search.py",
-      "line_number": 168,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "should_cancel",
-      "file_path": "indexer/search.py",
-      "line_number": 180,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "batch_callback",
-      "file_path": "indexer/search.py",
-      "line_number": 183,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "cancel",
-      "file_path": "indexer/search.py",
-      "line_number": 202,
-      "symbol_type": "function/method"
+      "line_number": 104,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "BackgroundSearch.cancel",
       "file_path": "indexer/search.py",
-      "line_number": 202,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "is_running",
-      "file_path": "indexer/search.py",
-      "line_number": 208,
-      "symbol_type": "function/method"
+      "line_number": 138,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "BackgroundSearch.is_running",
       "file_path": "indexer/search.py",
-      "line_number": 208,
-      "symbol_type": "function/method"
+      "line_number": 144,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "ProcessProjectTestCase",
       "file_path": "indexer/tests/test_core.py",
       "line_number": 10,
-      "symbol_type": "class/structure"
-    },
-    {
-      "name": "setUp",
-      "file_path": "indexer/tests/test_core.py",
-      "line_number": 13,
-      "symbol_type": "function/method"
+      "symbol_type": "class/structure",
+      "scope": "global"
     },
     {
       "name": "ProcessProjectTestCase.setUp",
       "file_path": "indexer/tests/test_core.py",
       "line_number": 13,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_process_project_extracts_symbols",
-      "file_path": "indexer/tests/test_core.py",
-      "line_number": 17,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "ProcessProjectTestCase.test_process_project_extracts_symbols",
       "file_path": "indexer/tests/test_core.py",
       "line_number": 17,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_process_project_symbol_types",
-      "file_path": "indexer/tests/test_core.py",
-      "line_number": 29,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "ProcessProjectTestCase.test_process_project_symbol_types",
       "file_path": "indexer/tests/test_core.py",
       "line_number": 29,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_process_project_file_paths",
-      "file_path": "indexer/tests/test_core.py",
-      "line_number": 42,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "ProcessProjectTestCase.test_process_project_file_paths",
       "file_path": "indexer/tests/test_core.py",
       "line_number": 42,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_process_project_line_numbers",
-      "file_path": "indexer/tests/test_core.py",
-      "line_number": 51,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "ProcessProjectTestCase.test_process_project_line_numbers",
       "file_path": "indexer/tests/test_core.py",
       "line_number": 51,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_process_project_empty_directory",
-      "file_path": "indexer/tests/test_core.py",
-      "line_number": 59,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "ProcessProjectTestCase.test_process_project_empty_directory",
       "file_path": "indexer/tests/test_core.py",
       "line_number": 59,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
-      "name": "test_process_project_default_language",
+      "name": "ProcessProjectTestCase.test_process_project_python_language",
       "file_path": "indexer/tests/test_core.py",
       "line_number": 73,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "ProcessProjectTestCase.test_process_project_default_language",
-      "file_path": "indexer/tests/test_core.py",
-      "line_number": 73,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_process_project_unsupported_language",
-      "file_path": "indexer/tests/test_core.py",
-      "line_number": 84,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "ProcessProjectTestCase.test_process_project_unsupported_language",
       "file_path": "indexer/tests/test_core.py",
-      "line_number": 84,
-      "symbol_type": "function/method"
+      "line_number": 81,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "ProcessAllRepositoriesTestCase",
       "file_path": "indexer/tests/test_core.py",
-      "line_number": 90,
-      "symbol_type": "class/structure"
-    },
-    {
-      "name": "test_all_repositories",
-      "file_path": "indexer/tests/test_core.py",
-      "line_number": 93,
-      "symbol_type": "function/method"
+      "line_number": 87,
+      "symbol_type": "class/structure",
+      "scope": "global"
     },
     {
       "name": "ProcessAllRepositoriesTestCase.test_all_repositories",
       "file_path": "indexer/tests/test_core.py",
-      "line_number": 93,
-      "symbol_type": "function/method"
+      "line_number": 90,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "FileChangeDetectionTestCase",
       "file_path": "indexer/tests/test_file_changes.py",
       "line_number": 18,
-      "symbol_type": "class/structure"
-    },
-    {
-      "name": "setUp",
-      "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 21,
-      "symbol_type": "function/method"
+      "symbol_type": "class/structure",
+      "scope": "global"
     },
     {
       "name": "FileChangeDetectionTestCase.setUp",
       "file_path": "indexer/tests/test_file_changes.py",
       "line_number": 21,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_get_file_hashes_returns_dict",
-      "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 25,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "FileChangeDetectionTestCase.test_get_file_hashes_returns_dict",
       "file_path": "indexer/tests/test_file_changes.py",
       "line_number": 25,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_get_merkle_hashes_returns_dict",
-      "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 38,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "FileChangeDetectionTestCase.test_get_merkle_hashes_returns_dict",
       "file_path": "indexer/tests/test_file_changes.py",
       "line_number": 38,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_get_merkle_diff_no_changes",
-      "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 51,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "FileChangeDetectionTestCase.test_get_merkle_diff_no_changes",
       "file_path": "indexer/tests/test_file_changes.py",
       "line_number": 51,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_get_merkle_diff_added_files",
-      "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 61,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "FileChangeDetectionTestCase.test_get_merkle_diff_added_files",
       "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 61,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_get_merkle_diff_modified_files",
-      "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 78,
-      "symbol_type": "function/method"
+      "line_number": 63,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "FileChangeDetectionTestCase.test_get_merkle_diff_modified_files",
       "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 78,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_get_merkle_diff_deleted_files",
-      "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 97,
-      "symbol_type": "function/method"
+      "line_number": 80,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "FileChangeDetectionTestCase.test_get_merkle_diff_deleted_files",
       "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 97,
-      "symbol_type": "function/method"
+      "line_number": 99,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "IndexConfigUpdateTestCase",
       "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 117,
-      "symbol_type": "class/structure"
-    },
-    {
-      "name": "setUp",
-      "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 120,
-      "symbol_type": "function/method"
+      "line_number": 119,
+      "symbol_type": "class/structure",
+      "scope": "global"
     },
     {
       "name": "IndexConfigUpdateTestCase.setUp",
       "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 120,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_update_index_config_no_changes",
-      "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 124,
-      "symbol_type": "function/method"
+      "line_number": 122,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "IndexConfigUpdateTestCase.test_update_index_config_no_changes",
       "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 124,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_update_index_config_added_file",
-      "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 133,
-      "symbol_type": "function/method"
+      "line_number": 126,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "IndexConfigUpdateTestCase.test_update_index_config_added_file",
       "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 133,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_update_index_config_modified_file",
-      "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 157,
-      "symbol_type": "function/method"
+      "line_number": 135,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "IndexConfigUpdateTestCase.test_update_index_config_modified_file",
       "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 157,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_update_index_config_deleted_file",
-      "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 185,
-      "symbol_type": "function/method"
+      "line_number": 159,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "IndexConfigUpdateTestCase.test_update_index_config_deleted_file",
       "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 185,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_update_index_config_preserves_language",
-      "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 213,
-      "symbol_type": "function/method"
+      "line_number": 187,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "IndexConfigUpdateTestCase.test_update_index_config_preserves_language",
       "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 213,
-      "symbol_type": "function/method"
+      "line_number": 215,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "AllRepositoriesFileChangeTestCase",
       "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 221,
-      "symbol_type": "class/structure"
-    },
-    {
-      "name": "test_all_repositories_file_hashes",
-      "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 224,
-      "symbol_type": "function/method"
+      "line_number": 223,
+      "symbol_type": "class/structure",
+      "scope": "global"
     },
     {
       "name": "AllRepositoriesFileChangeTestCase.test_all_repositories_file_hashes",
       "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 224,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_all_repositories_merkle_diff_consistency",
-      "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 247,
-      "symbol_type": "function/method"
+      "line_number": 226,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "AllRepositoriesFileChangeTestCase.test_all_repositories_merkle_diff_consistency",
       "file_path": "indexer/tests/test_file_changes.py",
-      "line_number": 247,
-      "symbol_type": "function/method"
+      "line_number": 249,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FoldingTestCase",
+      "file_path": "indexer/tests/test_folding.py",
+      "line_number": 17,
+      "symbol_type": "class/structure",
+      "scope": "global"
+    },
+    {
+      "name": "FoldingTestCase.setUp",
+      "file_path": "indexer/tests/test_folding.py",
+      "line_number": 20,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FoldingTestCase.test_get_code_range_with_range",
+      "file_path": "indexer/tests/test_folding.py",
+      "line_number": 48,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FoldingTestCase.test_get_code_range_without_range",
+      "file_path": "indexer/tests/test_folding.py",
+      "line_number": 53,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FoldingTestCase.test_get_file_symbols",
+      "file_path": "indexer/tests/test_folding.py",
+      "line_number": 65,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FoldingTestCase.test_get_file_symbols_empty",
+      "file_path": "indexer/tests/test_folding.py",
+      "line_number": 72,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FoldingTestCase.test_find_parent_symbols",
+      "file_path": "indexer/tests/test_folding.py",
+      "line_number": 77,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FoldingTestCase.test_is_in_folded_parent_true",
+      "file_path": "indexer/tests/test_folding.py",
+      "line_number": 83,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FoldingTestCase.test_is_in_folded_parent_false",
+      "file_path": "indexer/tests/test_folding.py",
+      "line_number": 91,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FoldingTestCase.test_process_line_symbol_declaration",
+      "file_path": "indexer/tests/test_folding.py",
+      "line_number": 99,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FoldingTestCase.test_process_line_regular_line",
+      "file_path": "indexer/tests/test_folding.py",
+      "line_number": 107,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FoldingTestCase.test_fold_file_basic",
+      "file_path": "indexer/tests/test_folding.py",
+      "line_number": 115,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FoldingTestCase.test_fold_file_empty_range",
+      "file_path": "indexer/tests/test_folding.py",
+      "line_number": 130,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FoldingTestCase.test_fold_file_with_symbols",
+      "file_path": "indexer/tests/test_folding.py",
+      "line_number": 145,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FoldingTestCase.test_filter_symbols_by_level_0",
+      "file_path": "indexer/tests/test_folding.py",
+      "line_number": 161,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FoldingTestCase.test_filter_symbols_by_level_1",
+      "file_path": "indexer/tests/test_folding.py",
+      "line_number": 170,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FoldingTestCase.test_filter_symbols_by_level_2",
+      "file_path": "indexer/tests/test_folding.py",
+      "line_number": 178,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FoldingTestCase.test_filter_symbols_by_level_3",
+      "file_path": "indexer/tests/test_folding.py",
+      "line_number": 184,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FoldingTestCase.test_fold_file_level_3_shows_all",
+      "file_path": "indexer/tests/test_folding.py",
+      "line_number": 190,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "TEST_REPOSITORIES_PATH",
       "file_path": "indexer/tests/test_indexer.py",
       "line_number": 7,
-      "symbol_type": "constant/variable"
+      "symbol_type": "constant/variable",
+      "scope": "global"
     },
     {
       "name": "TestIndexer",
       "file_path": "indexer/tests/test_indexer.py",
       "line_number": 10,
-      "symbol_type": "class/structure"
-    },
-    {
-      "name": "test_filter_unignored_files_babi",
-      "file_path": "indexer/tests/test_indexer.py",
-      "line_number": 11,
-      "symbol_type": "function/method"
+      "symbol_type": "class/structure",
+      "scope": "global"
     },
     {
       "name": "TestIndexer.test_filter_unignored_files_babi",
       "file_path": "indexer/tests/test_indexer.py",
       "line_number": 11,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_filter_unignored_files_flask",
-      "file_path": "indexer/tests/test_indexer.py",
-      "line_number": 38,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "TestIndexer.test_filter_unignored_files_flask",
       "file_path": "indexer/tests/test_indexer.py",
       "line_number": 38,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_filter_unignored_files_pre_commit",
-      "file_path": "indexer/tests/test_indexer.py",
-      "line_number": 67,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "TestIndexer.test_filter_unignored_files_pre_commit",
       "file_path": "indexer/tests/test_indexer.py",
       "line_number": 67,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_filter_unignored_files_empty_list",
-      "file_path": "indexer/tests/test_indexer.py",
-      "line_number": 94,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "TestIndexer.test_filter_unignored_files_empty_list",
       "file_path": "indexer/tests/test_indexer.py",
       "line_number": 94,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_filter_unignored_files_all_ignored",
-      "file_path": "indexer/tests/test_indexer.py",
-      "line_number": 100,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "TestIndexer.test_filter_unignored_files_all_ignored",
       "file_path": "indexer/tests/test_indexer.py",
       "line_number": 100,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_get_project_files_babi",
-      "file_path": "indexer/tests/test_indexer.py",
-      "line_number": 114,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "TestIndexer.test_get_project_files_babi",
       "file_path": "indexer/tests/test_indexer.py",
       "line_number": 114,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_get_project_files_non_git_directory",
-      "file_path": "indexer/tests/test_indexer.py",
-      "line_number": 132,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "TestIndexer.test_get_project_files_non_git_directory",
       "file_path": "indexer/tests/test_indexer.py",
       "line_number": 132,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "TestSearchPerformance",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 12,
-      "symbol_type": "class/structure"
-    },
-    {
-      "name": "setUp",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 14,
-      "symbol_type": "function/method"
+      "file_path": "indexer/tests/test_search.py",
+      "line_number": 11,
+      "symbol_type": "class/structure",
+      "scope": "global"
     },
     {
       "name": "TestSearchPerformance.setUp",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 14,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "create_test_config",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 17,
-      "symbol_type": "function/method"
+      "file_path": "indexer/tests/test_search.py",
+      "line_number": 12,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "TestSearchPerformance.create_test_config",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 17,
-      "symbol_type": "function/method"
+      "file_path": "indexer/tests/test_search.py",
+      "line_number": 15,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
-      "name": "test_should_skip_by_length",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 36,
-      "symbol_type": "function/method"
+      "name": "TestSearchPerformance.test_matches_regex",
+      "file_path": "indexer/tests/test_search.py",
+      "line_number": 43,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
-      "name": "TestSearchPerformance.test_should_skip_by_length",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 36,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_calculate_similarity",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 42,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "TestSearchPerformance.test_calculate_similarity",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 42,
-      "symbol_type": "function/method"
+      "name": "TestSearchPerformance.test_matches_regex_invalid_pattern",
+      "file_path": "indexer/tests/test_search.py",
+      "line_number": 54,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "TestBackgroundSearch",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 50,
-      "symbol_type": "class/structure"
-    },
-    {
-      "name": "setUp",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 52,
-      "symbol_type": "function/method"
+      "file_path": "indexer/tests/test_search.py",
+      "line_number": 58,
+      "symbol_type": "class/structure",
+      "scope": "global"
     },
     {
       "name": "TestBackgroundSearch.setUp",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 52,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "create_test_config",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 56,
-      "symbol_type": "function/method"
+      "file_path": "indexer/tests/test_search.py",
+      "line_number": 59,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "TestBackgroundSearch.create_test_config",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 56,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_background_search_start_and_cancel",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 75,
-      "symbol_type": "function/method"
+      "file_path": "indexer/tests/test_search.py",
+      "line_number": 63,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "TestBackgroundSearch.test_background_search_start_and_cancel",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 75,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "callback",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 79,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_background_search_completion",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 103,
-      "symbol_type": "function/method"
+      "file_path": "indexer/tests/test_search.py",
+      "line_number": 91,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "TestBackgroundSearch.test_background_search_completion",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 103,
-      "symbol_type": "function/method"
+      "file_path": "indexer/tests/test_search.py",
+      "line_number": 113,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
-      "name": "callback",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 106,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_background_search_empty_config",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 130,
-      "symbol_type": "function/method"
+      "name": "TestBackgroundSearch.test_background_search_regex_patterns",
+      "file_path": "indexer/tests/test_search.py",
+      "line_number": 136,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "TestBackgroundSearch.test_background_search_empty_config",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 130,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "callback",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 142,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_background_search_multiple_starts",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 155,
-      "symbol_type": "function/method"
+      "file_path": "indexer/tests/test_search.py",
+      "line_number": 158,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "TestBackgroundSearch.test_background_search_multiple_starts",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 155,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "callback",
-      "file_path": "indexer/tests/test_search_performance.py",
-      "line_number": 158,
-      "symbol_type": "function/method"
+      "file_path": "indexer/tests/test_search.py",
+      "line_number": 180,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "SymbolParsingTestCase",
       "file_path": "indexer/tests/test_symbol_parsing.py",
-      "line_number": 8,
-      "symbol_type": "class/structure"
-    },
-    {
-      "name": "test_parse_source_and_parse_equivalence",
-      "file_path": "indexer/tests/test_symbol_parsing.py",
-      "line_number": 11,
-      "symbol_type": "function/method"
+      "line_number": 9,
+      "symbol_type": "class/structure",
+      "scope": "global"
     },
     {
       "name": "SymbolParsingTestCase.test_parse_source_and_parse_equivalence",
       "file_path": "indexer/tests/test_symbol_parsing.py",
-      "line_number": 11,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_parse_source_with_various_symbols",
-      "file_path": "indexer/tests/test_symbol_parsing.py",
-      "line_number": 61,
-      "symbol_type": "function/method"
+      "line_number": 12,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "SymbolParsingTestCase.test_parse_source_with_various_symbols",
       "file_path": "indexer/tests/test_symbol_parsing.py",
       "line_number": 61,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_parse_source_with_syntax_error",
-      "file_path": "indexer/tests/test_symbol_parsing.py",
-      "line_number": 129,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "SymbolParsingTestCase.test_parse_source_with_syntax_error",
       "file_path": "indexer/tests/test_symbol_parsing.py",
       "line_number": 129,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "test_parse_source_empty_content",
-      "file_path": "indexer/tests/test_symbol_parsing.py",
-      "line_number": 139,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "SymbolParsingTestCase.test_parse_source_empty_content",
       "file_path": "indexer/tests/test_symbol_parsing.py",
       "line_number": 139,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "SymbolParsingTestCase.test_detect_globals_functions_and_variables",
+      "file_path": "indexer/tests/test_symbol_parsing.py",
+      "line_number": 147,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "SymbolParsingTestCase.test_detect_dataclass_like_declarations",
+      "file_path": "indexer/tests/test_symbol_parsing.py",
+      "line_number": 177,
+      "symbol_type": "function/method",
+      "scope": "class"
     },
     {
       "name": "SymbolType",
       "file_path": "indexer/utils.py",
       "line_number": 7,
-      "symbol_type": "class/structure"
+      "symbol_type": "class/structure",
+      "scope": "global"
+    },
+    {
+      "name": "SymbolType.CLASS",
+      "file_path": "indexer/utils.py",
+      "line_number": 24,
+      "symbol_type": "constant/variable",
+      "scope": "class"
+    },
+    {
+      "name": "SymbolType.CONSTANT",
+      "file_path": "indexer/utils.py",
+      "line_number": 25,
+      "symbol_type": "constant/variable",
+      "scope": "class"
+    },
+    {
+      "name": "SymbolType.FUNCTION",
+      "file_path": "indexer/utils.py",
+      "line_number": 26,
+      "symbol_type": "constant/variable",
+      "scope": "class"
+    },
+    {
+      "name": "SymbolType.OTHER",
+      "file_path": "indexer/utils.py",
+      "line_number": 27,
+      "symbol_type": "constant/variable",
+      "scope": "class"
+    },
+    {
+      "name": "SymbolScope",
+      "file_path": "indexer/utils.py",
+      "line_number": 30,
+      "symbol_type": "class/structure",
+      "scope": "global"
+    },
+    {
+      "name": "SymbolScope.GLOBAL",
+      "file_path": "indexer/utils.py",
+      "line_number": 35,
+      "symbol_type": "constant/variable",
+      "scope": "class"
+    },
+    {
+      "name": "SymbolScope.CLASS",
+      "file_path": "indexer/utils.py",
+      "line_number": 36,
+      "symbol_type": "constant/variable",
+      "scope": "class"
     },
     {
       "name": "SymbolDeclaration",
       "file_path": "indexer/utils.py",
-      "line_number": 31,
-      "symbol_type": "class/structure"
+      "line_number": 40,
+      "symbol_type": "class/structure",
+      "scope": "global"
     },
     {
-      "name": "SearchResult",
+      "name": "SymbolDeclaration.name",
       "file_path": "indexer/utils.py",
-      "line_number": 39,
-      "symbol_type": "class/structure"
+      "line_number": 41,
+      "symbol_type": "other",
+      "scope": "class"
+    },
+    {
+      "name": "SymbolDeclaration.file_path",
+      "file_path": "indexer/utils.py",
+      "line_number": 42,
+      "symbol_type": "other",
+      "scope": "class"
+    },
+    {
+      "name": "SymbolDeclaration.line_number",
+      "file_path": "indexer/utils.py",
+      "line_number": 43,
+      "symbol_type": "other",
+      "scope": "class"
+    },
+    {
+      "name": "SymbolDeclaration.symbol_type",
+      "file_path": "indexer/utils.py",
+      "line_number": 44,
+      "symbol_type": "other",
+      "scope": "class"
+    },
+    {
+      "name": "SymbolDeclaration.scope",
+      "file_path": "indexer/utils.py",
+      "line_number": 45,
+      "symbol_type": "other",
+      "scope": "class"
     },
     {
       "name": "IndexConfig",
       "file_path": "indexer/utils.py",
+      "line_number": 49,
+      "symbol_type": "class/structure",
+      "scope": "global"
+    },
+    {
+      "name": "IndexConfig.symbols",
+      "file_path": "indexer/utils.py",
       "line_number": 50,
-      "symbol_type": "class/structure"
+      "symbol_type": "other",
+      "scope": "class"
+    },
+    {
+      "name": "IndexConfig.file_hashes",
+      "file_path": "indexer/utils.py",
+      "line_number": 51,
+      "symbol_type": "other",
+      "scope": "class"
+    },
+    {
+      "name": "IndexConfig.merkle_hashes",
+      "file_path": "indexer/utils.py",
+      "line_number": 52,
+      "symbol_type": "other",
+      "scope": "class"
+    },
+    {
+      "name": "IndexConfig.language",
+      "file_path": "indexer/utils.py",
+      "line_number": 53,
+      "symbol_type": "other",
+      "scope": "class"
+    },
+    {
+      "name": "IndexConfig.last_updated",
+      "file_path": "indexer/utils.py",
+      "line_number": 54,
+      "symbol_type": "other",
+      "scope": "class"
+    },
+    {
+      "name": "SearchResult",
+      "file_path": "indexer/utils.py",
+      "line_number": 58,
+      "symbol_type": "class/structure",
+      "scope": "global"
+    },
+    {
+      "name": "SearchResult.symbol",
+      "file_path": "indexer/utils.py",
+      "line_number": 59,
+      "symbol_type": "other",
+      "scope": "class"
+    },
+    {
+      "name": "SearchResult.symbol_index",
+      "file_path": "indexer/utils.py",
+      "line_number": 60,
+      "symbol_type": "other",
+      "scope": "class"
+    },
+    {
+      "name": "SearchResult.symbol_score",
+      "file_path": "indexer/utils.py",
+      "line_number": 61,
+      "symbol_type": "other",
+      "scope": "class"
+    },
+    {
+      "name": "SearchResult.file_score",
+      "file_path": "indexer/utils.py",
+      "line_number": 62,
+      "symbol_type": "other",
+      "scope": "class"
+    },
+    {
+      "name": "SearchResult.combined_score",
+      "file_path": "indexer/utils.py",
+      "line_number": 63,
+      "symbol_type": "other",
+      "scope": "class"
     },
     {
       "name": "index_config_to_json",
       "file_path": "indexer/utils.py",
-      "line_number": 58,
-      "symbol_type": "function/method"
+      "line_number": 68,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "json_to_index_config",
       "file_path": "indexer/utils.py",
-      "line_number": 72,
-      "symbol_type": "function/method"
+      "line_number": 83,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "load_index_config_from_file",
+      "file_path": "indexer/utils.py",
+      "line_number": 107,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "get_symbol_text",
       "file_path": "indexer/utils.py",
-      "line_number": 92,
-      "symbol_type": "function/method"
+      "line_number": 114,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "server",
       "file_path": "llm_ide/mcp.py",
       "line_number": 8,
-      "symbol_type": "constant/variable"
+      "symbol_type": "constant/variable",
+      "scope": "global"
     },
     {
       "name": "load_env",
       "file_path": "prompt_engineering/__init__.py",
       "line_number": 5,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "LITE_MODEL",
       "file_path": "prompt_engineering/connection.py",
       "line_number": 18,
-      "symbol_type": "constant/variable"
+      "symbol_type": "constant/variable",
+      "scope": "global"
     },
     {
       "name": "MEDIUM_MODEL",
       "file_path": "prompt_engineering/connection.py",
       "line_number": 19,
-      "symbol_type": "constant/variable"
+      "symbol_type": "constant/variable",
+      "scope": "global"
     },
     {
       "name": "BIG_MODEL",
       "file_path": "prompt_engineering/connection.py",
       "line_number": 20,
-      "symbol_type": "constant/variable"
+      "symbol_type": "constant/variable",
+      "scope": "global"
     },
     {
       "name": "LanguageModelQuery",
       "file_path": "prompt_engineering/connection.py",
       "line_number": 24,
-      "symbol_type": "class/structure"
+      "symbol_type": "class/structure",
+      "scope": "global"
+    },
+    {
+      "name": "LanguageModelQuery.system_prompt",
+      "file_path": "prompt_engineering/connection.py",
+      "line_number": 25,
+      "symbol_type": "other",
+      "scope": "class"
+    },
+    {
+      "name": "LanguageModelQuery.prompt",
+      "file_path": "prompt_engineering/connection.py",
+      "line_number": 26,
+      "symbol_type": "other",
+      "scope": "class"
+    },
+    {
+      "name": "LanguageModelQuery.model_name",
+      "file_path": "prompt_engineering/connection.py",
+      "line_number": 27,
+      "symbol_type": "other",
+      "scope": "class"
     },
     {
       "name": "prepare_prompt",
       "file_path": "prompt_engineering/connection.py",
       "line_number": 30,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "is_retryable_error",
       "file_path": "prompt_engineering/connection.py",
       "line_number": 39,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "_execute_prompt_internal",
       "file_path": "prompt_engineering/connection.py",
       "line_number": 55,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "execute_prompt",
       "file_path": "prompt_engineering/connection.py",
       "line_number": 97,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "FIND_SYMBOLS_IN_FILE_PROMPT",
       "file_path": "prompt_engineering/templates/indexer/prompts.py",
       "line_number": 3,
-      "symbol_type": "constant/variable"
+      "symbol_type": "constant/variable",
+      "scope": "global"
     },
     {
       "name": "FIND_SYMBOLS_IN_FILE_SYSTEM_PROMPT",
       "file_path": "prompt_engineering/templates/indexer/prompts.py",
       "line_number": 14,
-      "symbol_type": "constant/variable"
+      "symbol_type": "constant/variable",
+      "scope": "global"
     },
     {
       "name": "FindSymbolsInFileConfig",
       "file_path": "prompt_engineering/templates/indexer/prompts.py",
       "line_number": 60,
-      "symbol_type": "class/structure"
+      "symbol_type": "class/structure",
+      "scope": "global"
+    },
+    {
+      "name": "FindSymbolsInFileConfig.file_path",
+      "file_path": "prompt_engineering/templates/indexer/prompts.py",
+      "line_number": 61,
+      "symbol_type": "other",
+      "scope": "class"
+    },
+    {
+      "name": "FindSymbolsInFileConfig.numbered_code_content",
+      "file_path": "prompt_engineering/templates/indexer/prompts.py",
+      "line_number": 62,
+      "symbol_type": "other",
+      "scope": "class"
+    },
+    {
+      "name": "FindSymbolsInFileConfig.previous_symbols",
+      "file_path": "prompt_engineering/templates/indexer/prompts.py",
+      "line_number": 63,
+      "symbol_type": "other",
+      "scope": "class"
     },
     {
       "name": "PARSE_IMPORT_STATEMENTS_PROMPT",
       "file_path": "prompt_engineering/templates/indexer/prompts.py",
       "line_number": 66,
-      "symbol_type": "constant/variable"
+      "symbol_type": "constant/variable",
+      "scope": "global"
     },
     {
       "name": "PARSE_IMPORT_STATEMENTS_SYSTEM_PROMPT",
       "file_path": "prompt_engineering/templates/indexer/prompts.py",
       "line_number": 77,
-      "symbol_type": "constant/variable"
+      "symbol_type": "constant/variable",
+      "scope": "global"
     },
     {
       "name": "ParseImportStatementsConfig",
       "file_path": "prompt_engineering/templates/indexer/prompts.py",
       "line_number": 181,
-      "symbol_type": "class/structure"
+      "symbol_type": "class/structure",
+      "scope": "global"
+    },
+    {
+      "name": "ParseImportStatementsConfig.file_path",
+      "file_path": "prompt_engineering/templates/indexer/prompts.py",
+      "line_number": 182,
+      "symbol_type": "other",
+      "scope": "class"
+    },
+    {
+      "name": "ParseImportStatementsConfig.numbered_code_content",
+      "file_path": "prompt_engineering/templates/indexer/prompts.py",
+      "line_number": 183,
+      "symbol_type": "other",
+      "scope": "class"
+    },
+    {
+      "name": "ParseImportStatementsConfig.project_structure",
+      "file_path": "prompt_engineering/templates/indexer/prompts.py",
+      "line_number": 184,
+      "symbol_type": "other",
+      "scope": "class"
     },
     {
       "name": "logfile",
       "file_path": "prompt_engineering/templates/indexer/setup.py",
       "line_number": 19,
-      "symbol_type": "constant/variable"
+      "symbol_type": "constant/variable",
+      "scope": "global"
     },
     {
       "name": "prompt_parse_import_statements",
       "file_path": "prompt_engineering/templates/indexer/setup.py",
       "line_number": 22,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "prompt_find_symbols_in_file",
       "file_path": "prompt_engineering/templates/indexer/setup.py",
       "line_number": 34,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
-      "name": "black",
+      "name": "ruff",
       "file_path": "tasks.py",
       "line_number": 5,
-      "symbol_type": "function/method"
-    },
-    {
-      "name": "isort",
-      "file_path": "tasks.py",
-      "line_number": 11,
-      "symbol_type": "function/method"
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "lint",
       "file_path": "tasks.py",
-      "line_number": 16,
-      "symbol_type": "function/method"
+      "line_number": 9,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "ctags",
+      "file_path": "tasks.py",
+      "line_number": 13,
+      "symbol_type": "function/method",
+      "scope": "global"
     },
     {
       "name": "test",
       "file_path": "tasks.py",
-      "line_number": 21,
-      "symbol_type": "function/method"
+      "line_number": 17,
+      "symbol_type": "function/method",
+      "scope": "global"
     }
   ],
   "file_hashes": {
@@ -1149,38 +1485,41 @@
     "five-vscode/webview/src/types.d.ts": "d828368ae9189c4648e6f83438924a76",
     "five-vscode/webview/src/vite-env.d.ts": "0352474ba2918efe13895edbc3780d94",
     "five-vscode/webview/vite.config.ts": "932b1927113401d7529005ca45e2d4e5",
-    "indexer/__main__.py": "03361984007e73d80b0dc87aebe52636",
-    "indexer/core.py": "bc8b3ac6c1b544cd649bb5733dd70f4b",
-    "indexer/files.py": "6b64b1a20e65e4ccbeebf9dd512d5989",
-    "indexer/parsers/python.py": "0f619b0501ad66d95ed0e0b5917ad50b",
-    "indexer/search.py": "ae612e7779a23efa3074dcc53dbafb8f",
-    "indexer/tests/test_core.py": "8f79327b298eec47227820031041f4a1",
-    "indexer/tests/test_file_changes.py": "933cd40979f2bf70e305e450feadab23",
+    "indexer/__main__.py": "4cd838ae7b3dcacef7eb22a33abd3447",
+    "indexer/core.py": "c8114dba5a5030d259c88c00cf2b5d90",
+    "indexer/files.py": "8c4360840d7c93e26e50f573072feecd",
+    "indexer/folding.py": "76b35b327b0f324437f8a10aee8dfb2a",
+    "indexer/lib.py": "f69b994a5b7936e8f7c1303f70f4e18a",
+    "indexer/parsers/python.py": "47c9233ff4d1aedc9e11b57f501b923f",
+    "indexer/search.py": "81c2b120b3c99fcd469881714a4e10ad",
+    "indexer/tests/test_core.py": "f613e64ee0d4810b0aac806aa3a1906e",
+    "indexer/tests/test_file_changes.py": "f559329cf1c43838d6dce1c2bddbaf85",
+    "indexer/tests/test_folding.py": "f2a728a2be98f79fc862e273bb2a6a7f",
     "indexer/tests/test_indexer.py": "83e2dc1bd58b2de1da8a7f973595315c",
-    "indexer/tests/test_search_performance.py": "6c3d8542a6bf5f078902f6b9edd975de",
-    "indexer/tests/test_symbol_parsing.py": "a3d63b82c58a7628e3543c97b342de8e",
-    "indexer/utils.py": "8858b7402923ce6914c8b53ddc3138b4",
-    "llm_ide/mcp.py": "e40fd74c97a64ca2e1cdb1a3e7d2381c",
+    "indexer/tests/test_search.py": "1aa016c6528a1577fba26be781bfd3aa",
+    "indexer/tests/test_symbol_parsing.py": "439070a5b798f573624b4dc718a7e296",
+    "indexer/utils.py": "9acafc6692ece970316df9286293e8a7",
+    "llm_ide/mcp.py": "23f8253ffff11d0001c9068c6fd7e541",
     "prompt_engineering/__init__.py": "e81edc3f5a0935a05c2b0385340052cd",
     "prompt_engineering/connection.py": "c13caac195ad4b8c398809dd3b09c3a1",
     "prompt_engineering/templates/indexer/prompts.py": "19a247d2c2083956a279eca88b1ce52c",
     "prompt_engineering/templates/indexer/setup.py": "06b7ce21c5408d48c1f1b9bc1381a9d3",
-    "tasks.py": "2b635db34a78298d3902338662a9f712"
+    "tasks.py": "81f03bba04834f5aa84c8e9d4ab43516"
   },
   "merkle_hashes": {
-    ".": "39b7f59ecec6e11cbb63e9766fc9b7ff",
+    ".": "c8326092f6a018431dce7febb5480f03",
     "five-vscode/src": "d77e226d5cbbaea2ad384d5345776862",
     "five-vscode": "715ec9ec47655c731aeaf395a9a65c3e",
     "five-vscode/webview": "4505771214ca6bf741eb160f14243cb4",
     "five-vscode/webview/src": "ac88a20a7e1dcc30339996a1c4f6197f",
     "five-vscode/webview/src/components": "3693aba6cef5d6c09a7622b259a17d9b",
-    "indexer": "da96543999f20272186f0fb7130bb61f",
-    "indexer/parsers": "61399e2d48175dbcf87eccbc1073e82b",
-    "indexer/tests": "51c107f43f3c8c4db716be4c9630eced",
-    "llm_ide": "89bd5fd5b89f1ec4d5ac8c919206de16",
+    "indexer": "8875f94aab67b202c8b08c2f68219917",
+    "indexer/parsers": "e6cf1d8d3d6191581172cb7e017851d6",
+    "indexer/tests": "35d04a7dda5e8b97a236fda9ab125fac",
+    "llm_ide": "d5ef3f9375d3152b51eb3a1f56f15b37",
     "prompt_engineering": "b539582b9f83419b2dc6313cd9b24105",
     "prompt_engineering/templates/indexer": "3dbc6808a84987aa146370e79d06138f"
   },
   "language": "python",
-  "last_updated": "2025-07-26T08:29:56.931721+00:00"
+  "last_updated": "2025-07-28T22:11:10.184829+00:00"
 }

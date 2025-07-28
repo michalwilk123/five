@@ -3,49 +3,29 @@ import argparse
 import os
 import sys
 
-from indexer.core import (
-    build_and_save_index_config,
-    load_index_config,
-    update_and_save_index_config,
-    update_index_config,
+from indexer.folding import fold_file, get_code_range
+from indexer.lib import (
+    Indexer,
+    create_index,
+    format_file_changes,
+    format_search_results,
+    get_config_path,
+    update_index,
+    parse_file_spec,
 )
-from indexer.search import BackgroundSearch
-from indexer.utils import get_symbol_text
-
-
-def get_config_path(project_path: str, language: str) -> str:
-    config_dir = os.path.join(project_path, ".five")
-    return os.path.join(config_dir, f"index_{language.lower()}.json")
-
-
-def create_index(project_path: str, language: str, show_progress: bool) -> None:
-    config_dir = os.path.join(project_path, ".five")
-    config_path = build_and_save_index_config(
-        project_path, language, config_dir, show_progress
-    )
-    print(f"Index created: {config_path}")
-
-
-def _print_file_changes(file_changes: dict) -> None:
-    op_map = {
-        "added": "A",
-        "deleted": "D",
-        "modified": "M",
-    }
-    for file_path, op in file_changes.items():
-        print(f"{op_map.get(op.value, op.value)} {file_path}")
+from indexer.utils import load_index_config_from_file
 
 
 def _handle_changes(
     has_changes: bool,
     file_changes: dict,
-    updated_path: str = None,
+    updated_path: str | None = None,
     dry_run: bool = False,
 ) -> None:
     if has_changes:
         if dry_run:
             print("Changes detected:")
-        _print_file_changes(file_changes)
+        print(format_file_changes(file_changes))
         if dry_run:
             print("(dry run - no changes made)")
             sys.exit(1)
@@ -55,75 +35,34 @@ def _handle_changes(
         print("no changes")
 
 
-def update_index(
-    project_path: str, language: str, show_progress: bool, dry_run: bool = False
-) -> None:
-    config_path = get_config_path(project_path, language)
+def _handle_fold(args, config) -> None:
+    """Handle the fold command."""
+    file_path, line_range = parse_file_spec(args.file_spec)
+    code_range = get_code_range(file_path, line_range)
+    folded_lines = fold_file(file_path, config, code_range, args.level)
 
-    if not os.path.exists(config_path):
-        print(f"Index file not found: {config_path}")
-        print("Use 'create' command to build initial index")
-        sys.exit(1)
-
-    if dry_run:
-        old_config = load_index_config(config_path)
-        _, has_changes, file_changes = update_index_config(
-            old_config, project_path, show_progress
-        )
-        _handle_changes(has_changes, file_changes, dry_run=True)
-    else:
-        updated_path, has_changes, file_changes = update_and_save_index_config(
-            project_path, config_path, show_progress
-        )
-        _handle_changes(has_changes, file_changes, updated_path, dry_run=False)
-
-
-def _display_results(
-    results,
-    max_display: int = 10,
-    show_code: bool = False,
-    project_path: str = "",
-    config=None,
-):
-    if not results:
-        print("No results found")
-        return
-
-    print(f"Found {len(results)} results:")
-
-    for i, result in enumerate(results[:max_display]):
-        symbol = result.symbol
-        score = result.combined_score
-        symbol_type = f" [{symbol.symbol_type.value}]" if symbol.symbol_type else ""
-        print(
-            f"{i + 1:2d}. {symbol.name} ({score:.2f}) - {symbol.file_path}:{symbol.line_number}{symbol_type}"
-        )
-
-        if show_code and config:
-            try:
-                code_content = get_symbol_text(result, config.symbols, project_path)
-                if code_content.strip():
-                    print("   " + "─" * 60)
-                    for line in code_content.rstrip().split("\n"):
-                        print(f"   {line}")
-                    print("   " + "─" * 60)
-            except Exception as e:
-                print(f"   Error reading code: {e}")
+    for line_num, text in folded_lines:
+        if args.numbers:
+            print(f"{line_num:4d} {text}")
+        else:
+            print(text)
 
 
 def _interactive_search(
     config, project_path: str, max_results: int = 50, show_code: bool = False
 ):
-    background_search = BackgroundSearch(config)
+    indexer = Indexer(project_path, config.language, config)
+    background_search = indexer.create_background_search()
     current_results = []
 
     def on_results_update(results):
         nonlocal current_results
         current_results = results
-        # os.system('clear' if os.name == 'posix' else 'cls')
         print("Symbol Search (type to search, Ctrl+C to exit)")
-        _display_results(
-            results, show_code=show_code, project_path=project_path, config=config
+        print(
+            format_search_results(
+                results, show_code=show_code, project_path=project_path, config=config
+            )
         )
         print("Query: ", end="", flush=True)
 
@@ -139,8 +78,13 @@ def _interactive_search(
                 os.system("clear" if os.name == "posix" else "cls")
                 print("Interactive Symbol Search (type to search, Ctrl+C to exit)")
                 print("=" * 60)
-                _display_results(
-                    [], show_code=show_code, project_path=project_path, config=config
+                print(
+                    format_search_results(
+                        [],
+                        show_code=show_code,
+                        project_path=project_path,
+                        config=config,
+                    )
                 )
                 print("Query: ", end="", flush=True)
                 continue
@@ -154,38 +98,12 @@ def _interactive_search(
         print("\nSearch cancelled. Exiting...")
 
 
-def search_symbols(
-    project_path: str,
-    language: str,
-    max_results: int = 50,
-    interactive: bool = True,
-    query: str = "",
-    show_code: bool = False,
-) -> None:
-    config_path = get_config_path(project_path, language)
-
-    if not os.path.exists(config_path):
-        print(f"Index file not found: {config_path}")
-        print("Use 'create' command to build initial index")
-        sys.exit(1)
-
-    config = load_index_config(config_path)
-
-    if interactive:
-        _interactive_search(config, project_path, max_results, show_code)
-    else:
-        from indexer.search import fuzzy_search_symbols
-
-        results = fuzzy_search_symbols(
-            config, symbol_query=query, max_results=max_results
-        )
-        _display_results(results, max_results, show_code, project_path, config)
-
-
 def main():
     parser = argparse.ArgumentParser(description="Code indexer CLI")
     parser.add_argument(
-        "command", choices=["create", "update", "search"], help="Command to execute"
+        "command",
+        choices=["create", "update", "search", "fold"],
+        help="Command to execute",
     )
     parser.add_argument(
         "--project", "-p", default=".", help="Project path (default: current directory)"
@@ -222,6 +140,22 @@ def main():
         action="store_true",
         help="Display code content for symbols in search results",
     )
+    parser.add_argument(
+        "--file-spec",
+        help="File path with optional range (e.g., file.py:20-400) (fold command only)",
+    )
+    parser.add_argument(
+        "--numbers",
+        "-n",
+        action="store_true",
+        help="Show line numbers (fold command only)",
+    )
+    parser.add_argument(
+        "--level",
+        type=int,
+        default=1,
+        help="Folding level (0-3, default: 1) (fold command only)",
+    )
 
     args = parser.parse_args()
 
@@ -231,22 +165,53 @@ def main():
         print(f"Project path does not exist: {project_path}")
         sys.exit(1)
 
-    if args.command == "create":
-        create_index(project_path, args.language, args.progress)
-    elif args.command == "update":
-        update_index(project_path, args.language, args.progress, args.dry_run)
-    elif args.command == "search":
-        if args.no_interactive and not args.query:
-            print("Error: --query is required when using --no-interactive")
+    config = None
+    if args.command in ["update", "search", "fold"]:
+        try:
+            config = load_index_config_from_file(
+                get_config_path(project_path, args.language)
+            )
+        except FileNotFoundError as e:
+            print(f"Error: {e}")
+            print("Use 'create' command to build initial index")
             sys.exit(1)
-        search_symbols(
-            project_path,
-            args.language,
-            args.max_results,
-            not args.no_interactive,
-            args.query or "",
-            args.show_code,
-        )
+
+    try:
+        if args.command == "create":
+            config_path = create_index(
+                project_path, args.language, config, args.progress
+            )
+            print(f"Index created: {config_path}")
+        elif args.command == "update":
+            has_changes, file_changes, updated_path = update_index(
+                project_path, args.language, config, args.progress, args.dry_run
+            )
+            _handle_changes(has_changes, file_changes, updated_path, args.dry_run)
+        elif args.command == "search":
+            if args.no_interactive and not args.query:
+                print("Error: --query is required when using --no-interactive")
+                sys.exit(1)
+
+            if args.no_interactive:
+                indexer = Indexer(project_path, args.language, config)
+                results = indexer.search_symbols(args.query or "", args.max_results)
+                print(
+                    format_search_results(
+                        results, args.max_results, args.show_code, project_path, config
+                    )
+                )
+            else:
+                _interactive_search(
+                    config, project_path, args.max_results, args.show_code
+                )
+        elif args.command == "fold":
+            if not args.file_spec:
+                print("Error: --file-spec is required for fold command")
+                sys.exit(1)
+            _handle_fold(args, config)
+    except Exception as e:
+        print(f"Error: {e}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

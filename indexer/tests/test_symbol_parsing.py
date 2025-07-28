@@ -3,6 +3,7 @@ import tempfile
 import unittest
 
 from indexer.parsers.python import parse, parse_source
+from indexer.utils import SymbolType, SymbolScope
 
 
 class SymbolParsingTestCase(unittest.TestCase):
@@ -142,3 +143,119 @@ def incomplete_function(
 
         symbols = parse_source("\n\n", "whitespace.py")
         self.assertEqual(symbols, [])
+
+    def test_detect_globals_functions_and_variables(self):
+        code = """
+GLOBAL_VAR = 123
+
+def foo():
+    return 1
+
+class Bar:
+    CLASS_VAR = 42
+    def method(self):
+        pass
+"""
+        symbols = parse_source(code, "sample.py")
+        names = {s.name: s for s in symbols}
+        self.assertIn("GLOBAL_VAR", names)
+        self.assertEqual(names["GLOBAL_VAR"].symbol_type, SymbolType.CONSTANT)
+        self.assertEqual(names["GLOBAL_VAR"].scope, SymbolScope.GLOBAL)
+        self.assertIn("foo", names)
+        self.assertEqual(names["foo"].symbol_type, SymbolType.FUNCTION)
+        self.assertEqual(names["foo"].scope, SymbolScope.GLOBAL)
+        self.assertIn("Bar", names)
+        self.assertEqual(names["Bar"].symbol_type, SymbolType.CLASS)
+        self.assertEqual(names["Bar"].scope, SymbolScope.GLOBAL)
+        self.assertIn("Bar.CLASS_VAR", names)
+        self.assertEqual(names["Bar.CLASS_VAR"].symbol_type, SymbolType.CONSTANT)
+        self.assertEqual(names["Bar.CLASS_VAR"].scope, SymbolScope.CLASS)
+        self.assertIn("Bar.method", names)
+        self.assertEqual(names["Bar.method"].symbol_type, SymbolType.FUNCTION)
+        self.assertEqual(names["Bar.method"].scope, SymbolScope.CLASS)
+
+    def test_detect_dataclass_like_declarations(self):
+        """Test that dataclass-like declarations are parsed as OTHER SymbolType."""
+        code = """
+from dataclasses import dataclass
+from typing import List, Optional
+
+@dataclass
+class Point:
+    x: int
+    y: int
+
+@dataclass
+class Config:
+    name: str = "default"
+    debug: bool = False
+
+class SimpleClass:
+    x: int = 5
+    y: str = "hello"
+    z: list
+
+class EnumClass:
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+
+# Global annotated assignments
+global_var: int = 10
+another_var: str = "test"
+"""
+        symbols = parse_source(code, "dataclass_test.py")
+        names = {s.name: s for s in symbols}
+
+        # Check dataclass attributes are OTHER type
+        self.assertIn("Point.x", names)
+        self.assertEqual(names["Point.x"].symbol_type, SymbolType.OTHER)
+        self.assertEqual(names["Point.x"].scope, SymbolScope.CLASS)
+
+        self.assertIn("Point.y", names)
+        self.assertEqual(names["Point.y"].symbol_type, SymbolType.OTHER)
+        self.assertEqual(names["Point.y"].scope, SymbolScope.CLASS)
+
+        self.assertIn("Config.name", names)
+        self.assertEqual(names["Config.name"].symbol_type, SymbolType.OTHER)
+        self.assertEqual(names["Config.name"].scope, SymbolScope.CLASS)
+
+        self.assertIn("Config.debug", names)
+        self.assertEqual(names["Config.debug"].symbol_type, SymbolType.OTHER)
+        self.assertEqual(names["Config.debug"].scope, SymbolScope.CLASS)
+
+        # Check class attributes with type annotations are OTHER type
+        self.assertIn("SimpleClass.x", names)
+        self.assertEqual(names["SimpleClass.x"].symbol_type, SymbolType.OTHER)
+        self.assertEqual(names["SimpleClass.x"].scope, SymbolScope.CLASS)
+
+        self.assertIn("SimpleClass.y", names)
+        self.assertEqual(names["SimpleClass.y"].symbol_type, SymbolType.OTHER)
+        self.assertEqual(names["SimpleClass.y"].scope, SymbolScope.CLASS)
+
+        self.assertIn("SimpleClass.z", names)
+        self.assertEqual(names["SimpleClass.z"].symbol_type, SymbolType.OTHER)
+        self.assertEqual(names["SimpleClass.z"].scope, SymbolScope.CLASS)
+
+        # Check regular class attributes remain CONSTANT type
+        self.assertIn("EnumClass.ACTIVE", names)
+        self.assertEqual(names["EnumClass.ACTIVE"].symbol_type, SymbolType.CONSTANT)
+        self.assertEqual(names["EnumClass.ACTIVE"].scope, SymbolScope.CLASS)
+
+        self.assertIn("EnumClass.INACTIVE", names)
+        self.assertEqual(names["EnumClass.INACTIVE"].symbol_type, SymbolType.CONSTANT)
+        self.assertEqual(names["EnumClass.INACTIVE"].scope, SymbolScope.CLASS)
+
+        # Check global annotated variables are OTHER type
+        self.assertIn("global_var", names)
+        self.assertEqual(names["global_var"].symbol_type, SymbolType.OTHER)
+        self.assertEqual(names["global_var"].scope, SymbolScope.GLOBAL)
+
+        self.assertIn("another_var", names)
+        self.assertEqual(names["another_var"].symbol_type, SymbolType.OTHER)
+        self.assertEqual(names["another_var"].scope, SymbolScope.GLOBAL)
+
+        # Verify total count
+        other_symbols = [s for s in symbols if s.symbol_type == SymbolType.OTHER]
+        self.assertEqual(
+            len(other_symbols), 9
+        )  # 7 class attributes + 2 global variables

@@ -5,7 +5,7 @@ from indexer.search import (
     BackgroundSearch,
     _matches_regex,
 )
-from indexer.utils import IndexConfig, SymbolDeclaration, SymbolType
+from indexer.utils import IndexConfig, SymbolDeclaration, SymbolType, SymbolScope
 
 
 class TestSearchPerformance(unittest.TestCase):
@@ -28,6 +28,7 @@ class TestSearchPerformance(unittest.TestCase):
                     file_path=f"/path/to/file_{i}.py",
                     line_number=i + 1,
                     symbol_type=symbol_type,
+                    scope=SymbolScope.GLOBAL,
                 )
             )
 
@@ -75,6 +76,7 @@ class TestBackgroundSearch(unittest.TestCase):
                     file_path=f"/path/to/file_{i}.py",
                     line_number=i + 1,
                     symbol_type=symbol_type,
+                    scope=SymbolScope.GLOBAL,
                 )
             )
 

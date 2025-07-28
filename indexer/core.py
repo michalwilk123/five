@@ -15,7 +15,7 @@ from indexer.utils import (
     IndexConfig,
     SymbolDeclaration,
     index_config_to_json,
-    json_to_index_config,
+    load_index_config_from_file,
 )
 
 
@@ -44,7 +44,7 @@ def _process_files_with_parser(
 
 
 def process_project(
-    project_path: str, language: str = "python", show_progress: bool = False
+    project_path: str, language: str, show_progress: bool = False
 ) -> list[SymbolDeclaration]:
     files = get_files_for_indexing(project_path)
     return _process_files_with_parser(
@@ -55,7 +55,7 @@ def process_project(
 def process_specific_files(
     project_path: str,
     file_paths: list[str],
-    language: str = "python",
+    language: str,
     show_progress: bool = False,
 ) -> list[SymbolDeclaration]:
     return _process_files_with_parser(
@@ -164,16 +164,10 @@ def build_and_save_index_config(
     return save_index_config_to_file(config, config_path, language)
 
 
-def load_index_config(config_path: str) -> IndexConfig:
-    with open(config_path, "r") as f:
-        json_content = f.read()
-    return json_to_index_config(json_content)
-
-
 def update_and_save_index_config(
     project_path: str, config_file_path: str, show_progress: bool = False
 ) -> tuple[str, bool, dict[str, "FileOperation"]]:
-    old_config = load_index_config(config_file_path)
+    old_config = load_index_config_from_file(config_file_path)
     updated_config, has_changes, file_changes = update_index_config(
         old_config, project_path, show_progress
     )

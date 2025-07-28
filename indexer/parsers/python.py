@@ -1,23 +1,131 @@
-"""
-Python file parser using AST to extract symbols.
-"""
-
 import ast
 
-from indexer.utils import SymbolDeclaration, SymbolType
+from indexer.utils import SymbolDeclaration, SymbolScope, SymbolType
+
+
+def create_symbol_declaration(
+    name: str,
+    filename: str,
+    line_number: int,
+    symbol_type: SymbolType,
+    scope: SymbolScope,
+) -> SymbolDeclaration:
+    return SymbolDeclaration(
+        name=name,
+        file_path=filename,
+        line_number=line_number,
+        symbol_type=symbol_type,
+        scope=scope,
+    )
+
+
+def process_function_def(
+    node: ast.FunctionDef, filename: str, current_class: str | None = None
+) -> SymbolDeclaration:
+    if current_class is None:
+        return create_symbol_declaration(
+            node.name, filename, node.lineno, SymbolType.FUNCTION, SymbolScope.GLOBAL
+        )
+    else:
+        return create_symbol_declaration(
+            f"{current_class}.{node.name}",
+            filename,
+            node.lineno,
+            SymbolType.FUNCTION,
+            SymbolScope.CLASS,
+        )
+
+
+def process_class_def(node: ast.ClassDef, filename: str) -> list[SymbolDeclaration]:
+    symbols = [
+        create_symbol_declaration(
+            node.name, filename, node.lineno, SymbolType.CLASS, SymbolScope.GLOBAL
+        )
+    ]
+
+    for item in node.body:
+        symbols.extend(process_node(item, filename, node.name))
+
+    return symbols
+
+
+def process_assign(
+    node: ast.Assign, filename: str, current_class: str | None = None
+) -> list[SymbolDeclaration]:
+    symbols = []
+
+    for target in node.targets:
+        if isinstance(target, ast.Name):
+            if current_class is None:
+                symbols.append(
+                    create_symbol_declaration(
+                        target.id,
+                        filename,
+                        node.lineno,
+                        SymbolType.CONSTANT,
+                        SymbolScope.GLOBAL,
+                    )
+                )
+            else:
+                symbols.append(
+                    create_symbol_declaration(
+                        f"{current_class}.{target.id}",
+                        filename,
+                        node.lineno,
+                        SymbolType.CONSTANT,
+                        SymbolScope.CLASS,
+                    )
+                )
+
+    return symbols
+
+
+def process_ann_assign(
+    node: ast.AnnAssign, filename: str, current_class: str | None = None
+) -> list[SymbolDeclaration]:
+    symbols = []
+
+    if isinstance(node.target, ast.Name):
+        if current_class is None:
+            symbols.append(
+                create_symbol_declaration(
+                    node.target.id,
+                    filename,
+                    node.lineno,
+                    SymbolType.OTHER,
+                    SymbolScope.GLOBAL,
+                )
+            )
+        else:
+            symbols.append(
+                create_symbol_declaration(
+                    f"{current_class}.{node.target.id}",
+                    filename,
+                    node.lineno,
+                    SymbolType.OTHER,
+                    SymbolScope.CLASS,
+                )
+            )
+
+    return symbols
+
+
+def process_node(
+    node: ast.AST, filename: str, current_class: str | None = None
+) -> list[SymbolDeclaration]:
+    if isinstance(node, ast.FunctionDef):
+        return [process_function_def(node, filename, current_class)]
+    elif isinstance(node, ast.ClassDef):
+        return process_class_def(node, filename)
+    elif isinstance(node, ast.Assign):
+        return process_assign(node, filename, current_class)
+    elif isinstance(node, ast.AnnAssign):
+        return process_ann_assign(node, filename, current_class)
+    else:
+        return []
 
 
 def parse_source(content: str, filename: str) -> list[SymbolDeclaration]:
-    """
-    Parse Python source code and extract symbol declarations.
-
-    Args:
-        content: Python source code as string
-        filename: Path to the Python file (for reference in SymbolDeclaration)
-
-    Returns:
-        List of SymbolDeclaration objects
-    """
     symbols = []
 
     try:
@@ -25,89 +133,16 @@ def parse_source(content: str, filename: str) -> list[SymbolDeclaration]:
     except SyntaxError:
         return symbols
 
-    for node in ast.walk(tree):
-        if isinstance(node, ast.FunctionDef):
-            symbols.append(
-                SymbolDeclaration(
-                    name=node.name,
-                    file_path=filename,
-                    line_number=node.lineno,
-                    symbol_type=SymbolType.FUNCTION,
-                )
-            )
-        elif isinstance(node, ast.ClassDef):
-            symbols.append(
-                SymbolDeclaration(
-                    name=node.name,
-                    file_path=filename,
-                    line_number=node.lineno,
-                    symbol_type=SymbolType.CLASS,
-                )
-            )
-        elif isinstance(node, ast.Assign):
-            if _is_global_scope(node, tree):
-                for target in node.targets:
-                    if isinstance(target, ast.Name):
-                        symbols.append(
-                            SymbolDeclaration(
-                                name=target.id,
-                                file_path=filename,
-                                line_number=node.lineno,
-                                symbol_type=SymbolType.CONSTANT,
-                            )
-                        )
-
-    for node in ast.walk(tree):
-        if isinstance(node, ast.ClassDef):
-            for item in node.body:
-                if isinstance(item, ast.FunctionDef):
-                    symbols.append(
-                        SymbolDeclaration(
-                            name=f"{node.name}.{item.name}",
-                            file_path=filename,
-                            line_number=item.lineno,
-                            symbol_type=SymbolType.FUNCTION,
-                        )
-                    )
+    for node in tree.body:
+        symbols.extend(process_node(node, filename))
 
     return symbols
 
 
 def parse(project_root: str, filename: str) -> list[SymbolDeclaration]:
-    """
-    Parse a Python file and extract symbol declarations.
-
-    Args:
-        project_root: Root directory of the project
-        filename: Path to the Python file relative to project root
-
-    Returns:
-        List of SymbolDeclaration objects
-    """
     file_path = f"{project_root}/{filename}"
 
     with open(file_path, "r", encoding="utf-8") as file:
         content = file.read()
 
     return parse_source(content, filename)
-
-
-def _is_global_scope(node: ast.AST, tree: ast.AST) -> bool:
-    """
-    Check if a node is in global scope (not inside a function or class).
-    """
-    for parent in ast.walk(tree):
-        if isinstance(parent, (ast.FunctionDef, ast.ClassDef)):
-            if _node_in_parent(node, parent):
-                return False
-    return True
-
-
-def _node_in_parent(node: ast.AST, parent: ast.AST) -> bool:
-    """
-    Check if a node is contained within a parent node.
-    """
-    for child in ast.walk(parent):
-        if child is node:
-            return True
-    return False
