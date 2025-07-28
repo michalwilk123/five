@@ -22,30 +22,79 @@
       "scope": "global"
     },
     {
+      "name": "common_options",
+      "file_path": "indexer/__main__.py",
+      "line_number": 22,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
       "name": "_handle_changes",
       "file_path": "indexer/__main__.py",
-      "line_number": 19,
+      "line_number": 36,
       "symbol_type": "function/method",
       "scope": "global"
     },
     {
       "name": "_handle_fold",
       "file_path": "indexer/__main__.py",
-      "line_number": 38,
+      "line_number": 55,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "_handle_edit",
+      "file_path": "indexer/__main__.py",
+      "line_number": 68,
       "symbol_type": "function/method",
       "scope": "global"
     },
     {
       "name": "_interactive_search",
       "file_path": "indexer/__main__.py",
-      "line_number": 51,
+      "line_number": 104,
       "symbol_type": "function/method",
       "scope": "global"
     },
     {
-      "name": "main",
+      "name": "cli",
       "file_path": "indexer/__main__.py",
-      "line_number": 101,
+      "line_number": 156,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "create",
+      "file_path": "indexer/__main__.py",
+      "line_number": 164,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "update",
+      "file_path": "indexer/__main__.py",
+      "line_number": 183,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "search",
+      "file_path": "indexer/__main__.py",
+      "line_number": 215,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "fold",
+      "file_path": "indexer/__main__.py",
+      "line_number": 261,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "edit",
+      "file_path": "indexer/__main__.py",
+      "line_number": 284,
       "symbol_type": "function/method",
       "scope": "global"
     },
@@ -103,6 +152,160 @@
       "file_path": "indexer/core.py",
       "line_number": 167,
       "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "DiffOperation",
+      "file_path": "indexer/differ.py",
+      "line_number": 6,
+      "symbol_type": "class/structure",
+      "scope": "global"
+    },
+    {
+      "name": "DiffOperation.__init__",
+      "file_path": "indexer/differ.py",
+      "line_number": 7,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "DiffOperation.__repr__",
+      "file_path": "indexer/differ.py",
+      "line_number": 15,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "DiffParser",
+      "file_path": "indexer/differ.py",
+      "line_number": 19,
+      "symbol_type": "class/structure",
+      "scope": "global"
+    },
+    {
+      "name": "DiffParser.HEADER_PATTERN",
+      "file_path": "indexer/differ.py",
+      "line_number": 20,
+      "symbol_type": "constant/variable",
+      "scope": "class"
+    },
+    {
+      "name": "DiffParser.END_MARKER",
+      "file_path": "indexer/differ.py",
+      "line_number": 23,
+      "symbol_type": "constant/variable",
+      "scope": "class"
+    },
+    {
+      "name": "DiffParser.__init__",
+      "file_path": "indexer/differ.py",
+      "line_number": 25,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "DiffParser.parse_stdin",
+      "file_path": "indexer/differ.py",
+      "line_number": 28,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "DiffParser._parse_operation",
+      "file_path": "indexer/differ.py",
+      "line_number": 43,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FileEditor",
+      "file_path": "indexer/differ.py",
+      "line_number": 78,
+      "symbol_type": "class/structure",
+      "scope": "global"
+    },
+    {
+      "name": "FileEditor.__init__",
+      "file_path": "indexer/differ.py",
+      "line_number": 79,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FileEditor.add_operations",
+      "file_path": "indexer/differ.py",
+      "line_number": 82,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FileEditor.validate_operations",
+      "file_path": "indexer/differ.py",
+      "line_number": 88,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FileEditor._validate_file_operations",
+      "file_path": "indexer/differ.py",
+      "line_number": 92,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FileEditor.apply_operations",
+      "file_path": "indexer/differ.py",
+      "line_number": 127,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FileEditor._apply_file_operations",
+      "file_path": "indexer/differ.py",
+      "line_number": 136,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "main",
+      "file_path": "indexer/differ.py",
+      "line_number": 153,
+      "symbol_type": "function/method",
+      "scope": "global"
+    },
+    {
+      "name": "CREATE_HELP",
+      "file_path": "indexer/docs.py",
+      "line_number": 3,
+      "symbol_type": "constant/variable",
+      "scope": "global"
+    },
+    {
+      "name": "UPDATE_HELP",
+      "file_path": "indexer/docs.py",
+      "line_number": 20,
+      "symbol_type": "constant/variable",
+      "scope": "global"
+    },
+    {
+      "name": "SEARCH_HELP",
+      "file_path": "indexer/docs.py",
+      "line_number": 37,
+      "symbol_type": "constant/variable",
+      "scope": "global"
+    },
+    {
+      "name": "FOLD_HELP",
+      "file_path": "indexer/docs.py",
+      "line_number": 56,
+      "symbol_type": "constant/variable",
+      "scope": "global"
+    },
+    {
+      "name": "EDIT_HELP",
+      "file_path": "indexer/docs.py",
+      "line_number": 80,
+      "symbol_type": "constant/variable",
       "scope": "global"
     },
     {
@@ -571,6 +774,335 @@
       "name": "ProcessAllRepositoriesTestCase.test_all_repositories",
       "file_path": "indexer/tests/test_core.py",
       "line_number": 90,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "DiffOperationTestCase",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 11,
+      "symbol_type": "class/structure",
+      "scope": "global"
+    },
+    {
+      "name": "DiffOperationTestCase.test_diff_operation_creation",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 12,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "DiffOperationTestCase.test_diff_operation_repr",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 19,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "DiffParserTestCase",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 24,
+      "symbol_type": "class/structure",
+      "scope": "global"
+    },
+    {
+      "name": "DiffParserTestCase.setUp",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 25,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "DiffParserTestCase.test_parse_simple_operation",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 28,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "DiffParserTestCase.test_parse_multiple_operations",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 47,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "DiffParserTestCase.test_parse_with_project_path",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 67,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "DiffParserTestCase.test_invalid_header_format",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 76,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "DiffParserTestCase.test_start_line_greater_than_end_line",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 84,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "DiffParserTestCase.test_missing_end_marker",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 94,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "DiffParserTestCase.test_empty_content",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 102,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FileEditorTestCase",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 112,
+      "symbol_type": "class/structure",
+      "scope": "global"
+    },
+    {
+      "name": "FileEditorTestCase.setUp",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 113,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FileEditorTestCase.tearDown",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 117,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FileEditorTestCase.create_test_file",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 122,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FileEditorTestCase.test_add_operations",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 128,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FileEditorTestCase.test_validate_nonexistent_file",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 139,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FileEditorTestCase.test_validate_directory_path",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 147,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FileEditorTestCase.test_validate_empty_file",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 158,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FileEditorTestCase.test_validate_line_range_exceeds_file",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 168,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FileEditorTestCase.test_validate_overlapping_ranges",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 178,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FileEditorTestCase.test_apply_single_operation",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 191,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FileEditorTestCase.test_apply_multiple_operations_same_file",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 208,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "FileEditorTestCase.test_apply_operations_different_files",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 226,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "OrderDependentOperationsTestCase",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 248,
+      "symbol_type": "class/structure",
+      "scope": "global"
+    },
+    {
+      "name": "OrderDependentOperationsTestCase.setUp",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 249,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "OrderDependentOperationsTestCase.tearDown",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 253,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "OrderDependentOperationsTestCase.create_test_file",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 258,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "OrderDependentOperationsTestCase.test_order_dependent_replacements",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 264,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "OrderDependentOperationsTestCase.test_cascading_line_number_changes",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 288,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "OrderDependentOperationsTestCase.test_multiple_insertions_different_regions",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 311,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "OrderDependentOperationsTestCase.test_order_dependent_line_expansion",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 333,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "OrderDependentOperationsTestCase.test_order_dependent_overlapping_behavior",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 355,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "OrderDependentOperationsTestCase.test_complex_non_overlapping_replacements",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 375,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "EdgeCasesTestCase",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 399,
+      "symbol_type": "class/structure",
+      "scope": "global"
+    },
+    {
+      "name": "EdgeCasesTestCase.setUp",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 400,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "EdgeCasesTestCase.tearDown",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 404,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "EdgeCasesTestCase.create_test_file",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 409,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "EdgeCasesTestCase.test_replace_entire_file",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 415,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "EdgeCasesTestCase.test_replace_single_line_with_multiple",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 431,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "EdgeCasesTestCase.test_replace_multiple_lines_with_single",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 447,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "EdgeCasesTestCase.test_replace_with_empty_content",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 463,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "EdgeCasesTestCase.test_unicode_content",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 479,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "EdgeCasesTestCase.test_special_characters_in_content",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 496,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "EdgeCasesTestCase.test_replace_last_line",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 513,
+      "symbol_type": "function/method",
+      "scope": "class"
+    },
+    {
+      "name": "EdgeCasesTestCase.test_replace_first_line",
+      "file_path": "indexer/tests/test_differ.py",
+      "line_number": 529,
       "symbol_type": "function/method",
       "scope": "class"
     },
@@ -1485,14 +2017,17 @@
     "five-vscode/webview/src/types.d.ts": "d828368ae9189c4648e6f83438924a76",
     "five-vscode/webview/src/vite-env.d.ts": "0352474ba2918efe13895edbc3780d94",
     "five-vscode/webview/vite.config.ts": "932b1927113401d7529005ca45e2d4e5",
-    "indexer/__main__.py": "4cd838ae7b3dcacef7eb22a33abd3447",
+    "indexer/__main__.py": "fd8c487345431efffa391d62b8cd8b4a",
     "indexer/core.py": "c8114dba5a5030d259c88c00cf2b5d90",
+    "indexer/differ.py": "bbdd92f0ed0749d7c7ba497e55286b7e",
+    "indexer/docs.py": "c3682026e2d8ffadbfb4ee87877d29b3",
     "indexer/files.py": "8c4360840d7c93e26e50f573072feecd",
     "indexer/folding.py": "76b35b327b0f324437f8a10aee8dfb2a",
     "indexer/lib.py": "f69b994a5b7936e8f7c1303f70f4e18a",
     "indexer/parsers/python.py": "47c9233ff4d1aedc9e11b57f501b923f",
     "indexer/search.py": "81c2b120b3c99fcd469881714a4e10ad",
     "indexer/tests/test_core.py": "f613e64ee0d4810b0aac806aa3a1906e",
+    "indexer/tests/test_differ.py": "ee035fa75540fda4ab7681bd80f43574",
     "indexer/tests/test_file_changes.py": "f559329cf1c43838d6dce1c2bddbaf85",
     "indexer/tests/test_folding.py": "f2a728a2be98f79fc862e273bb2a6a7f",
     "indexer/tests/test_indexer.py": "83e2dc1bd58b2de1da8a7f973595315c",
@@ -1513,13 +2048,13 @@
     "five-vscode/webview": "4505771214ca6bf741eb160f14243cb4",
     "five-vscode/webview/src": "ac88a20a7e1dcc30339996a1c4f6197f",
     "five-vscode/webview/src/components": "3693aba6cef5d6c09a7622b259a17d9b",
-    "indexer": "8875f94aab67b202c8b08c2f68219917",
+    "indexer": "a66922e0364db0a2fb95ecddf153d825",
     "indexer/parsers": "e6cf1d8d3d6191581172cb7e017851d6",
-    "indexer/tests": "35d04a7dda5e8b97a236fda9ab125fac",
+    "indexer/tests": "5e8bf92793ff99e577d0e7260a56412a",
     "llm_ide": "d5ef3f9375d3152b51eb3a1f56f15b37",
     "prompt_engineering": "b539582b9f83419b2dc6313cd9b24105",
     "prompt_engineering/templates/indexer": "3dbc6808a84987aa146370e79d06138f"
   },
   "language": "python",
-  "last_updated": "2025-07-28T22:11:10.184829+00:00"
+  "last_updated": "2025-07-28T22:55:59.985148+00:00"
 }

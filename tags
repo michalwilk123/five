@@ -1818,6 +1818,7 @@ CREATED	.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py	/^       
 CREATED	.venv/lib/python3.12/site-packages/httpx/_status_codes.py	/^    CREATED = 201, "Created"$/;"	v	class:codes
 CREATED	.venv/lib64/python3.12/site-packages/anyio/_backends/_asyncio.py	/^        CREATED = "created"$/;"	v	class:_State
 CREATED	.venv/lib64/python3.12/site-packages/httpx/_status_codes.py	/^    CREATED = 201, "Created"$/;"	v	class:codes
+CREATE_HELP	indexer/docs.py	/^CREATE_HELP = """Create a new code index for a project.$/;"	v
 CREDENTIALS	.venv/lib/python3.12/site-packages/google/auth/environment_vars.py	/^CREDENTIALS = "GOOGLE_APPLICATION_CREDENTIALS"$/;"	v
 CREDENTIALS	.venv/lib64/python3.12/site-packages/google/auth/environment_vars.py	/^CREDENTIALS = "GOOGLE_APPLICATION_CREDENTIALS"$/;"	v
 CRED_TYPE_SA_ASSERTION	.venv/lib/python3.12/site-packages/google/auth/metrics.py	/^CRED_TYPE_SA_ASSERTION = "cred-type\/sa"$/;"	v
@@ -3465,6 +3466,10 @@ DictValues	.venv/lib/python3.12/site-packages/pydantic/_internal/_generics.py	/^
 DictValues	.venv/lib/python3.12/site-packages/pydantic/v1/generics.py	/^DictValues: Type[Any] = {}.values().__class__$/;"	v	typeref:typename:Type[Any]
 DictValues	.venv/lib64/python3.12/site-packages/pydantic/_internal/_generics.py	/^DictValues: type[Any] = {}.values().__class__$/;"	v	typeref:typename:type[Any]
 DictValues	.venv/lib64/python3.12/site-packages/pydantic/v1/generics.py	/^DictValues: Type[Any] = {}.values().__class__$/;"	v	typeref:typename:Type[Any]
+DiffOperation	indexer/differ.py	/^class DiffOperation:$/;"	c
+DiffOperationTestCase	indexer/tests/test_differ.py	/^class DiffOperationTestCase(unittest.TestCase):$/;"	c
+DiffParser	indexer/differ.py	/^class DiffParser:$/;"	c
+DiffParserTestCase	indexer/tests/test_differ.py	/^class DiffParserTestCase(unittest.TestCase):$/;"	c
 Digest	.venv/lib/python3.12/site-packages/pyasn1_modules/rfc2315.py	/^class Digest(univ.OctetString):$/;"	c
 Digest	.venv/lib/python3.12/site-packages/pyasn1_modules/rfc3852.py	/^class Digest(univ.OctetString):$/;"	c
 Digest	.venv/lib/python3.12/site-packages/pyasn1_modules/rfc5652.py	/^class Digest(univ.OctetString):$/;"	c
@@ -3713,6 +3718,7 @@ EDIPartyName	.venv/lib/python3.12/site-packages/pyasn1_modules/rfc5280.py	/^clas
 EDIPartyName	.venv/lib64/python3.12/site-packages/pyasn1_modules/rfc2459.py	/^class EDIPartyName(univ.Sequence):$/;"	c
 EDIPartyName	.venv/lib64/python3.12/site-packages/pyasn1_modules/rfc3280.py	/^class EDIPartyName(univ.Sequence):$/;"	c
 EDIPartyName	.venv/lib64/python3.12/site-packages/pyasn1_modules/rfc5280.py	/^class EDIPartyName(univ.Sequence):$/;"	c
+EDIT_HELP	indexer/docs.py	/^EDIT_HELP = """Apply diff operations to files in the project.$/;"	v
 EDIT_MODE_BGSWAP	.venv/lib/python3.12/site-packages/google/genai/types.py	/^  EDIT_MODE_BGSWAP = 'EDIT_MODE_BGSWAP'$/;"	v	class:EditMode
 EDIT_MODE_BGSWAP	.venv/lib64/python3.12/site-packages/google/genai/types.py	/^  EDIT_MODE_BGSWAP = 'EDIT_MODE_BGSWAP'$/;"	v	class:EditMode
 EDIT_MODE_CONTROLLED_EDITING	.venv/lib/python3.12/site-packages/google/genai/types.py	/^  EDIT_MODE_CONTROLLED_EDITING = 'EDIT_MODE_CONTROLLED_EDITING'$/;"	v	class:EditMode
@@ -3749,6 +3755,7 @@ END	.venv/lib64/python3.12/site-packages/python_multipart/multipart.py	/^    END
 END	.venv/lib64/python3.12/site-packages/starlette/formparsers.py	/^    END = 5$/;"	v	class:FormMessage
 END_BOUNDARY	.venv/lib/python3.12/site-packages/python_multipart/multipart.py	/^    END_BOUNDARY = 11$/;"	v	class:MultipartState
 END_BOUNDARY	.venv/lib64/python3.12/site-packages/python_multipart/multipart.py	/^    END_BOUNDARY = 11$/;"	v	class:MultipartState
+END_MARKER	indexer/differ.py	/^    END_MARKER = "======end"$/;"	v	class:DiffParser
 END_SENSITIVITY_HIGH	.venv/lib/python3.12/site-packages/google/genai/types.py	/^  END_SENSITIVITY_HIGH = 'END_SENSITIVITY_HIGH'$/;"	v	class:EndSensitivity
 END_SENSITIVITY_HIGH	.venv/lib64/python3.12/site-packages/google/genai/types.py	/^  END_SENSITIVITY_HIGH = 'END_SENSITIVITY_HIGH'$/;"	v	class:EndSensitivity
 END_SENSITIVITY_LOW	.venv/lib/python3.12/site-packages/google/genai/types.py	/^  END_SENSITIVITY_LOW = 'END_SENSITIVITY_LOW'$/;"	v	class:EndSensitivity
@@ -3869,6 +3876,7 @@ EchoingStdin	.venv/lib/python3.12/site-packages/click/testing.py	/^class Echoing
 EchoingStdin	.venv/lib64/python3.12/site-packages/click/testing.py	/^class EchoingStdin:$/;"	c
 EcpkParameters	.venv/lib/python3.12/site-packages/pyasn1_modules/rfc3279.py	/^class EcpkParameters(univ.Choice):$/;"	c
 EcpkParameters	.venv/lib64/python3.12/site-packages/pyasn1_modules/rfc3279.py	/^class EcpkParameters(univ.Choice):$/;"	c
+EdgeCasesTestCase	indexer/tests/test_differ.py	/^class EdgeCasesTestCase(unittest.TestCase):$/;"	c
 EditImageConfig	.venv/lib/python3.12/site-packages/google/genai/types.py	/^class EditImageConfig(_common.BaseModel):$/;"	c
 EditImageConfig	.venv/lib64/python3.12/site-packages/google/genai/types.py	/^class EditImageConfig(_common.BaseModel):$/;"	c
 EditImageConfigDict	.venv/lib/python3.12/site-packages/google/genai/types.py	/^class EditImageConfigDict(TypedDict, total=False):$/;"	c
@@ -4379,6 +4387,7 @@ FMT_PICKLED	.venv/lib/python3.12/site-packages/anyio/to_interpreter.py	/^FMT_PIC
 FMT_PICKLED	.venv/lib64/python3.12/site-packages/anyio/to_interpreter.py	/^FMT_PICKLED: Final = 1$/;"	v	typeref:typename:Final
 FMT_UNPICKLED	.venv/lib/python3.12/site-packages/anyio/to_interpreter.py	/^FMT_UNPICKLED: Final = 0$/;"	v	typeref:typename:Final
 FMT_UNPICKLED	.venv/lib64/python3.12/site-packages/anyio/to_interpreter.py	/^FMT_UNPICKLED: Final = 0$/;"	v	typeref:typename:Final
+FOLD_HELP	indexer/docs.py	/^FOLD_HELP = """Fold code in a file based on the index.$/;"	v
 FORBIDDEN	.venv/lib/python3.12/site-packages/httpx/_status_codes.py	/^    FORBIDDEN = 403, "Forbidden"$/;"	v	class:codes
 FORBIDDEN	.venv/lib64/python3.12/site-packages/httpx/_status_codes.py	/^    FORBIDDEN = 403, "Forbidden"$/;"	v	class:codes
 FORMAT_CHECKER	.venv/lib/python3.12/site-packages/jsonschema/validators.py	/^        FORMAT_CHECKER = format_checker_arg$/;"	v	class:create.Validator
@@ -4509,6 +4518,8 @@ FileDataOrDict	.venv/lib/python3.12/site-packages/google/genai/types.py	/^FileDa
 FileDataOrDict	.venv/lib64/python3.12/site-packages/google/genai/types.py	/^FileDataOrDict = Union[FileData, FileDataDict]$/;"	v
 FileDict	.venv/lib/python3.12/site-packages/google/genai/types.py	/^class FileDict(TypedDict, total=False):$/;"	c
 FileDict	.venv/lib64/python3.12/site-packages/google/genai/types.py	/^class FileDict(TypedDict, total=False):$/;"	c
+FileEditor	indexer/differ.py	/^class FileEditor:$/;"	c
+FileEditorTestCase	indexer/tests/test_differ.py	/^class FileEditorTestCase(unittest.TestCase):$/;"	c
 FileError	.venv/lib/python3.12/site-packages/click/__init__.py	/^from .exceptions import FileError as FileError$/;"	x	nameref:unknown:FileError
 FileError	.venv/lib/python3.12/site-packages/click/exceptions.py	/^class FileError(ClickException):$/;"	c
 FileError	.venv/lib/python3.12/site-packages/python_multipart/exceptions.py	/^class FileError(FormParserError, OSError):$/;"	c
@@ -5355,6 +5366,7 @@ HEADER_FIELD	.venv/lib/python3.12/site-packages/python_multipart/multipart.py	/^
 HEADER_FIELD	.venv/lib64/python3.12/site-packages/python_multipart/multipart.py	/^    HEADER_FIELD = 3$/;"	v	class:MultipartState
 HEADER_FIELD_START	.venv/lib/python3.12/site-packages/python_multipart/multipart.py	/^    HEADER_FIELD_START = 2$/;"	v	class:MultipartState
 HEADER_FIELD_START	.venv/lib64/python3.12/site-packages/python_multipart/multipart.py	/^    HEADER_FIELD_START = 2$/;"	v	class:MultipartState
+HEADER_PATTERN	indexer/differ.py	/^    HEADER_PATTERN = re.compile($/;"	v	class:DiffParser
 HEADER_RE	.venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py	/^HEADER_RE = re.compile(b'[\\x00-\\x1f\\x7f()<>@,;:[]={} \\t\\\\"]')$/;"	v
 HEADER_RE	.venv/lib64/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py	/^HEADER_RE = re.compile(b'[\\x00-\\x1f\\x7f()<>@,;:[]={} \\t\\\\"]')$/;"	v
 HEADER_VALIDATORS	.venv/lib/python3.12/site-packages/requests/_internal_utils.py	/^HEADER_VALIDATORS = {$/;"	v
@@ -8459,6 +8471,7 @@ OptionalValidity	.venv/lib/python3.12/site-packages/pyasn1_modules/rfc2511.py	/^
 OptionalValidity	.venv/lib/python3.12/site-packages/pyasn1_modules/rfc4211.py	/^class OptionalValidity(univ.Sequence):$/;"	c
 OptionalValidity	.venv/lib64/python3.12/site-packages/pyasn1_modules/rfc2511.py	/^class OptionalValidity(univ.Sequence):$/;"	c
 OptionalValidity	.venv/lib64/python3.12/site-packages/pyasn1_modules/rfc4211.py	/^class OptionalValidity(univ.Sequence):$/;"	c
+OrderDependentOperationsTestCase	indexer/tests/test_differ.py	/^class OrderDependentOperationsTestCase(unittest.TestCase):$/;"	c
 OrderedDict	.venv/lib/python3.12/site-packages/typing_extensions.py	/^OrderedDict = typing.OrderedDict$/;"	v
 OrderedDict	.venv/lib64/python3.12/site-packages/typing_extensions.py	/^OrderedDict = typing.OrderedDict$/;"	v
 OrganizationName	.venv/lib/python3.12/site-packages/pyasn1_modules/rfc2459.py	/^class OrganizationName(char.PrintableString):$/;"	c
@@ -10374,6 +10387,7 @@ SCVPIssuerSerial	.venv/lib/python3.12/site-packages/pyasn1_modules/rfc5697.py	/^
 SCVPIssuerSerial	.venv/lib64/python3.12/site-packages/pyasn1_modules/rfc5697.py	/^class SCVPIssuerSerial(univ.Sequence):$/;"	c
 SCVPReqRes	.venv/lib/python3.12/site-packages/pyasn1_modules/rfc5940.py	/^class SCVPReqRes(univ.Sequence):$/;"	c
 SCVPReqRes	.venv/lib64/python3.12/site-packages/pyasn1_modules/rfc5940.py	/^class SCVPReqRes(univ.Sequence):$/;"	c
+SEARCH_HELP	indexer/docs.py	/^SEARCH_HELP = """Search for symbols in the code index.$/;"	v
 SEE_OTHER	.venv/lib/python3.12/site-packages/httpx/_status_codes.py	/^    SEE_OTHER = 303, "See Other"$/;"	v	class:codes
 SEE_OTHER	.venv/lib64/python3.12/site-packages/httpx/_status_codes.py	/^    SEE_OTHER = 303, "See Other"$/;"	v	class:codes
 SEMICOLON	.venv/lib/python3.12/site-packages/python_multipart/multipart.py	/^SEMICOLON = b";"[0]$/;"	v
@@ -12905,6 +12919,7 @@ UNSUPPORTED_OPTS	.venv/lib/python3.12/site-packages/tqdm/cli.py	/^UNSUPPORTED_OP
 UNSUPPORTED_OPTS	.venv/lib64/python3.12/site-packages/tqdm/cli.py	/^UNSUPPORTED_OPTS = ('iterable', 'gui', 'out', 'file')$/;"	v
 UNTOUCHED_TYPES	.venv/lib/python3.12/site-packages/pydantic/v1/main.py	/^UNTOUCHED_TYPES: Tuple[Any, ...] = (FunctionType,) + ANNOTATED_FIELD_UNTOUCHED_TYPES$/;"	v	typeref:typename:Tuple[Any, ...]
 UNTOUCHED_TYPES	.venv/lib64/python3.12/site-packages/pydantic/v1/main.py	/^UNTOUCHED_TYPES: Tuple[Any, ...] = (FunctionType,) + ANNOTATED_FIELD_UNTOUCHED_TYPES$/;"	v	typeref:typename:Tuple[Any, ...]
+UPDATE_HELP	indexer/docs.py	/^UPDATE_HELP = """Update an existing code index.$/;"	v
 UPGRADE_REQUIRED	.venv/lib/python3.12/site-packages/httpx/_status_codes.py	/^    UPGRADE_REQUIRED = 426, "Upgrade Required"$/;"	v	class:codes
 UPGRADE_REQUIRED	.venv/lib64/python3.12/site-packages/httpx/_status_codes.py	/^    UPGRADE_REQUIRED = 426, "Upgrade Required"$/;"	v	class:codes
 UPLOADED	.venv/lib/python3.12/site-packages/google/genai/types.py	/^  UPLOADED = 'UPLOADED'$/;"	v	class:FileSource
@@ -20805,6 +20820,9 @@ __init__	five-vscode/webview/node_modules/.pnpm/flatted@3.3.3/node_modules/flatt
 __init__	five-vscode/webview/node_modules/.pnpm/flatted@3.3.3/node_modules/flatted/python/flatted.py	/^    def __init__(self, value):$/;"	m	class:_String
 __init__	five-vscode/webview/node_modules/.pnpm/node_modules/flatted/python/flatted.py	/^    def __init__(self):$/;"	m	class:_Known
 __init__	five-vscode/webview/node_modules/.pnpm/node_modules/flatted/python/flatted.py	/^    def __init__(self, value):$/;"	m	class:_String
+__init__	indexer/differ.py	/^    def __init__($/;"	m	class:DiffOperation
+__init__	indexer/differ.py	/^    def __init__(self):$/;"	m	class:FileEditor
+__init__	indexer/differ.py	/^    def __init__(self, project_path: str = None):$/;"	m	class:DiffParser
 __init__	indexer/lib.py	/^    def __init__(self, project_path: str, language: str, config: IndexConfig):$/;"	m	class:Indexer
 __init__	indexer/search.py	/^    def __init__(self, config: IndexConfig):$/;"	m	class:BackgroundSearch
 __init_subclass__	.venv/lib/python3.12/site-packages/annotated_types/__init__.py	/^        def __init_subclass__(cls, *args: Any, **kwargs: Any) -> None:$/;"	m	class:GroupedMetadata	typeref:typename:None
@@ -22019,6 +22037,7 @@ __repr__	.venv/lib64/python3.12/site-packages/urllib3/util/retry.py	/^    def __
 __repr__	.venv/lib64/python3.12/site-packages/urllib3/util/timeout.py	/^    def __repr__(self) -> str:$/;"	m	class:Timeout	typeref:typename:str
 __repr__	.venv/lib64/python3.12/site-packages/websockets/datastructures.py	/^    def __repr__(self) -> str:$/;"	m	class:Headers	typeref:typename:str
 __repr__	.venv/lib64/python3.12/site-packages/websockets/extensions/permessage_deflate.py	/^    def __repr__(self) -> str:$/;"	m	class:PerMessageDeflate	typeref:typename:str
+__repr__	indexer/differ.py	/^    def __repr__(self):$/;"	m	class:DiffOperation
 __repr_args__	.venv/lib/python3.12/site-packages/pydantic/_internal/_repr.py	/^    def __repr_args__(self) -> ReprArgs:$/;"	m	class:Representation	typeref:typename:ReprArgs
 __repr_args__	.venv/lib/python3.12/site-packages/pydantic/_internal/_utils.py	/^    def __repr_args__(self) -> _repr.ReprArgs:$/;"	m	class:ValueItems	typeref:typename:_repr.ReprArgs
 __repr_args__	.venv/lib/python3.12/site-packages/pydantic/color.py	/^    def __repr_args__(self) -> '_repr.ReprArgs':$/;"	m	class:Color	typeref:typename:'_repr.ReprArgs'
@@ -23023,6 +23042,7 @@ _apply_field_serializers	.venv/lib/python3.12/site-packages/pydantic/_internal/_
 _apply_field_serializers	.venv/lib64/python3.12/site-packages/pydantic/_internal/_generate_schema.py	/^    def _apply_field_serializers($/;"	m	class:GenerateSchema	typeref:typename:core_schema.CoreSchema
 _apply_field_title_generator_to_field_info	.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py	/^    def _apply_field_title_generator_to_field_info($/;"	m	class:GenerateSchema	typeref:typename:None
 _apply_field_title_generator_to_field_info	.venv/lib64/python3.12/site-packages/pydantic/_internal/_generate_schema.py	/^    def _apply_field_title_generator_to_field_info($/;"	m	class:GenerateSchema	typeref:typename:None
+_apply_file_operations	indexer/differ.py	/^    def _apply_file_operations(self, filepath: str, operations: list[DiffOperation]):$/;"	m	class:FileEditor
 _apply_model_serializers	.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py	/^    def _apply_model_serializers($/;"	m	class:GenerateSchema	typeref:typename:core_schema.CoreSchema
 _apply_model_serializers	.venv/lib64/python3.12/site-packages/pydantic/_internal/_generate_schema.py	/^    def _apply_model_serializers($/;"	m	class:GenerateSchema	typeref:typename:core_schema.CoreSchema
 _apply_modify_schema	.venv/lib/python3.12/site-packages/pydantic/v1/schema.py	/^def _apply_modify_schema($/;"	f	typeref:typename:None
@@ -24434,9 +24454,10 @@ _handle_current_part	.venv/lib/python3.12/site-packages/google/genai/_transforme
 _handle_current_part	.venv/lib64/python3.12/site-packages/google/genai/_transformers.py	/^  def _handle_current_part($/;"	f	function:t_contents	typeref:typename:None	file:
 _handle_delete_request	.venv/lib/python3.12/site-packages/mcp/server/streamable_http.py	/^    async def _handle_delete_request(self, request: Request, send: Send) -> None:$/;"	m	class:StreamableHTTPServerTransport	typeref:typename:None
 _handle_delete_request	.venv/lib64/python3.12/site-packages/mcp/server/streamable_http.py	/^    async def _handle_delete_request(self, request: Request, send: Send) -> None:$/;"	m	class:StreamableHTTPServerTransport	typeref:typename:None
+_handle_edit	indexer/__main__.py	/^def _handle_edit(project_path: str) -> None:$/;"	f	typeref:typename:None
 _handle_error_response	.venv/lib/python3.12/site-packages/google/oauth2/_client.py	/^def _handle_error_response(response_data, retryable_error):$/;"	f
 _handle_error_response	.venv/lib64/python3.12/site-packages/google/oauth2/_client.py	/^def _handle_error_response(response_data, retryable_error):$/;"	f
-_handle_fold	indexer/__main__.py	/^def _handle_fold(args, config) -> None:$/;"	f	typeref:typename:None
+_handle_fold	indexer/__main__.py	/^def _handle_fold(file_spec: str, config, level: int, numbers: bool) -> None:$/;"	f	typeref:typename:None
 _handle_get_request	.venv/lib/python3.12/site-packages/mcp/server/streamable_http.py	/^    async def _handle_get_request(self, request: Request, send: Send) -> None:$/;"	m	class:StreamableHTTPServerTransport	typeref:typename:None
 _handle_get_request	.venv/lib64/python3.12/site-packages/mcp/server/streamable_http.py	/^    async def _handle_get_request(self, request: Request, send: Send) -> None:$/;"	m	class:StreamableHTTPServerTransport	typeref:typename:None
 _handle_incoming	.venv/lib/python3.12/site-packages/mcp/client/session.py	/^    async def _handle_incoming($/;"	m	class:ClientSession	typeref:typename:None
@@ -25285,6 +25306,7 @@ _parse_known_args	.venv/lib/python3.12/site-packages/pydantic_settings/sources/p
 _parse_known_args	.venv/lib64/python3.12/site-packages/pydantic_settings/sources/providers/cli.py	/^        def _parse_known_args(*args: Any, **kwargs: Any) -> Namespace:$/;"	f	member:CliSettingsSource._connect_root_parser	typeref:typename:Namespace	file:
 _parse_list_header	.venv/lib/python3.12/site-packages/requests/utils.py	/^from .compat import parse_http_list as _parse_list_header$/;"	x	nameref:unknown:parse_http_list
 _parse_list_header	.venv/lib64/python3.12/site-packages/requests/utils.py	/^from .compat import parse_http_list as _parse_list_header$/;"	x	nameref:unknown:parse_http_list
+_parse_operation	indexer/differ.py	/^    def _parse_operation($/;"	m	class:DiffParser	typeref:typename:tuple[DiffOperation,int]
 _parse_range_header	.venv/lib/python3.12/site-packages/starlette/responses.py	/^    def _parse_range_header(http_range: str, file_size: int) -> list[tuple[int, int]]:$/;"	m	class:FileResponse	typeref:typename:list[tuple[int,int]]
 _parse_range_header	.venv/lib64/python3.12/site-packages/starlette/responses.py	/^    def _parse_range_header(http_range: str, file_size: int) -> list[tuple[int, int]]:$/;"	m	class:FileResponse	typeref:typename:list[tuple[int,int]]
 _parse_raw_hosts	.venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py	/^def _parse_raw_hosts(value: str) -> list[str]:$/;"	f	typeref:typename:list[str]
@@ -26603,6 +26625,7 @@ _validate_discriminated_union	.venv/lib/python3.12/site-packages/pydantic/v1/fie
 _validate_discriminated_union	.venv/lib64/python3.12/site-packages/pydantic/v1/fields.py	/^    def _validate_discriminated_union($/;"	m	class:ModelField	typeref:typename:'ValidateReturn'
 _validate_elicitation_schema	.venv/lib/python3.12/site-packages/mcp/server/elicitation.py	/^def _validate_elicitation_schema(schema: type[BaseModel]) -> None:$/;"	f	typeref:typename:None
 _validate_elicitation_schema	.venv/lib64/python3.12/site-packages/mcp/server/elicitation.py	/^def _validate_elicitation_schema(schema: type[BaseModel]) -> None:$/;"	f	typeref:typename:None
+_validate_file_operations	indexer/differ.py	/^    def _validate_file_operations(self, filepath: str, operations: list[DiffOperation]):$/;"	m	class:FileEditor
 _validate_file_or_url_config	.venv/lib/python3.12/site-packages/google/auth/identity_pool.py	/^    def _validate_file_or_url_config(self, credential_source):$/;"	m	class:Credentials
 _validate_file_or_url_config	.venv/lib64/python3.12/site-packages/google/auth/identity_pool.py	/^    def _validate_file_or_url_config(self, credential_source):$/;"	m	class:Credentials
 _validate_header_part	.venv/lib/python3.12/site-packages/requests/utils.py	/^def _validate_header_part(header, header_part, header_validator_index):$/;"	f
@@ -27133,6 +27156,7 @@ add_middleware	.venv/lib/python3.12/site-packages/starlette/applications.py	/^  
 add_middleware	.venv/lib64/python3.12/site-packages/starlette/applications.py	/^    def add_middleware($/;"	m	class:Starlette	typeref:typename:None
 add_model_construct_method	.venv/lib/python3.12/site-packages/pydantic/mypy.py	/^    def add_model_construct_method($/;"	m	class:PydanticModelTransformer	typeref:typename:None
 add_model_construct_method	.venv/lib64/python3.12/site-packages/pydantic/mypy.py	/^    def add_model_construct_method($/;"	m	class:PydanticModelTransformer	typeref:typename:None
+add_operations	indexer/differ.py	/^    def add_operations(self, operations: list[DiffOperation]):$/;"	m	class:FileEditor
 add_option	.venv/lib/python3.12/site-packages/click/parser.py	/^    def add_option($/;"	m	class:_OptionParser	typeref:typename:None
 add_option	.venv/lib64/python3.12/site-packages/click/parser.py	/^    def add_option($/;"	m	class:_OptionParser	typeref:typename:None
 add_order	.venv/lib/python3.12/site-packages/attr/_make.py	/^    def add_order(self):$/;"	m	class:_ClassBuilder
@@ -27483,6 +27507,7 @@ apply_mask	.venv/lib/python3.12/site-packages/websockets/utils.py	/^def apply_ma
 apply_mask	.venv/lib64/python3.12/site-packages/websockets/utils.py	/^def apply_mask(data: bytes, mask: bytes) -> bytes:$/;"	f	typeref:typename:bytes
 apply_model_validators	.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py	/^def apply_model_validators($/;"	f	typeref:typename:core_schema.CoreSchema
 apply_model_validators	.venv/lib64/python3.12/site-packages/pydantic/_internal/_generate_schema.py	/^def apply_model_validators($/;"	f	typeref:typename:core_schema.CoreSchema
+apply_operations	indexer/differ.py	/^    def apply_operations(self) -> list[str]:$/;"	m	class:FileEditor	typeref:typename:list[str]
 apply_typevars_map	.venv/lib/python3.12/site-packages/pydantic/fields.py	/^    def apply_typevars_map($/;"	m	class:FieldInfo	typeref:typename:None
 apply_typevars_map	.venv/lib64/python3.12/site-packages/pydantic/fields.py	/^    def apply_typevars_map($/;"	m	class:FieldInfo	typeref:typename:None
 apply_validators	.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py	/^def apply_validators($/;"	f	typeref:typename:core_schema.CoreSchema
@@ -28822,6 +28847,7 @@ cli	.venv/lib/python3.12/site-packages/dotenv/cli.py	/^def cli(ctx: click.Contex
 cli	.venv/lib/python3.12/site-packages/mcp/client/__main__.py	/^def cli():$/;"	f
 cli	.venv/lib64/python3.12/site-packages/dotenv/cli.py	/^def cli(ctx: click.Context, file: Any, quote: Any, export: Any) -> None:$/;"	f	typeref:typename:None
 cli	.venv/lib64/python3.12/site-packages/mcp/client/__main__.py	/^def cli():$/;"	f
+cli	indexer/__main__.py	/^def cli():$/;"	f
 cli_detect	.venv/lib/python3.12/site-packages/charset_normalizer/cli/__main__.py	/^def cli_detect(argv: list[str] | None = None) -> int:$/;"	f	typeref:typename:int
 cli_detect	.venv/lib64/python3.12/site-packages/charset_normalizer/cli/__main__.py	/^def cli_detect(argv: list[str] | None = None) -> int:$/;"	f	typeref:typename:int
 cli_output_for	.venv/lib/python3.12/site-packages/jsonschema/tests/test_cli.py	/^    def cli_output_for(self, *argv):$/;"	m	class:TestParser
@@ -29312,6 +29338,7 @@ common_name	.venv/lib/python3.12/site-packages/pyasn1_modules/rfc5280.py	/^commo
 common_name	.venv/lib64/python3.12/site-packages/pyasn1_modules/rfc2459.py	/^common_name = univ.Integer(1)$/;"	v
 common_name	.venv/lib64/python3.12/site-packages/pyasn1_modules/rfc3280.py	/^common_name = univ.Integer(1)$/;"	v
 common_name	.venv/lib64/python3.12/site-packages/pyasn1_modules/rfc5280.py	/^common_name = univ.Integer(1)$/;"	v
+common_options	indexer/__main__.py	/^def common_options(f):$/;"	f
 compare_func	.venv/lib/python3.12/site-packages/attr/validators.py	/^    compare_func = attrib()$/;"	v	class:_NumberValidator
 compare_func	.venv/lib64/python3.12/site-packages/attr/validators.py	/^    compare_func = attrib()$/;"	v	class:_NumberValidator
 compare_op	.venv/lib/python3.12/site-packages/attr/validators.py	/^    compare_op = attrib()$/;"	v	class:_NumberValidator
@@ -30906,6 +30933,7 @@ create	.venv/lib64/python3.12/site-packages/google/genai/chats.py	/^  def create
 create	.venv/lib64/python3.12/site-packages/google/genai/tokens.py	/^  async def create($/;"	m	class:AsyncTokens	typeref:typename:types.AuthToken
 create	.venv/lib64/python3.12/site-packages/google/genai/tokens.py	/^  def create($/;"	m	class:Tokens	typeref:typename:types.AuthToken
 create	.venv/lib64/python3.12/site-packages/jsonschema/validators.py	/^def create($/;"	f
+create	indexer/__main__.py	/^def create(project: str, language: str, progress: bool):$/;"	f
 create_auth_routes	.venv/lib/python3.12/site-packages/mcp/server/auth/routes.py	/^def create_auth_routes($/;"	f	typeref:typename:list[Route]
 create_auth_routes	.venv/lib64/python3.12/site-packages/mcp/server/auth/routes.py	/^def create_auth_routes($/;"	f	typeref:typename:list[Route]
 create_background_search	indexer/lib.py	/^    def create_background_search(self) -> BackgroundSearch:$/;"	m	class:Indexer	typeref:typename:BackgroundSearch
@@ -31060,6 +31088,9 @@ create_tcp_listener	.venv/lib64/python3.12/site-packages/anyio/_core/_sockets.py
 create_tcp_listener	.venv/lib64/python3.12/site-packages/anyio/abc/_eventloop.py	/^    def create_tcp_listener(cls, sock: socket) -> SocketListener:$/;"	m	class:AsyncBackend	typeref:typename:SocketListener
 create_test_config	indexer/tests/test_search.py	/^    def create_test_config(self, num_symbols: int = 1000) -> IndexConfig:$/;"	m	class:TestBackgroundSearch	typeref:typename:IndexConfig
 create_test_config	indexer/tests/test_search.py	/^    def create_test_config(self, num_symbols: int = 1000) -> IndexConfig:$/;"	m	class:TestSearchPerformance	typeref:typename:IndexConfig
+create_test_file	indexer/tests/test_differ.py	/^    def create_test_file(self, filename, content):$/;"	m	class:EdgeCasesTestCase
+create_test_file	indexer/tests/test_differ.py	/^    def create_test_file(self, filename, content):$/;"	m	class:FileEditorTestCase
+create_test_file	indexer/tests/test_differ.py	/^    def create_test_file(self, filename, content):$/;"	m	class:OrderDependentOperationsTestCase
 create_test_runner	.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py	/^    def create_test_runner(cls, options: dict[str, Any]) -> TestRunner:$/;"	m	class:AsyncIOBackend	typeref:typename:TestRunner
 create_test_runner	.venv/lib/python3.12/site-packages/anyio/_backends/_trio.py	/^    def create_test_runner(cls, options: dict[str, Any]) -> TestRunner:$/;"	m	class:TrioBackend	typeref:typename:TestRunner
 create_test_runner	.venv/lib/python3.12/site-packages/anyio/abc/_eventloop.py	/^    def create_test_runner(cls, options: dict[str, Any]) -> TestRunner:$/;"	m	class:AsyncBackend	typeref:typename:TestRunner
@@ -32153,6 +32184,7 @@ edit	.venv/lib64/python3.12/site-packages/click/termui.py	/^def edit($/;"	f	type
 edit	.venv/lib64/python3.12/site-packages/click/termui.py	/^def edit($/;"	f	typeref:typename:bytes|None
 edit	.venv/lib64/python3.12/site-packages/click/termui.py	/^def edit($/;"	f	typeref:typename:str|None
 edit	.venv/lib64/python3.12/site-packages/click/termui.py	/^def edit($/;"	f	typeref:typename:str|bytes|bytearray|None
+edit	indexer/__main__.py	/^def edit(project: str, language: str):$/;"	f
 edit_files	.venv/lib/python3.12/site-packages/click/_termui_impl.py	/^    def edit_files(self, filenames: cabc.Iterable[str]) -> None:$/;"	m	class:Editor	typeref:typename:None
 edit_files	.venv/lib64/python3.12/site-packages/click/_termui_impl.py	/^    def edit_files(self, filenames: cabc.Iterable[str]) -> None:$/;"	m	class:Editor	typeref:typename:None
 edit_image	.venv/lib/python3.12/site-packages/google/genai/models.py	/^  async def edit_image($/;"	m	class:AsyncModels	typeref:typename:types.EditImageResponse
@@ -33290,6 +33322,7 @@ fn	.venv/lib64/python3.12/site-packages/mcp/server/fastmcp/resources/types.py	/^
 fn	.venv/lib64/python3.12/site-packages/mcp/server/fastmcp/tools/base.py	/^    fn: Callable[..., Any] = Field(exclude=True)$/;"	v	class:Tool	typeref:typename:Callable[..., Any]
 fn_metadata	.venv/lib/python3.12/site-packages/mcp/server/fastmcp/tools/base.py	/^    fn_metadata: FuncMetadata = Field($/;"	v	class:Tool	typeref:typename:FuncMetadata
 fn_metadata	.venv/lib64/python3.12/site-packages/mcp/server/fastmcp/tools/base.py	/^    fn_metadata: FuncMetadata = Field($/;"	v	class:Tool	typeref:typename:FuncMetadata
+fold	indexer/__main__.py	/^def fold(project: str, language: str, numbers: bool, file_spec: str, level: int = 1):$/;"	f
 fold_file	indexer/folding.py	/^def fold_file($/;"	f	typeref:typename:list[LineContent]
 foo	.venv/lib/python3.12/site-packages/jsonschema/tests/test_validators.py	/^                foo = field(factory=lambda: [1, 2, 3])$/;"	v	class:ValidatorTestMixin.test_evolve_with_subclass.OhNo
 foo	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^                foo = field(factory=lambda: [1, 2, 3])$/;"	v	class:ValidatorTestMixin.test_evolve_with_subclass.OhNo
@@ -39433,7 +39466,7 @@ main	.venv/lib64/python3.12/site-packages/tqdm/cli.py	/^def main(fp=sys.stderr, 
 main	.venv/lib64/python3.12/site-packages/uvicorn/lifespan/on.py	/^    async def main(self) -> None:$/;"	m	class:LifespanOn	typeref:typename:None
 main	.venv/lib64/python3.12/site-packages/uvicorn/main.py	/^def main($/;"	f	typeref:typename:None
 main	.venv/lib64/python3.12/site-packages/websockets/cli.py	/^def main(argv: list[str] | None = None) -> None:$/;"	f	typeref:typename:None
-main	indexer/__main__.py	/^def main():$/;"	f
+main	indexer/differ.py	/^def main():$/;"	f
 main	llm_ide/mcp.py	/^async def main():$/;"	f
 main_loop	.venv/lib/python3.12/site-packages/uvicorn/server.py	/^    async def main_loop(self) -> None:$/;"	m	class:Server	typeref:typename:None
 main_loop	.venv/lib64/python3.12/site-packages/uvicorn/server.py	/^    async def main_loop(self) -> None:$/;"	m	class:Server	typeref:typename:None
@@ -41616,6 +41649,7 @@ parse_raw_as	.venv/lib64/python3.12/site-packages/pydantic/v1/tools.py	/^def par
 parse_retry_after	.venv/lib/python3.12/site-packages/urllib3/util/retry.py	/^    def parse_retry_after(self, retry_after: str) -> float:$/;"	m	class:Retry	typeref:typename:float
 parse_retry_after	.venv/lib64/python3.12/site-packages/urllib3/util/retry.py	/^    def parse_retry_after(self, retry_after: str) -> float:$/;"	m	class:Retry	typeref:typename:float
 parse_source	indexer/parsers/python.py	/^def parse_source(content: str, filename: str) -> list[SymbolDeclaration]:$/;"	f	typeref:typename:list[SymbolDeclaration]
+parse_stdin	indexer/differ.py	/^    def parse_stdin(self) -> list[DiffOperation]:$/;"	m	class:DiffParser	typeref:typename:list[DiffOperation]
 parse_str	.venv/lib/python3.12/site-packages/pydantic/color.py	/^def parse_str(value: str) -> RGBA:$/;"	f	typeref:typename:RGBA
 parse_str	.venv/lib/python3.12/site-packages/pydantic/v1/color.py	/^def parse_str(value: str) -> RGBA:$/;"	f	typeref:typename:RGBA
 parse_str	.venv/lib64/python3.12/site-packages/pydantic/color.py	/^def parse_str(value: str) -> RGBA:$/;"	f	typeref:typename:RGBA
@@ -44633,6 +44667,7 @@ sdk_response_segments	.venv/lib/python3.12/site-packages/google/genai/types.py	/
 sdk_response_segments	.venv/lib64/python3.12/site-packages/google/genai/types.py	/^  sdk_response_segments: Optional[list[dict[str, Any]]] = Field($/;"	v	class:ReplayResponse	typeref:typename:Optional[list[dict[str, Any]]]
 sdsiCertificate	.venv/lib/python3.12/site-packages/pyasn1_modules/rfc7292.py	/^sdsiCertificate = CertBag()$/;"	v
 sdsiCertificate	.venv/lib64/python3.12/site-packages/pyasn1_modules/rfc7292.py	/^sdsiCertificate = CertBag()$/;"	v
+search	indexer/__main__.py	/^def search($/;"	f
 search_dict_for_path	.venv/lib/python3.12/site-packages/pydantic/aliases.py	/^    def search_dict_for_path(self, d: dict) -> Any:$/;"	m	class:AliasPath	typeref:typename:Any
 search_dict_for_path	.venv/lib64/python3.12/site-packages/pydantic/aliases.py	/^    def search_dict_for_path(self, d: dict) -> Any:$/;"	m	class:AliasPath	typeref:typename:Any
 search_entry_point	.venv/lib/python3.12/site-packages/google/genai/types.py	/^  search_entry_point: Optional[SearchEntryPoint] = Field($/;"	v	class:GroundingMetadata	typeref:typename:Optional[SearchEntryPoint]
@@ -45198,6 +45233,10 @@ setUp	.venv/lib/python3.12/site-packages/jsonschema/tests/test_validators.py	/^ 
 setUp	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def setUp(self):$/;"	m	class:TestCreateAndExtend
 setUp	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def setUp(self):$/;"	m	class:TestRefResolver
 setUp	indexer/tests/test_core.py	/^    def setUp(self):$/;"	m	class:ProcessProjectTestCase
+setUp	indexer/tests/test_differ.py	/^    def setUp(self):$/;"	m	class:DiffParserTestCase
+setUp	indexer/tests/test_differ.py	/^    def setUp(self):$/;"	m	class:EdgeCasesTestCase
+setUp	indexer/tests/test_differ.py	/^    def setUp(self):$/;"	m	class:FileEditorTestCase
+setUp	indexer/tests/test_differ.py	/^    def setUp(self):$/;"	m	class:OrderDependentOperationsTestCase
 setUp	indexer/tests/test_file_changes.py	/^    def setUp(self):$/;"	m	class:FileChangeDetectionTestCase
 setUp	indexer/tests/test_file_changes.py	/^    def setUp(self):$/;"	m	class:IndexConfigUpdateTestCase
 setUp	indexer/tests/test_folding.py	/^    def setUp(self):$/;"	m	class:FoldingTestCase
@@ -47025,6 +47064,9 @@ te	.venv/lib/python3.12/site-packages/click/utils.py	/^    import typing_extensi
 te	.venv/lib64/python3.12/site-packages/click/decorators.py	/^    import typing_extensions as te$/;"	I	nameref:module:typing_extensions
 te	.venv/lib64/python3.12/site-packages/click/types.py	/^    import typing_extensions as te$/;"	I	nameref:module:typing_extensions
 te	.venv/lib64/python3.12/site-packages/click/utils.py	/^    import typing_extensions as te$/;"	I	nameref:module:typing_extensions
+tearDown	indexer/tests/test_differ.py	/^    def tearDown(self):$/;"	m	class:EdgeCasesTestCase
+tearDown	indexer/tests/test_differ.py	/^    def tearDown(self):$/;"	m	class:FileEditorTestCase
+tearDown	indexer/tests/test_differ.py	/^    def tearDown(self):$/;"	m	class:OrderDependentOperationsTestCase
 teletex_common_name	.venv/lib/python3.12/site-packages/pyasn1_modules/rfc2459.py	/^teletex_common_name = univ.Integer(2)$/;"	v
 teletex_common_name	.venv/lib/python3.12/site-packages/pyasn1_modules/rfc3280.py	/^teletex_common_name = univ.Integer(2)$/;"	v
 teletex_common_name	.venv/lib/python3.12/site-packages/pyasn1_modules/rfc5280.py	/^teletex_common_name = univ.Integer(2)$/;"	v
@@ -47136,6 +47178,7 @@ test_Validator_subclassing	.venv/lib/python3.12/site-packages/jsonschema/tests/t
 test_Validator_subclassing	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_deprecations.py	/^    def test_Validator_subclassing(self):$/;"	m	class:TestDeprecations
 test_WrappedReferencingError_hashability	.venv/lib/python3.12/site-packages/jsonschema/tests/test_deprecations.py	/^    def test_WrappedReferencingError_hashability(self):$/;"	m	class:TestDeprecations
 test_WrappedReferencingError_hashability	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_deprecations.py	/^    def test_WrappedReferencingError_hashability(self):$/;"	m	class:TestDeprecations
+test_add_operations	indexer/tests/test_differ.py	/^    def test_add_operations(self):$/;"	m	class:FileEditorTestCase
 test_additionalItems	.venv/lib/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_additionalItems(self):$/;"	m	class:TestValidationErrorDetails
 test_additionalItems	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_additionalItems(self):$/;"	m	class:TestValidationErrorDetails
 test_additionalItems_multiple_failures	.venv/lib/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_additionalItems_multiple_failures(self):$/;"	m	class:TestValidationErrorMessages
@@ -47175,6 +47218,9 @@ test_any_type_is_redefinable	.venv/lib/python3.12/site-packages/jsonschema/tests
 test_any_type_is_redefinable	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_any_type_is_redefinable(self):$/;"	m	class:TestDraft3Validator
 test_any_type_is_valid_for_type_any	.venv/lib/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_any_type_is_valid_for_type_any(self):$/;"	m	class:TestDraft3Validator
 test_any_type_is_valid_for_type_any	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_any_type_is_valid_for_type_any(self):$/;"	m	class:TestDraft3Validator
+test_apply_multiple_operations_same_file	indexer/tests/test_differ.py	/^    def test_apply_multiple_operations_same_file(self):$/;"	m	class:FileEditorTestCase
+test_apply_operations_different_files	indexer/tests/test_differ.py	/^    def test_apply_operations_different_files(self):$/;"	m	class:FileEditorTestCase
+test_apply_single_operation	indexer/tests/test_differ.py	/^    def test_apply_single_operation(self):$/;"	m	class:FileEditorTestCase
 test_async_request	.venv/lib/python3.12/site-packages/google/genai/_test_api_client.py	/^async def test_async_request(mock_async_request, mock_build_request):$/;"	f
 test_async_request	.venv/lib64/python3.12/site-packages/google/genai/_test_api_client.py	/^async def test_async_request(mock_async_request, mock_build_request):$/;"	f
 test_async_request_streamed_non_blocking	.venv/lib/python3.12/site-packages/google/genai/_test_api_client.py	/^async def test_async_request_streamed_non_blocking($/;"	f
@@ -47206,6 +47252,7 @@ test_cache_remote_off	.venv/lib/python3.12/site-packages/jsonschema/tests/test_v
 test_cache_remote_off	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_cache_remote_off(self):$/;"	m	class:TestRefResolver
 test_cache_remote_on	.venv/lib/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_cache_remote_on(self):$/;"	m	class:TestRefResolver
 test_cache_remote_on	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_cache_remote_on(self):$/;"	m	class:TestRefResolver
+test_cascading_line_number_changes	indexer/tests/test_differ.py	/^    def test_cascading_line_number_changes(self):$/;"	m	class:OrderDependentOperationsTestCase
 test_catching_Unresolvable_directly	.venv/lib/python3.12/site-packages/jsonschema/tests/test_deprecations.py	/^    def test_catching_Unresolvable_directly(self):$/;"	m	class:TestDeprecations
 test_catching_Unresolvable_directly	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_deprecations.py	/^    def test_catching_Unresolvable_directly(self):$/;"	m	class:TestDeprecations
 test_catching_Unresolvable_via_RefResolutionError	.venv/lib/python3.12/site-packages/jsonschema/tests/test_deprecations.py	/^    def test_catching_Unresolvable_via_RefResolutionError(self):$/;"	m	class:TestDeprecations
@@ -47234,6 +47281,7 @@ test_combine_with_single_retrieve	.venv/lib/python3.12/site-packages/referencing
 test_combine_with_single_retrieve	.venv/lib64/python3.12/site-packages/referencing/tests/test_core.py	/^    def test_combine_with_single_retrieve(self):$/;"	m	class:TestRegistry
 test_combine_with_uncrawled_resources	.venv/lib/python3.12/site-packages/referencing/tests/test_core.py	/^    def test_combine_with_uncrawled_resources(self):$/;"	m	class:TestRegistry
 test_combine_with_uncrawled_resources	.venv/lib64/python3.12/site-packages/referencing/tests/test_core.py	/^    def test_combine_with_uncrawled_resources(self):$/;"	m	class:TestRegistry
+test_complex_non_overlapping_replacements	indexer/tests/test_differ.py	/^    def test_complex_non_overlapping_replacements(self):$/;"	m	class:OrderDependentOperationsTestCase
 test_const	.venv/lib/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_const(self):$/;"	m	class:TestValidationErrorMessages
 test_const	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_const(self):$/;"	m	class:TestValidationErrorMessages
 test_contains_draft_6	.venv/lib/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_contains_draft_6(self):$/;"	m	class:TestValidationErrorMessages
@@ -47318,6 +47366,8 @@ test_detect_with_non_URI_schema	.venv/lib/python3.12/site-packages/referencing/t
 test_detect_with_non_URI_schema	.venv/lib64/python3.12/site-packages/referencing/tests/test_core.py	/^    def test_detect_with_non_URI_schema(self):$/;"	m	class:TestSpecification
 test_dict_conversion	.venv/lib/python3.12/site-packages/referencing/tests/test_core.py	/^    def test_dict_conversion(self):$/;"	m	class:TestRegistry
 test_dict_conversion	.venv/lib64/python3.12/site-packages/referencing/tests/test_core.py	/^    def test_dict_conversion(self):$/;"	m	class:TestRegistry
+test_diff_operation_creation	indexer/tests/test_differ.py	/^    def test_diff_operation_creation(self):$/;"	m	class:DiffOperationTestCase
+test_diff_operation_repr	indexer/tests/test_differ.py	/^    def test_diff_operation_repr(self):$/;"	m	class:DiffOperationTestCase
 test_does_not_contain	.venv/lib/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_does_not_contain(self):$/;"	m	class:TestValidationErrorMessages
 test_does_not_contain	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_does_not_contain(self):$/;"	m	class:TestValidationErrorMessages
 test_does_not_reorder_dicts	.venv/lib/python3.12/site-packages/jsonschema/tests/test_exceptions.py	/^    def test_does_not_reorder_dicts(self):$/;"	m	class:TestErrorInitReprStr
@@ -47352,6 +47402,7 @@ test_draft_7	.venv/lib/python3.12/site-packages/jsonschema/tests/test_validators
 test_draft_7	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_draft_7(self):$/;"	m	class:TestValidatorFor
 test_dynamic_scope	.venv/lib/python3.12/site-packages/referencing/tests/test_core.py	/^    def test_dynamic_scope(self):$/;"	m	class:TestResolver
 test_dynamic_scope	.venv/lib64/python3.12/site-packages/referencing/tests/test_core.py	/^    def test_dynamic_scope(self):$/;"	m	class:TestResolver
+test_empty_content	indexer/tests/test_differ.py	/^    def test_empty_content(self):$/;"	m	class:DiffParserTestCase
 test_empty_dictionaries	.venv/lib/python3.12/site-packages/jsonschema/tests/test_utils.py	/^    def test_empty_dictionaries(self):$/;"	m	class:TestDictEqual
 test_empty_dictionaries	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_utils.py	/^    def test_empty_dictionaries(self):$/;"	m	class:TestDictEqual
 test_empty_list	.venv/lib/python3.12/site-packages/jsonschema/tests/test_utils.py	/^    def test_empty_list(self):$/;"	m	class:TestListEqual
@@ -47514,6 +47565,7 @@ test_invalid_explicit_base_uri	.venv/lib/python3.12/site-packages/jsonschema/tes
 test_invalid_explicit_base_uri	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_cli.py	/^    def test_invalid_explicit_base_uri(self):$/;"	m	class:TestCLI
 test_invalid_format_default_message	.venv/lib/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_invalid_format_default_message(self):$/;"	m	class:TestValidationErrorMessages
 test_invalid_format_default_message	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_invalid_format_default_message(self):$/;"	m	class:TestValidationErrorMessages
+test_invalid_header_format	indexer/tests/test_differ.py	/^    def test_invalid_header_format(self):$/;"	m	class:DiffParserTestCase
 test_invalid_instance	.venv/lib/python3.12/site-packages/jsonschema/tests/test_cli.py	/^    def test_invalid_instance(self):$/;"	m	class:TestCLI
 test_invalid_instance	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_cli.py	/^    def test_invalid_instance(self):$/;"	m	class:TestCLI
 test_invalid_instance_continues_with_the_rest	.venv/lib/python3.12/site-packages/jsonschema/tests/test_cli.py	/^    def test_invalid_instance_continues_with_the_rest(self):$/;"	m	class:TestCLI
@@ -47730,6 +47782,7 @@ test_minProperties_1	.venv/lib/python3.12/site-packages/jsonschema/tests/test_va
 test_minProperties_1	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_minProperties_1(self):$/;"	m	class:TestValidationErrorMessages
 test_minimum	.venv/lib/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_minimum(self):$/;"	m	class:TestValidationErrorMessages
 test_minimum	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_minimum(self):$/;"	m	class:TestValidationErrorMessages
+test_missing_end_marker	indexer/tests/test_differ.py	/^    def test_missing_end_marker(self):$/;"	m	class:DiffParserTestCase
 test_missing_key	.venv/lib/python3.12/site-packages/jsonschema/tests/test_utils.py	/^    def test_missing_key(self):$/;"	m	class:TestDictEqual
 test_missing_key	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_utils.py	/^    def test_missing_key(self):$/;"	m	class:TestDictEqual
 test_missing_value	.venv/lib/python3.12/site-packages/jsonschema/tests/test_utils.py	/^    def test_missing_value(self):$/;"	m	class:TestDictEqual
@@ -47740,6 +47793,7 @@ test_multipleOf	.venv/lib/python3.12/site-packages/jsonschema/tests/test_validat
 test_multipleOf	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_multipleOf(self):$/;"	m	class:TestValidationErrorMessages
 test_multiple_errors_with_instance	.venv/lib/python3.12/site-packages/jsonschema/tests/test_exceptions.py	/^    def test_multiple_errors_with_instance(self):$/;"	m	class:TestErrorTree
 test_multiple_errors_with_instance	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_exceptions.py	/^    def test_multiple_errors_with_instance(self):$/;"	m	class:TestErrorTree
+test_multiple_insertions_different_regions	indexer/tests/test_differ.py	/^    def test_multiple_insertions_different_regions(self):$/;"	m	class:OrderDependentOperationsTestCase
 test_multiple_invalid_instances	.venv/lib/python3.12/site-packages/jsonschema/tests/test_cli.py	/^    def test_multiple_invalid_instances(self):$/;"	m	class:TestCLI
 test_multiple_invalid_instances	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_cli.py	/^    def test_multiple_invalid_instances(self):$/;"	m	class:TestCLI
 test_multiple_invalid_instances_pretty_output	.venv/lib/python3.12/site-packages/jsonschema/tests/test_cli.py	/^    def test_multiple_invalid_instances_pretty_output(self):$/;"	m	class:TestCLI
@@ -47838,10 +47892,16 @@ test_one_none	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_utils.p
 test_one_none	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_utils.py	/^    def test_one_none(self):$/;"	m	class:TestListEqual
 test_opaque	.venv/lib/python3.12/site-packages/referencing/tests/test_core.py	/^    def test_opaque(self):$/;"	m	class:TestResource
 test_opaque	.venv/lib64/python3.12/site-packages/referencing/tests/test_core.py	/^    def test_opaque(self):$/;"	m	class:TestResource
+test_order_dependent_line_expansion	indexer/tests/test_differ.py	/^    def test_order_dependent_line_expansion(self):$/;"	m	class:OrderDependentOperationsTestCase
+test_order_dependent_overlapping_behavior	indexer/tests/test_differ.py	/^    def test_order_dependent_overlapping_behavior(self):$/;"	m	class:OrderDependentOperationsTestCase
+test_order_dependent_replacements	indexer/tests/test_differ.py	/^    def test_order_dependent_replacements(self):$/;"	m	class:OrderDependentOperationsTestCase
+test_parse_multiple_operations	indexer/tests/test_differ.py	/^    def test_parse_multiple_operations(self):$/;"	m	class:DiffParserTestCase
+test_parse_simple_operation	indexer/tests/test_differ.py	/^    def test_parse_simple_operation(self):$/;"	m	class:DiffParserTestCase
 test_parse_source_and_parse_equivalence	indexer/tests/test_symbol_parsing.py	/^    def test_parse_source_and_parse_equivalence(self):$/;"	m	class:SymbolParsingTestCase
 test_parse_source_empty_content	indexer/tests/test_symbol_parsing.py	/^    def test_parse_source_empty_content(self):$/;"	m	class:SymbolParsingTestCase
 test_parse_source_with_syntax_error	indexer/tests/test_symbol_parsing.py	/^    def test_parse_source_with_syntax_error(self):$/;"	m	class:SymbolParsingTestCase
 test_parse_source_with_various_symbols	indexer/tests/test_symbol_parsing.py	/^    def test_parse_source_with_various_symbols(self):$/;"	m	class:SymbolParsingTestCase
+test_parse_with_project_path	indexer/tests/test_differ.py	/^    def test_parse_with_project_path(self):$/;"	m	class:DiffParserTestCase
 test_pattern	.venv/lib/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_pattern(self):$/;"	m	class:TestValidationErrorMessages
 test_pattern	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_pattern(self):$/;"	m	class:TestValidationErrorMessages
 test_patternProperties	.venv/lib/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_patternProperties(self):$/;"	m	class:TestValidationErrorDetails
@@ -47907,6 +47967,12 @@ test_repeated_anchor_lookup_from_retrieved_resource	.venv/lib/python3.12/site-pa
 test_repeated_anchor_lookup_from_retrieved_resource	.venv/lib64/python3.12/site-packages/referencing/tests/test_core.py	/^    def test_repeated_anchor_lookup_from_retrieved_resource(self):$/;"	m	class:TestResolver
 test_repeated_lookup_from_retrieved_resource	.venv/lib/python3.12/site-packages/referencing/tests/test_core.py	/^    def test_repeated_lookup_from_retrieved_resource(self):$/;"	m	class:TestResolver
 test_repeated_lookup_from_retrieved_resource	.venv/lib64/python3.12/site-packages/referencing/tests/test_core.py	/^    def test_repeated_lookup_from_retrieved_resource(self):$/;"	m	class:TestResolver
+test_replace_entire_file	indexer/tests/test_differ.py	/^    def test_replace_entire_file(self):$/;"	m	class:EdgeCasesTestCase
+test_replace_first_line	indexer/tests/test_differ.py	/^    def test_replace_first_line(self):$/;"	m	class:EdgeCasesTestCase
+test_replace_last_line	indexer/tests/test_differ.py	/^    def test_replace_last_line(self):$/;"	m	class:EdgeCasesTestCase
+test_replace_multiple_lines_with_single	indexer/tests/test_differ.py	/^    def test_replace_multiple_lines_with_single(self):$/;"	m	class:EdgeCasesTestCase
+test_replace_single_line_with_multiple	indexer/tests/test_differ.py	/^    def test_replace_single_line_with_multiple(self):$/;"	m	class:EdgeCasesTestCase
+test_replace_with_empty_content	indexer/tests/test_differ.py	/^    def test_replace_with_empty_content(self):$/;"	m	class:EdgeCasesTestCase
 test_repr	.venv/lib/python3.12/site-packages/jsonschema/tests/test_exceptions.py	/^    def test_repr(self):$/;"	m	class:TestErrorInitReprStr
 test_repr	.venv/lib/python3.12/site-packages/jsonschema/tests/test_format.py	/^    def test_repr(self):$/;"	m	class:TestFormatChecker
 test_repr	.venv/lib/python3.12/site-packages/jsonschema/tests/test_types.py	/^    def test_repr(self):$/;"	m	class:TestTypeChecker
@@ -47999,6 +48065,7 @@ test_single_type_failure	.venv/lib/python3.12/site-packages/jsonschema/tests/tes
 test_single_type_failure	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_single_type_failure(self):$/;"	m	class:TestValidationErrorMessages
 test_single_type_list_failure	.venv/lib/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_single_type_list_failure(self):$/;"	m	class:TestValidationErrorMessages
 test_single_type_list_failure	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_single_type_list_failure(self):$/;"	m	class:TestValidationErrorMessages
+test_special_characters_in_content	indexer/tests/test_differ.py	/^    def test_special_characters_in_content(self):$/;"	m	class:EdgeCasesTestCase
 test_specification_with	.venv/lib/python3.12/site-packages/referencing/tests/test_jsonschema.py	/^def test_specification_with(uri, expected):$/;"	f
 test_specification_with	.venv/lib64/python3.12/site-packages/referencing/tests/test_jsonschema.py	/^def test_specification_with(uri, expected):$/;"	f
 test_specification_with_default	.venv/lib/python3.12/site-packages/referencing/tests/test_jsonschema.py	/^def test_specification_with_default():$/;"	f
@@ -48007,6 +48074,7 @@ test_specification_with_no_empty_fragment	.venv/lib/python3.12/site-packages/ref
 test_specification_with_no_empty_fragment	.venv/lib64/python3.12/site-packages/referencing/tests/test_jsonschema.py	/^def test_specification_with_no_empty_fragment(uri, expected):$/;"	f
 test_specification_with_unknown_dialect	.venv/lib/python3.12/site-packages/referencing/tests/test_jsonschema.py	/^def test_specification_with_unknown_dialect():$/;"	f
 test_specification_with_unknown_dialect	.venv/lib64/python3.12/site-packages/referencing/tests/test_jsonschema.py	/^def test_specification_with_unknown_dialect():$/;"	f
+test_start_line_greater_than_end_line	indexer/tests/test_differ.py	/^    def test_start_line_greater_than_end_line(self):$/;"	m	class:DiffParserTestCase
 test_str_works_with_instances_having_overriden_eq_operator	.venv/lib/python3.12/site-packages/jsonschema/tests/test_exceptions.py	/^    def test_str_works_with_instances_having_overriden_eq_operator(self):$/;"	m	class:TestErrorInitReprStr
 test_str_works_with_instances_having_overriden_eq_operator	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_exceptions.py	/^    def test_str_works_with_instances_having_overriden_eq_operator(self):$/;"	m	class:TestErrorInitReprStr
 test_strong_keywords_are_higher_priority	.venv/lib/python3.12/site-packages/jsonschema/tests/test_exceptions.py	/^    def test_strong_keywords_are_higher_priority(self):$/;"	m	class:TestByRelevance
@@ -48051,6 +48119,7 @@ test_unevaluated_properties_invalid_against_subschema	.venv/lib/python3.12/site-
 test_unevaluated_properties_invalid_against_subschema	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_unevaluated_properties_invalid_against_subschema(self):$/;"	m	class:TestValidationErrorMessages
 test_unevaluated_properties_on_invalid_type	.venv/lib/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_unevaluated_properties_on_invalid_type(self):$/;"	m	class:TestValidationErrorMessages
 test_unevaluated_properties_on_invalid_type	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_unevaluated_properties_on_invalid_type(self):$/;"	m	class:TestValidationErrorMessages
+test_unicode_content	indexer/tests/test_differ.py	/^    def test_unicode_content(self):$/;"	m	class:EdgeCasesTestCase
 test_unknown_dialect	.venv/lib/python3.12/site-packages/referencing/tests/test_jsonschema.py	/^def test_unknown_dialect():$/;"	f
 test_unknown_dialect	.venv/lib64/python3.12/site-packages/referencing/tests/test_jsonschema.py	/^def test_unknown_dialect():$/;"	f
 test_unknown_output	.venv/lib/python3.12/site-packages/jsonschema/tests/test_cli.py	/^    def test_unknown_output(self):$/;"	m	class:TestParser
@@ -48074,6 +48143,11 @@ test_uses_pprint	.venv/lib/python3.12/site-packages/jsonschema/tests/test_except
 test_uses_pprint	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_exceptions.py	/^    def test_uses_pprint(self):$/;"	m	class:TestErrorInitReprStr
 test_valid_instances_are_valid	.venv/lib/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_valid_instances_are_valid(self):$/;"	m	class:ValidatorTestMixin
 test_valid_instances_are_valid	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_valid_instances_are_valid(self):$/;"	m	class:ValidatorTestMixin
+test_validate_directory_path	indexer/tests/test_differ.py	/^    def test_validate_directory_path(self):$/;"	m	class:FileEditorTestCase
+test_validate_empty_file	indexer/tests/test_differ.py	/^    def test_validate_empty_file(self):$/;"	m	class:FileEditorTestCase
+test_validate_line_range_exceeds_file	indexer/tests/test_differ.py	/^    def test_validate_line_range_exceeds_file(self):$/;"	m	class:FileEditorTestCase
+test_validate_nonexistent_file	indexer/tests/test_differ.py	/^    def test_validate_nonexistent_file(self):$/;"	m	class:FileEditorTestCase
+test_validate_overlapping_ranges	indexer/tests/test_differ.py	/^    def test_validate_overlapping_ranges(self):$/;"	m	class:FileEditorTestCase
 test_validates_registers_meta_schema_draft6_id	.venv/lib/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_validates_registers_meta_schema_draft6_id(self):$/;"	m	class:TestCreateAndExtend
 test_validates_registers_meta_schema_draft6_id	.venv/lib64/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_validates_registers_meta_schema_draft6_id(self):$/;"	m	class:TestCreateAndExtend
 test_validates_registers_meta_schema_id	.venv/lib/python3.12/site-packages/jsonschema/tests/test_validators.py	/^    def test_validates_registers_meta_schema_id(self):$/;"	m	class:TestCreateAndExtend
@@ -49360,6 +49434,7 @@ update	.venv/lib64/python3.12/site-packages/tqdm/notebook.py	/^    def update(se
 update	.venv/lib64/python3.12/site-packages/tqdm/std.py	/^    def update(self, n=1):$/;"	m	class:tqdm
 update	.venv/lib64/python3.12/site-packages/websockets/asyncio/async_timeout.py	/^    def update(self, deadline: float) -> None:$/;"	m	class:Timeout	typeref:typename:None
 update	.venv/lib64/python3.12/site-packages/websockets/datastructures.py	/^    def update(self, *args: HeadersLike, **kwargs: str) -> None:$/;"	m	class:Headers	typeref:typename:None
+update	indexer/__main__.py	/^def update(project: str, language: str, progress: bool, dry_run: bool):$/;"	f
 update_and_save_index_config	indexer/core.py	/^def update_and_save_index_config($/;"	f	typeref:typename:tuple[str,bool,dict[str,"FileOperation"]]
 update_claude_config	.venv/lib/python3.12/site-packages/mcp/cli/claude.py	/^def update_claude_config($/;"	f	typeref:typename:bool
 update_claude_config	.venv/lib64/python3.12/site-packages/mcp/cli/claude.py	/^def update_claude_config($/;"	f	typeref:typename:bool
@@ -49776,6 +49851,7 @@ validate_model	.venv/lib/python3.12/site-packages/pydantic/v1/main.py	/^def vali
 validate_model	.venv/lib64/python3.12/site-packages/pydantic/v1/main.py	/^def validate_model(  # noqa: C901 (ignore complexity)$/;"	f	typeref:typename:Tuple['DictStrAny','SetStr',Optional[ValidationError]]
 validate_new	.venv/lib/python3.12/site-packages/pydantic/types.py	/^    def validate_new(path: Path, _: core_schema.ValidationInfo) -> Path:$/;"	m	class:PathType	typeref:typename:Path
 validate_new	.venv/lib64/python3.12/site-packages/pydantic/types.py	/^    def validate_new(path: Path, _: core_schema.ValidationInfo) -> Path:$/;"	m	class:PathType	typeref:typename:Path
+validate_operations	indexer/differ.py	/^    def validate_operations(self):$/;"	m	class:FileEditor
 validate_parts	.venv/lib/python3.12/site-packages/pydantic/v1/networks.py	/^    def validate_parts(cls, parts: 'Parts', validate_port: bool = True) -> 'Parts':$/;"	m	class:AnyUrl	typeref:typename:'Parts'
 validate_parts	.venv/lib/python3.12/site-packages/pydantic/v1/networks.py	/^    def validate_parts(cls, parts: 'Parts', validate_port: bool = True) -> 'Parts':$/;"	m	class:MultiHostDsn	typeref:typename:'Parts'
 validate_parts	.venv/lib64/python3.12/site-packages/pydantic/v1/networks.py	/^    def validate_parts(cls, parts: 'Parts', validate_port: bool = True) -> 'Parts':$/;"	m	class:AnyUrl	typeref:typename:'Parts'
