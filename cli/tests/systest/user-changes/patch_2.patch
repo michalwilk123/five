@@ -1,0 +1,26 @@
+diff --git a/tinydb/middlewares.py b/tinydb/middlewares.py
+index 7973012..8e98205 100644
+--- a/tinydb/middlewares.py
++++ b/tinydb/middlewares.py
+@@ -83,7 +83,7 @@ class CachingMiddleware(Middleware):
+     """
+ 
+     #: The number of write operations to cache before writing to disc
+-    WRITE_CACHE_SIZE = 1000
++    WRITE_CACHE_SIZE = 2000
+ 
+     def __init__(self, storage_cls):
+         # Initialize the parent constructor
+diff --git a/tinydb/table.py b/tinydb/table.py
+index c562d02..ce684d9 100644
+--- a/tinydb/table.py
++++ b/tinydb/table.py
+@@ -93,7 +93,7 @@ class Table:
+     #: The default capacity of the query cache
+     #:
+     #: .. versionadded:: 4.0
+-    default_query_cache_capacity = 10
++    default_query_cache_capacity = 30
+ 
+     def __init__(
+         self,

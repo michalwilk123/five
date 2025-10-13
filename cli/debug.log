@@ -1,0 +1,16 @@
+
+[CLAUDE RESPONSE] 2025-09-16T16:05:38.477562
+Status: 200
+URL: https://api.anthropic.com/custom-proxy-health-check
+
+Response Body (171 bytes):
+{
+  "status": "running",
+  "proxy": "claude-mitm-proxy",
+  "timestamp": "2025-09-16T16:05:38.476577",
+  "features": [
+    "system-key-removal",
+    "request-logging"
+  ]
+}
+================================================================================

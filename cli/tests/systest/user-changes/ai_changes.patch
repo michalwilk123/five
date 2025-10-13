@@ -1,0 +1,289 @@
+diff --git a/tests/test_tinydb.py b/tests/test_tinydb.py
+index 655027a..f996c31 100644
+--- a/tests/test_tinydb.py
++++ b/tests/test_tinydb.py
+@@ -386,6 +386,143 @@ def test_count(db: TinyDB):
+     assert db.count(where('char') == 'd') == 0
+ 
+ 
++def test_sum(db: TinyDB):
++    # Test sum with condition
++    assert db.sum('int', where('char') == 'a') == 1
++    assert db.sum('int', where('int') == 1) == 3
++
++    # Test sum without condition (all documents)
++    assert db.sum('int') == 6  # 1 + 1 + 1 + 3 = 6
++
++    # Test sum with non-existent field
++    assert db.sum('nonexistent') == 0
++
++    # Test sum with non-numeric values
++    with pytest.raises(ValueError, match="contains non-numeric value"):
++        db.sum('char')
++
++
++def test_avg(db: TinyDB):
++    # Test avg with condition
++    assert db.avg('int', where('char') == 'a') == 1.0
++    assert db.avg('int', where('int') == 1) == 1.0
++
++    # Test avg without condition (all documents)
++    assert db.avg('int') == 1.5  # (1 + 1 + 1 + 3) / 4 = 1.5
++
++    # Test avg with no matching documents
++    with pytest.raises(ValueError, match="No documents found"):
++        db.avg('int', where('char') == 'z')
++
++    # Test avg with non-existent field
++    with pytest.raises(ValueError, match="No documents contain field"):
++        db.avg('nonexistent')
++
++    # Test avg with non-numeric values
++    with pytest.raises(ValueError, match="contains non-numeric value"):
++        db.avg('char')
++
++
++def test_min(db: TinyDB):
++    # Test min with condition
++    assert db.min('int', where('char') == 'a') == 1
++    assert db.min('char', where('int') == 1) == 'a'
++
++    # Test min without condition (all documents)
++    assert db.min('int') == 1
++    assert db.min('char') == 'a'
++
++    # Test min with no matching documents
++    with pytest.raises(ValueError, match="No documents found"):
++        db.min('int', where('char') == 'z')
++
++    # Test min with non-existent field
++    with pytest.raises(ValueError, match="No documents contain field"):
++        db.min('nonexistent')
++
++
++def test_max(db: TinyDB):
++    # Test max with condition
++    assert db.max('int', where('char') == 'a') == 1
++    assert db.max('char', where('int') == 1) == 'c'
++
++    # Test max without condition (all documents)
++    assert db.max('int') == 3
++    assert db.max('char') == 'c'
++
++    # Test max with no matching documents
++    with pytest.raises(ValueError, match="No documents found"):
++        db.max('int', where('char') == 'z')
++
++    # Test max with non-existent field
++    with pytest.raises(ValueError, match="No documents contain field"):
++        db.max('nonexistent')
++
++
++def test_distinct(db: TinyDB):
++    # Test distinct with condition
++    distinct_ints = db.distinct('int', where('char') == 'a')
++    assert len(distinct_ints) == 1
++    assert 1 in distinct_ints
++
++    # Test distinct without condition (all documents)
++    distinct_ints = db.distinct('int')
++    assert len(distinct_ints) == 2
++    assert 1 in distinct_ints and 3 in distinct_ints
++
++    distinct_chars = db.distinct('char')
++    assert len(distinct_chars) == 3
++    assert 'a' in distinct_chars and 'b' in distinct_chars and 'c' in distinct_chars
++
++    # Test distinct with non-existent field
++    assert db.distinct('nonexistent') == []
++
++    # Test distinct with no matching documents
++    assert db.distinct('int', where('char') == 'z') == []
++
++
++def test_statistical_methods_with_empty_db():
++    """Test statistical methods with empty database"""
++    from tinydb import TinyDB
++    from tinydb.storages import MemoryStorage
++
++    empty_db = TinyDB(storage=MemoryStorage())
++
++    # Test with empty database
++    assert empty_db.sum('int') == 0
++
++    with pytest.raises(ValueError, match="No documents found"):
++        empty_db.avg('int')
++
++    with pytest.raises(ValueError, match="No documents found"):
++        empty_db.min('int')
++
++    with pytest.raises(ValueError, match="No documents found"):
++        empty_db.max('int')
++
++    assert empty_db.distinct('int') == []
++
++
++def test_statistical_methods_with_complex_data():
++    """Test statistical methods with more complex data types"""
++    from tinydb import TinyDB
++    from tinydb.storages import MemoryStorage
++
++    db = TinyDB(storage=MemoryStorage())
++
++    # Insert test data with lists and dicts
++    db.insert({'nums': [1, 2, 3], 'info': {'name': 'test1'}})
++    db.insert({'nums': [4, 5, 6], 'info': {'name': 'test2'}})
++    db.insert({'nums': [1, 2, 3], 'info': {'name': 'test1'}})  # Duplicate for testing
++
++    # Test distinct with complex types
++    distinct_nums = db.distinct('nums')
++    assert len(distinct_nums) == 2  # Should handle duplicate [1,2,3]
++
++    distinct_info = db.distinct('info')
++    assert len(distinct_info) == 2
++
++
+ def test_contains(db: TinyDB):
+     assert db.contains(where('int') == 1)
+     assert not db.contains(where('int') == 0)
+diff --git a/tinydb/table.py b/tinydb/table.py
+index c562d02..970a063 100644
+--- a/tinydb/table.py
++++ b/tinydb/table.py
+@@ -634,6 +634,136 @@ class Table:
+ 
+         return len(self.search(cond))
+ 
++    def sum(self, field: str, cond: Optional[QueryLike] = None) -> Union[int, float]:
++        """
++        Calculate the sum of a numeric field for documents matching a query.
++
++        :param field: the field to sum
++        :param cond: the condition to filter documents (optional)
++        :returns: sum of the field values
++        :raises ValueError: if field contains non-numeric values
++        """
++        documents = self.search(cond) if cond else self.all()
++        total = 0
++        for doc in documents:
++            if field in doc:
++                value = doc[field]
++                if not isinstance(value, (int, float)):
++                    raise ValueError(f"Field '{field}' contains non-numeric value: {value}")
++                total += value
++        return total
++
++    def avg(self, field: str, cond: Optional[QueryLike] = None) -> Union[int, float]:
++        """
++        Calculate the average of a numeric field for documents matching a query.
++
++        :param field: the field to average
++        :param cond: the condition to filter documents (optional)
++        :returns: average of the field values
++        :raises ValueError: if field contains non-numeric values or no documents match
++        """
++        documents = self.search(cond) if cond else self.all()
++        if not documents:
++            raise ValueError("No documents found to calculate average")
++
++        total = 0
++        count = 0
++        for doc in documents:
++            if field in doc:
++                value = doc[field]
++                if not isinstance(value, (int, float)):
++                    raise ValueError(f"Field '{field}' contains non-numeric value: {value}")
++                total += value
++                count += 1
++
++        if count == 0:
++            raise ValueError(f"No documents contain field '{field}'")
++
++        return total / count
++
++    def min(self, field: str, cond: Optional[QueryLike] = None):
++        """
++        Find the minimum value of a field for documents matching a query.
++
++        :param field: the field to find minimum of
++        :param cond: the condition to filter documents (optional)
++        :returns: minimum value of the field
++        :raises ValueError: if no documents match or field doesn't exist
++        """
++        documents = self.search(cond) if cond else self.all()
++        if not documents:
++            raise ValueError("No documents found")
++
++        values = []
++        for doc in documents:
++            if field in doc:
++                values.append(doc[field])
++
++        if not values:
++            raise ValueError(f"No documents contain field '{field}'")
++
++        return min(values)
++
++    def max(self, field: str, cond: Optional[QueryLike] = None):
++        """
++        Find the maximum value of a field for documents matching a query.
++
++        :param field: the field to find maximum of
++        :param cond: the condition to filter documents (optional)
++        :returns: maximum value of the field
++        :raises ValueError: if no documents match or field doesn't exist
++        """
++        documents = self.search(cond) if cond else self.all()
++        if not documents:
++            raise ValueError("No documents found")
++
++        values = []
++        for doc in documents:
++            if field in doc:
++                values.append(doc[field])
++
++        if not values:
++            raise ValueError(f"No documents contain field '{field}'")
++
++        return max(values)
++
++    def distinct(self, field: str, cond: Optional[QueryLike] = None) -> List:
++        """
++        Get distinct values of a field for documents matching a query.
++
++        :param field: the field to get distinct values of
++        :param cond: the condition to filter documents (optional)
++        :returns: list of distinct values
++        """
++        documents = self.search(cond) if cond else self.all()
++        values = set()
++        for doc in documents:
++            if field in doc:
++                value = doc[field]
++                # Handle unhashable types by converting to tuple if needed
++                if isinstance(value, (list, dict)):
++                    if isinstance(value, list):
++                        values.add(tuple(value))
++                    else:
++                        values.add(tuple(sorted(value.items())))
++                else:
++                    values.add(value)
++
++        # Convert back from tuples if needed
++        result = []
++        for value in values:
++            if isinstance(value, tuple):
++                # Check if this was originally a list or dict
++                try:
++                    result.append(list(value))
++                except (TypeError, ValueError):
++                    # If conversion fails, it was probably a dict
++                    result.append(dict(value))
++            else:
++                result.append(value)
++
++        return result
++
+     def clear_cache(self) -> None:
+         """
+         Clear the query cache.

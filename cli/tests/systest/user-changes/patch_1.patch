@@ -1,0 +1,21 @@
+diff --git a/tinydb/operations.py b/tinydb/operations.py
+index 47c3492..1ac6b43 100644
+--- a/tinydb/operations.py
++++ b/tinydb/operations.py
+@@ -29,6 +29,16 @@ def add(field, n):
+     return transform
+ 
+ 
++def multiply(field, n):
++    """
++    Multiply ``n`` to a given field in the document.
++    """
++    def transform(doc):
++        doc[field] *= n
++
++    return transform
++
++
+ def subtract(field, n):
+     """
+     Subtract ``n`` to a given field in the document.
