@@ -149,8 +149,7 @@ class DatabaseManager(BaseManager):
                 if exists(
                     t
                     for t in CompletedTask
-                    if t.project.id == project_id
-                    and (t.commit_id == c.id or c.completed_task is t)
+                    if t.project.id == project_id and (t.commit_id == c.id or c.completed_task is t)
                 )
             )[:]
         return [commit.to_dict() for commit in commits]
