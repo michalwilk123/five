@@ -2,11 +2,11 @@ from pathlib import Path
 
 import click
 
-from five_cli.cli.decorators import five_command
-from five_cli.cli.utils import build_validation_on_errors, handle_cli_errors
-from five_cli.handlers import init_handler, setup_handler
-from five_cli.utils import LogFunction
-from five_cli.validation import FiveValidator
+from five.cli.decorators import five_command
+from five.cli.utils import build_validation_on_errors, handle_cli_errors
+from five.handlers import init_handler, setup_handler
+from five.utils import LogFunction
+from five.validation import FiveValidator
 
 
 @click.command()
@@ -24,6 +24,10 @@ def init(
     global_config_path: Path,
     logger: LogFunction,
 ):
+    """
+    Initialize a project for Five tracking.
+    Creates project-specific config and git repository.
+    """
     # Validate basic inputs (do not enforce setup existence here)
     FiveValidator(
         raises=click.ClickException, on_errors=build_validation_on_errors('five init')

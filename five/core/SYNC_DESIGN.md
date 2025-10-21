@@ -100,7 +100,7 @@ Gets the current HEAD commit hash.
 ## Usage Example for Checkout
 
 ```python
-from five_cli.core.sync import analyze_sync_state, SyncOperation
+from five.core.sync import analyze_sync_state, SyncOperation
 
 # Get task to checkout
 task = db_manager.get_completed_task_entity_by_id(task_id)

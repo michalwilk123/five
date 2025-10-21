@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from five_cli.managers.base import BaseManager
-from five_cli.utils import LogFunction
+from five.managers.base import BaseManager
+from five.utils import LogFunction
 
 
 class StateManager(BaseManager):

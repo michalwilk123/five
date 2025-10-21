@@ -3,10 +3,10 @@ import traceback
 
 from click.testing import CliRunner
 
-from five_cli.cli.main import cli
-from five_cli.core.config import get_db_path, get_project_config_path
-from five_cli.managers.db_manager import DatabaseManager
-from five_cli.utils import NOOP_LOG
+from five.cli.main import cli
+from five.core.config import get_db_path, get_project_config_path
+from five.managers.db_manager import DatabaseManager
+from five.utils import NOOP_LOG
 
 from .helpers import ensure_tables_exist, get_commits, verify_git_commit_exists
 
@@ -210,7 +210,7 @@ def test_init_with_existing_git_repo_does_not_track_project_git(runner, isolated
         project = db_manager.get_project_by_path(project_path_str)
         project_config_dir = get_project_config_path(isolated_config_dir, project.name)
 
-        from five_cli.managers.git_manager import GitManager
+        from five.managers.git_manager import GitManager
 
         git_manager = GitManager(NOOP_LOG, project_config_dir / '.git', project_dir)
         result = git_manager.run(['ls-files'])

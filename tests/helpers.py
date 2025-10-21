@@ -6,12 +6,12 @@ from typing import Iterable
 from click.testing import CliRunner, Result
 from pony.orm import db_session
 
-from five_cli.cli.main import cli
-from five_cli.core.config import get_db_path
-from five_cli.db_models import Commit, CompletedTask
-from five_cli.managers.db_manager import DatabaseManager
-from five_cli.managers.git_manager import GitManager
-from five_cli.utils import NOOP_LOG
+from five.cli.main import cli
+from five.core.config import get_db_path
+from five.db_models import Commit, CompletedTask
+from five.managers.db_manager import DatabaseManager
+from five.managers.git_manager import GitManager
+from five.utils import NOOP_LOG
 
 
 class TestInvoker:
@@ -112,7 +112,7 @@ def get_commit_by_hash(db_path: Path, commit_hash: str):
     db_manager = _db_manager(global_config_path)
     db_manager.connect(create_tables=False)
 
-    from five_cli.db_models import Commit
+    from five.db_models import Commit
 
     with db_session:
         commit_entity = Commit.get(hash=commit_hash)

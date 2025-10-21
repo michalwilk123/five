@@ -40,6 +40,20 @@ class CompletedTask(db.Entity):
             'project_id': self.project.id if self.project else None,
         }
 
+    def to_dict_list_view(self):
+        return {
+            'id': self.id,
+            'position': self.position,
+            'commit_id': self.commit_id,
+            'prompt': self.prompt,
+            'context': self.context,
+            'model_name': self.model_name,
+            'temperature': self.temperature,
+            'timestamp': self.timestamp.isoformat() if self.timestamp else None,
+            'revert_commit_id': self.revert_commit_id,
+            'project_id': self.project.id if self.project else None,
+        }
+
 
 class Reference(db.Entity):
     task = Required('CompletedTask')

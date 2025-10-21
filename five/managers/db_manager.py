@@ -2,9 +2,9 @@ from pathlib import Path
 
 from pony.orm import db_session, desc, exists, max, select
 
-from five_cli.db_models import Commit, CompletedTask, Project, db
-from five_cli.managers.base import BaseManager
-from five_cli.utils import LogFunction
+from five.db_models import Commit, CompletedTask, Project, db
+from five.managers.base import BaseManager
+from five.utils import LogFunction
 
 
 class DatabaseManager(BaseManager):
@@ -104,7 +104,7 @@ class DatabaseManager(BaseManager):
         reference_ids: list[int],
         project: Project,
     ) -> CompletedTask:
-        from five_cli.db_models import Reference
+        from five.db_models import Reference
 
         position = self.get_next_task_position()
         task = CompletedTask(
@@ -133,7 +133,7 @@ class DatabaseManager(BaseManager):
             tasks = select(t for t in CompletedTask)[:]
         else:
             tasks = select(t for t in CompletedTask if t.project.id == project_id)[:]
-        return [task.to_dict() for task in tasks]
+        return [task.to_dict_list_view() for task in tasks]
 
     def get_completed_task_by_id(self, task_id: int) -> dict | None:
         task = CompletedTask.get(id=task_id)

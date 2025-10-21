@@ -1,8 +1,8 @@
 import json
 
-from five_cli.managers.db_manager import DatabaseManager
-from five_cli.managers.git_manager import GitManager
-from five_cli.utils import LogFunction
+from five.managers.db_manager import DatabaseManager
+from five.managers.git_manager import GitManager
+from five.utils import LogFunction
 
 
 def connect_database(db_manager: DatabaseManager, log: LogFunction):

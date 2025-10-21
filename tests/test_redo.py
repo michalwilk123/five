@@ -1,4 +1,4 @@
-from five_cli.core.config import get_db_path
+from five.core.config import get_db_path
 
 from .helpers import (
     get_commits,

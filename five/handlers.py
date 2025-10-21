@@ -1,15 +1,15 @@
 from pathlib import Path
 
-from five_cli.core import get as get_core
-from five_cli.core import init as init_core
-from five_cli.core import redo as redo_core
-from five_cli.core import track
-from five_cli.core import undo as undo_core
-from five_cli.core.common import connect_database
-from five_cli.core.config import ensure_global_config_path, get_db_path
-from five_cli.managers.db_manager import DatabaseManager
-from five_cli.managers.factory import ManagerFactory
-from five_cli.utils import LogFunction
+from five.core import get as get_core
+from five.core import init as init_core
+from five.core import redo as redo_core
+from five.core import track
+from five.core import undo as undo_core
+from five.core.common import connect_database
+from five.core.config import ensure_global_config_path, get_db_path
+from five.managers.db_manager import DatabaseManager
+from five.managers.factory import ManagerFactory
+from five.utils import LogFunction
 
 __all__ = [
     'setup_handler',
@@ -65,7 +65,6 @@ def init_handler(
     )
 
     init_core.initialize_checkpoint_repository(project_path, project_config_dir, log)
-    init_core.create_gitignore_for_project_git(project_config_dir, log)
 
     factory = ManagerFactory(project_path, global_config_path, project_config_dir, log)
     git_manager = factory.create_git_manager()
@@ -108,6 +107,7 @@ def track_stop_handler(
     temperature: float | None,
     model_name: str | None,
     reference_ids: list[int],
+    note: str | None,
 ) -> str:
     factory = ManagerFactory(project_path, global_config_path, project_config_path, log)
     git_manager = factory.create_git_manager()
@@ -135,7 +135,7 @@ def track_stop_handler(
 
     commit_hash = track.create_commit(git_manager, commit_id, log)
 
-    track.record_assistant_commit(db_manager, commit_hash, completed_task.id, log)
+    track.record_assistant_commit(db_manager, commit_hash, completed_task.id, note, log)
     track.clear_state(state_manager, log)
 
     return commit_hash

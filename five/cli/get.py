@@ -2,15 +2,16 @@ from pathlib import Path
 
 import click
 
-from five_cli.cli.decorators import five_command
-from five_cli.cli.utils import handle_cli_errors
-from five_cli.core.common import format_json_output
-from five_cli.handlers import handle_get_commits, handle_get_completed_tasks, handle_get_projects
-from five_cli.utils import LogFunction
+from five.cli.decorators import five_command
+from five.cli.utils import handle_cli_errors
+from five.core.common import format_json_output
+from five.handlers import handle_get_commits, handle_get_completed_tasks, handle_get_projects
+from five.utils import LogFunction
 
 
 @click.group()
 def get():
+    """Query and retrieve project data, tasks, and commits."""
     pass
 
 
@@ -29,6 +30,7 @@ def completed_tasks(
     project_path: Path,
     project_config_path: Path,
 ):
+    """Retrieve completed AI assistant tasks. Optionally filter by task ID or project name."""
     with handle_cli_errors('get completed tasks'):
         result = handle_get_completed_tasks(
             project_path, global_config_path, project_config_path, logger, task_id, project_name
@@ -52,6 +54,7 @@ def commits(
     project_path: Path,
     project_config_path: Path,
 ):
+    """Retrieve tracked git commits. Optionally filter by commit ID or project name."""
     with handle_cli_errors('get commits'):
         result = handle_get_commits(
             project_path,
@@ -69,7 +72,7 @@ def commits(
 @five_command(global_config_path=True, logger=True, project_config_path=True, project_path=True)
 @click.argument('project_id', type=int, required=False)
 @click.option('--pp', is_flag=True, default=False, help='Pretty print JSON output')
-def project(
+def projects(
     ctx: click.Context,
     global_config_path: Path,
     logger: LogFunction,
@@ -78,7 +81,8 @@ def project(
     project_path: Path,
     project_config_path: Path,
 ):
-    with handle_cli_errors('get project'):
+    """Retrieve information about projects."""
+    with handle_cli_errors('get projects'):
         result = handle_get_projects(
             project_path, global_config_path, project_config_path, logger, project_id
         )

@@ -4,9 +4,9 @@ from pathlib import Path
 import subprocess
 from typing import Callable
 
-from five_cli.core.config import get_db_path
-from five_cli.managers.db_manager import DatabaseManager
-from five_cli.utils import NOOP_LOG
+from five.core.config import get_db_path
+from five.managers.db_manager import DatabaseManager
+from five.utils import NOOP_LOG
 
 
 class FiveValidationError(Exception):

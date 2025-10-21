@@ -1,10 +1,10 @@
 from pathlib import Path
 
-from five_cli.core.config import get_db_path
-from five_cli.managers.db_manager import DatabaseManager
-from five_cli.managers.git_manager import GitManager
-from five_cli.managers.state_manager import StateManager
-from five_cli.utils import LogFunction
+from five.core.config import get_db_path
+from five.managers.db_manager import DatabaseManager
+from five.managers.git_manager import GitManager
+from five.managers.state_manager import StateManager
+from five.utils import LogFunction
 
 
 class ManagerFactory:

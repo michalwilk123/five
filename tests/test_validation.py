@@ -1,9 +1,9 @@
 import pytest
 
-from five_cli.core.config import get_db_path
-from five_cli.managers.db_manager import DatabaseManager
-from five_cli.utils import NOOP_LOG
-from five_cli.validation import FiveValidator
+from five.core.config import get_db_path
+from five.managers.db_manager import DatabaseManager
+from five.utils import NOOP_LOG
+from five.validation import FiveValidator
 
 
 @pytest.fixture
@@ -198,7 +198,7 @@ def test_validate_state_file_does_not_exist_fails_when_exists(tmp_path, make_val
 
 
 def test_validate_project_not_initialized_success(tmp_path, make_validator):
-    from five_cli.managers.db_manager import DatabaseManager
+    from five.managers.db_manager import DatabaseManager
 
     project_dir = tmp_path / 'project'
     project_dir.mkdir()
@@ -218,7 +218,7 @@ def test_validate_project_not_initialized_success(tmp_path, make_validator):
 
 
 def test_validate_project_not_initialized_fails_when_already_initialized(tmp_path, make_validator):
-    from five_cli.managers.db_manager import DatabaseManager
+    from five.managers.db_manager import DatabaseManager
 
     project_dir = tmp_path / 'project'
     project_dir.mkdir()

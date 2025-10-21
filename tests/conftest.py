@@ -5,10 +5,10 @@ import tempfile
 from click.testing import CliRunner
 import pytest
 
-from five_cli.cli.main import cli
-from five_cli.core.config import get_db_path, get_project_config_path
-from five_cli.managers.db_manager import DatabaseManager
-from five_cli.utils import NOOP_LOG
+from five.cli.main import cli
+from five.core.config import get_db_path, get_project_config_path
+from five.managers.db_manager import DatabaseManager
+from five.utils import NOOP_LOG
 
 from .helpers import TestInvoker
 
@@ -41,7 +41,7 @@ def initialized_project(runner, isolated_config_dir):
                 'init',
                 '--project',
                 str(project_dir),
-                '--config',
+                '--global-config',
                 str(isolated_config_dir),
                 '--no-interactive',
             ],

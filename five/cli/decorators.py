@@ -3,11 +3,11 @@ from pathlib import Path
 
 import click
 
-from five_cli.cli.utils import create_click_logger
-from five_cli.core.config import get_config_root, get_db_path, get_project_config_path
-from five_cli.managers.db_manager import DatabaseManager
-from five_cli.utils import NOOP_LOG
-from five_cli.validation import FiveValidator
+from five.cli.utils import create_click_logger
+from five.core.config import get_config_root, get_db_path, get_project_config_path
+from five.managers.db_manager import DatabaseManager
+from five.utils import NOOP_LOG
+from five.validation import FiveValidator
 
 
 def _validate_project_path(ctx, param, value):
@@ -38,8 +38,8 @@ def _validate_project_config_path(ctx, param, value):
 
     # Resolve default when not provided: depends on already-validated --project and --global-config
     if value is None:
-        project_path: Path | None = ctx.params.get('project')
-        global_config_path: Path | None = ctx.params.get('global_config')
+        project_path: Path | None = ctx.params['project']
+        global_config_path: Path | None = ctx.params['global_config']
 
         if project_path is None or global_config_path is None:
             raise click.BadParameter(
@@ -94,18 +94,17 @@ needs_global_config_path = click.option(
 )
 
 # Variant that also accepts --config as alias (only safe when project_config_path is not used)
-needs_global_config_path_with_alias = click.option(
-    '--global-config',
-    '--config',
-    'global_config',
-    type=click.Path(file_okay=False, path_type=Path),
-    default=None,
-    help=(
-        'Path to the global five config directory where database is stored '
-        '(defaults to XDG: ~/.config/five)'
-    ),
-    callback=_validate_global_config_path,
-)
+# needs_global_config_path_with_alias = click.option(
+#     '--global-config',
+#     'global_config',
+#     type=click.Path(file_okay=False, path_type=Path),
+#     default=None,
+#     help=(
+#         'Path to the global five config directory where database is stored '
+#         '(defaults to XDG: ~/.config/five)'
+#     ),
+#     callback=_validate_global_config_path,
+# )
 
 needs_project_config_path = click.option(
     '--config',
@@ -172,21 +171,16 @@ def five_command(
 
             return func(ctx, **passthrough)
 
-        # Apply validators/options in the correct order
         decorated = wrapper
 
-        if require_project:
-            decorated = needs_project_path(decorated)
-        if require_global:
-            # If also requiring project_config_path, avoid alias collision on --config
-            if project_config_path:
-                decorated = needs_global_config_path(decorated)
-            else:
-                decorated = needs_global_config_path_with_alias(decorated)
-        if project_config_path:
-            decorated = needs_project_config_path(decorated)
         if logger:
             decorated = needs_logger(decorated)
+        if project_config_path:
+            decorated = needs_project_config_path(decorated)
+        if require_global:
+            decorated = needs_global_config_path(decorated)
+        if require_project:
+            decorated = needs_project_path(decorated)
 
         return decorated
 

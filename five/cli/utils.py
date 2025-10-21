@@ -3,7 +3,7 @@ from typing import Callable, Iterator
 
 import click
 
-from five_cli.utils import LogFunction
+from five.utils import LogFunction
 
 
 def _extract_exception_messages(exc: BaseException) -> list[str]:

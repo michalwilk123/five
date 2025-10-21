@@ -1,10 +1,10 @@
 from pony.orm import db_session
 
-from five_cli.db_models import CompletedTask
-from five_cli.managers.db_manager import DatabaseManager
-from five_cli.managers.git_manager import GitManager
-from five_cli.managers.state_manager import StateManager
-from five_cli.utils import LogFunction
+from five.db_models import CompletedTask
+from five.managers.db_manager import DatabaseManager
+from five.managers.git_manager import GitManager
+from five.managers.state_manager import StateManager
+from five.utils import LogFunction
 
 
 def ensure_not_started(state_manager: StateManager, log: LogFunction):
@@ -104,13 +104,14 @@ def record_assistant_commit(
     db_manager: DatabaseManager,
     commit_hash: str,
     completed_task_id: int,
+    note: str | None,
     log: LogFunction,
 ):
     log('Creating assistant commit')
     assistant_commit = db_manager.create_assistant_commit(
         commit_hash,
         completed_task_id,
-        note=None,
+        note,
     )
     log(f'Created assistant commit with ID: {assistant_commit.id}')
     return assistant_commit

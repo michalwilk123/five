@@ -1,4 +1,4 @@
-from five_cli.core.config import get_db_path
+from five.core.config import get_db_path
 
 from .helpers import (
     get_commit_by_hash,
@@ -202,6 +202,8 @@ def test_track_stop_with_references(initialized_project):
             'Task 2 based on task 1',
             '--references',
             '[1]',
+            '--note',
+            'This is a test note for the commit',
         ]
     )
 
@@ -218,3 +220,21 @@ def test_track_stop_with_references(initialized_project):
     task_2 = get_task_by_id(db_path, task_2_id)
     assert task_2 is not None
     assert task_2[2] == 'Task 2 based on task 1'
+
+
+def test_track_status_no_session(initialized_project):
+    project_dir, runner, global_config_path, project_config_path, invoker = initialized_project
+
+    result = invoker.run(['track', 'status'])
+
+    assert 'No active tracking session' in result.output
+
+
+def test_track_status_active_session(initialized_project):
+    project_dir, runner, global_config_path, project_config_path, invoker = initialized_project
+
+    invoker.run(['track', 'start'])
+
+    result = invoker.run(['track', 'status'])
+
+    assert 'Tracking session is active' in result.output

@@ -3,11 +3,11 @@ from pathlib import Path
 
 from pony.orm import db_session, flush
 
-from five_cli.core.config import get_db_path
-from five_cli.db_models import CompletedTask, Project
-from five_cli.managers.db_manager import DatabaseManager
-from five_cli.managers.git_manager import GitManager, init_git_repo_in_dir
-from five_cli.utils import NOOP_LOG
+from five.core.config import get_db_path
+from five.db_models import CompletedTask, Project
+from five.managers.db_manager import DatabaseManager
+from five.managers.git_manager import GitManager, init_git_repo_in_dir
+from five.utils import NOOP_LOG
 
 
 def create_test_git_commits(project_dir: Path, project_config_path: Path):
@@ -122,7 +122,7 @@ def test_get_completed_task_by_id(initialized_project):
     assert task['prompt'] == 'Create hello function'
     assert task['model_name'] == 'gpt-4'
     assert task['temperature'] == 0.7
-    assert 'diff' in task
+    assert 'generated_code' in task
 
 
 def test_get_commits_list(initialized_project):
@@ -189,7 +189,7 @@ def test_get_project_list(initialized_project):
     db_manager = DatabaseManager(NOOP_LOG, db_path)
     db_manager.connect(create_tables=True)
 
-    result = invoker.run(['get', 'project'])
+    result = invoker.run(['get', 'projects'])
 
     projects = json.loads(result.output)
     assert len(projects) == 1
@@ -208,7 +208,7 @@ def test_get_project_detail(initialized_project):
         project = Project.get(path=str(project_dir.resolve()))
         project_id = project.id
 
-    result = invoker.run(['get', 'project', str(project_id)])
+    result = invoker.run(['get', 'projects', str(project_id)])
 
     project_data = json.loads(result.output)
     assert project_data['id'] == project_id

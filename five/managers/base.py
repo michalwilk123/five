@@ -1,4 +1,4 @@
-from five_cli.utils import LogFunction
+from five.utils import LogFunction
 
 
 class BaseManager:

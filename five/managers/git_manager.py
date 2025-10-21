@@ -3,8 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 import subprocess
 
-from five_cli.managers.base import BaseManager
-from five_cli.utils import LogFunction
+from five.managers.base import BaseManager
+from five.utils import LogFunction
 
 
 class GitCommandChain:
@@ -128,7 +128,7 @@ class GitManager(BaseManager):
 
     def get_diff(self, commit_hash: str) -> str:
         self._log(f'Getting diff for commit {commit_hash}')
-        result = self.run(['diff', commit_hash])
+        result = self.run(['show', commit_hash])
         return result.stdout
 
     def get_all_commit_hashes(self) -> set[str]:

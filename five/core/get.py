@@ -1,9 +1,9 @@
 from pony.orm import db_session
 
-from five_cli.core.common import get_diff_for_commit
-from five_cli.managers.db_manager import DatabaseManager
-from five_cli.managers.git_manager import GitManager
-from five_cli.utils import LogFunction
+from five.core.common import get_diff_for_commit
+from five.managers.db_manager import DatabaseManager
+from five.managers.git_manager import GitManager
+from five.utils import LogFunction
 
 
 @db_session
@@ -39,7 +39,7 @@ def fetch_completed_task_with_diff(
 
     diff = get_diff_for_commit(db_manager, git_manager, commit_id, log)
     if diff:
-        task['diff'] = diff
+        task['generated_code'] = diff
 
     return task
 

@@ -2,11 +2,11 @@ from pathlib import Path
 
 from pony.orm import db_session
 
-from five_cli.core.config import ensure_global_config_path, get_project_config_path
-from five_cli.managers import get_git_config_value
-from five_cli.managers.db_manager import DatabaseManager
-from five_cli.managers.git_manager import init_git_repo_in_dir
-from five_cli.utils import LogFunction, find_git_repo_path, generate_unique_project_name
+from five.core.config import ensure_global_config_path, get_project_config_path
+from five.managers import get_git_config_value
+from five.managers.db_manager import DatabaseManager
+from five.managers.git_manager import init_git_repo_in_dir
+from five.utils import LogFunction, find_git_repo_path, generate_unique_project_name
 
 
 @db_session
@@ -77,10 +77,3 @@ def initialize_checkpoint_repository(
     git_path = project_config_dir / '.git'
     init_git_repo_in_dir(project_path, git_path)
     log(f'Checkpoint repository initialized at {project_config_dir}')
-
-
-def create_gitignore_for_project_git(project_config_dir: Path, log: LogFunction):
-    log('Creating .gitignore to exclude .git directory')
-    gitignore_path = project_config_dir / '.gitignore'
-    gitignore_path.write_text('.git\n')
-    log('.gitignore created')
