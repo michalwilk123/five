@@ -12,6 +12,10 @@ jobs:
       - uses: astral-sh/setup-uv@v2
       - name: install
         run: uv sync --frozen
+      - name: configure git
+        run: |
+          git config --global user.email "test@example.com"
+          git config --global user.name "Test User"
       - name: test
         run: uv run pytest
 
