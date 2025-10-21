@@ -2,6 +2,7 @@ import pytest
 
 from five_cli.core.config import get_db_path
 from five_cli.managers.db_manager import DatabaseManager
+from five_cli.utils import NOOP_LOG
 from five_cli.validation import FiveValidator
 
 
@@ -96,7 +97,8 @@ def test_validate_setup_exists_success(tmp_path, make_validator):
     config_dir = tmp_path / 'config'
     config_dir.mkdir()
 
-    db_manager = DatabaseManager(config_dir, None)
+    db_path = get_db_path(config_dir)
+    db_manager = DatabaseManager(NOOP_LOG, db_path)
     db_manager.connect(create_tables=True)
 
     validator, _ = make_validator()
@@ -208,7 +210,7 @@ def test_validate_project_not_initialized_success(tmp_path, make_validator):
     db_path.parent.mkdir(parents=True, exist_ok=True)
     db_path.write_text('')
 
-    db_manager = DatabaseManager(config_dir, None)
+    db_manager = DatabaseManager(NOOP_LOG, db_path)
     db_manager.connect(create_tables=True)
 
     validator, _ = make_validator()
@@ -228,7 +230,7 @@ def test_validate_project_not_initialized_fails_when_already_initialized(tmp_pat
     db_path.parent.mkdir(parents=True, exist_ok=True)
     db_path.write_text('')
 
-    db_manager = DatabaseManager(config_dir, None)
+    db_manager = DatabaseManager(NOOP_LOG, db_path)
     db_manager.connect(create_tables=True)
     db_manager.create_project(
         name='test_project',

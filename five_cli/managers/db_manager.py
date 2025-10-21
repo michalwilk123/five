@@ -1,24 +1,20 @@
-from __future__ import annotations
-
 from pathlib import Path
 
-from pony.orm import db_session, desc, max, select
+from pony.orm import db_session, desc, exists, max, select
 
-from five_cli.core.config import get_db_path
 from five_cli.db_models import Commit, CompletedTask, Project, db
-from five_cli.managers.common import BaseManager
+from five_cli.managers.base import BaseManager
 from five_cli.utils import LogFunction
 
 
 class DatabaseManager(BaseManager):
     def __init__(
         self,
-        five_dir: Path,
-        logger: LogFunction | None = None,
-        db_path: Path | None = None,
+        logger: LogFunction,
+        db_path: Path,
     ):
-        super().__init__(five_dir, logger)
-        self._db_path = db_path or get_db_path(self.five_dir)
+        super().__init__(logger)
+        self._db_path = db_path
         self._connected = False
 
     @property
@@ -65,6 +61,10 @@ class DatabaseManager(BaseManager):
         return select(p.name for p in Project)[:]
 
     @db_session
+    def get_project_by_name(self, name: str) -> Project | None:
+        return Project.get(name=name)
+
+    @db_session
     def create_user_commit(self, commit_hash: str, note: str | None) -> Commit:
         self._log(f'Persisting user commit {commit_hash}')
         commit_data = {
@@ -79,10 +79,13 @@ class DatabaseManager(BaseManager):
         self, commit_hash: str, completed_task_id: int, note: str | None
     ) -> Commit:
         self._log(f'Persisting assistant commit {commit_hash}')
+        task = CompletedTask.get(id=completed_task_id)
+        if task is None:
+            raise ValueError(f'Completed task with ID {completed_task_id} not found')
         commit_data = {
             'hash': commit_hash,
             'type': 'assistant',
-            'completed_task_id': completed_task_id,
+            'completed_task': task,
         }
         if note is not None:
             commit_data['note'] = note
@@ -125,22 +128,45 @@ class DatabaseManager(BaseManager):
     def get_commit_by_hash(self, commit_hash: str) -> Commit | None:
         return Commit.get(hash=commit_hash)
 
-    def get_all_completed_tasks(self) -> list[dict]:
-        tasks = select(t for t in CompletedTask)[:]
+    def get_all_completed_tasks(self, project_id: int | None = None) -> list[dict]:
+        if project_id is None:
+            tasks = select(t for t in CompletedTask)[:]
+        else:
+            tasks = select(t for t in CompletedTask if t.project.id == project_id)[:]
         return [task.to_dict() for task in tasks]
 
     def get_completed_task_by_id(self, task_id: int) -> dict | None:
         task = CompletedTask.get(id=task_id)
         return task.to_dict() if task else None
 
-    @db_session
-    def get_all_commits(self) -> list[dict]:
-        commits = select(c for c in Commit)[:]
+    def get_commits_by_project_id(self, project_id: int | None) -> list[dict]:
+        if project_id is None:
+            commits = select(c for c in Commit)[:]
+        else:
+            commits = select(
+                c
+                for c in Commit
+                if exists(
+                    t
+                    for t in CompletedTask
+                    if t.project.id == project_id
+                    and (t.commit_id == c.id or c.completed_task is t)
+                )
+            )[:]
         return [commit.to_dict() for commit in commits]
 
     def get_commit_by_id(self, commit_id: int) -> dict | None:
         commit = Commit.get(id=commit_id)
         return commit.to_dict() if commit else None
+
+    @db_session
+    def get_all_projects(self) -> list[dict]:
+        projects = select(p for p in Project)[:]
+        return [project.to_dict() for project in projects]
+
+    def get_project_by_id(self, project_id: int) -> dict | None:
+        project = Project.get(id=project_id)
+        return project.to_dict() if project else None
 
     def get_commit_entity_by_hash(self, commit_hash: str) -> Commit | None:
         return Commit.get(hash=commit_hash)

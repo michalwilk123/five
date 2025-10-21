@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from pony.orm import db_session
 
 from five_cli.core.common import get_diff_for_commit
@@ -12,9 +10,10 @@ from five_cli.utils import LogFunction
 def fetch_completed_tasks_list(
     db_manager: DatabaseManager,
     log: LogFunction,
+    project_id: int | None,
 ) -> list[dict]:
     log('Fetching all completed tasks')
-    tasks = db_manager.get_all_completed_tasks()
+    tasks = db_manager.get_all_completed_tasks(project_id)
     log(f'Found {len(tasks)} completed tasks')
     return tasks
 
@@ -46,12 +45,13 @@ def fetch_completed_task_with_diff(
 
 
 @db_session
-def fetch_commits_list(
+def fetch_commits_by_project_id(
     db_manager: DatabaseManager,
     log: LogFunction,
+    project_id: int | None,
 ) -> list[dict]:
     log('Fetching all commits')
-    commits = db_manager.get_all_commits()
+    commits = db_manager.get_commits_by_project_id(project_id)
     log(f'Found {len(commits)} commits')
     return commits
 
@@ -75,3 +75,30 @@ def fetch_commit_with_diff(
         commit['diff'] = diff
 
     return commit
+
+
+@db_session
+def fetch_projects_list(
+    db_manager: DatabaseManager,
+    log: LogFunction,
+) -> list[dict]:
+    log('Fetching all projects')
+    projects = db_manager.get_all_projects()
+    log(f'Found {len(projects)} projects')
+    return projects
+
+
+@db_session
+def fetch_project(
+    db_manager: DatabaseManager,
+    project_id: int,
+    log: LogFunction,
+) -> dict | None:
+    log(f'Fetching project {project_id}')
+    project = db_manager.get_project_by_id(project_id)
+
+    if not project:
+        log(f'Project {project_id} not found')
+        return None
+
+    return project

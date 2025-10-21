@@ -4,9 +4,6 @@ from pathlib import Path
 
 
 def get_config_root() -> Path:
-    if custom_dir := os.getenv('FIVE_CONFIG_DIR'):
-        return Path(custom_dir)
-
     xdg_config_home = os.getenv('XDG_CONFIG_HOME')
     if xdg_config_home:
         return Path(xdg_config_home) / 'five'
@@ -20,12 +17,13 @@ def get_project_identifier(project_path: Path) -> str:
     return path_hash
 
 
-# removed: resolve_project_config_dir(project_path: Path) -> Path
+def get_db_path(global_config_path: Path) -> Path:
+    return global_config_path / 'data.db'
 
 
-def get_db_path(five_dir: Path) -> Path:
-    return five_dir / 'data.db'
+def ensure_global_config_path(global_config_path: Path):
+    global_config_path.mkdir(parents=True, exist_ok=True)
 
 
-def ensure_five_dir(five_dir: Path):
-    five_dir.mkdir(parents=True, exist_ok=True)
+def get_project_config_path(config_root: Path, project_name: str) -> Path:
+    return config_root / project_name

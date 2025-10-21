@@ -2,51 +2,61 @@ from pathlib import Path
 
 import click
 
-from five_cli.cli.utils import handle_cli_errors, build_validation_on_errors
-from five_cli.core.config import get_config_root
-from five_cli.handlers import init_handler
+from five_cli.cli.decorators import five_command
+from five_cli.cli.utils import build_validation_on_errors, handle_cli_errors
+from five_cli.handlers import init_handler, setup_handler
+from five_cli.utils import LogFunction
 from five_cli.validation import FiveValidator
-from five_cli.managers import ClickContextManager
 
 
 @click.command()
-@click.option('--project', type=click.Path(file_okay=False, path_type=Path), default=None, help='Path to the project directory to track (defaults to current directory)')
-@click.option(
-    '--config',
-    type=click.Path(file_okay=False, path_type=Path),
-    default=None,
-    help='Path to the five config directory (defaults to XDG standard path)',
-)
-@click.option('--verbose', '-v', is_flag=True, default=False, help='Enable verbose logging')
 @click.option(
     '--interactive/--no-interactive',
     default=True,
     help='Prompt to run setup if not already done (default: True)',
 )
-@click.pass_context
-def init(ctx: click.Context, project: Path | None, config: Path | None, verbose: bool, interactive: bool):
-    from five_cli.cli.utils import create_click_logger
+@five_command(project_path=True, logger=True, global_config_path=True)
+def init(
+    ctx: click.Context,
+    interactive: bool,
+    *,
+    project_path: Path,
+    global_config_path: Path,
+    logger: LogFunction,
+):
+    # Validate basic inputs (do not enforce setup existence here)
+    FiveValidator(
+        raises=click.ClickException, on_errors=build_validation_on_errors('five init')
+    ).project_path_exists(project_path).config_path_exists(global_config_path).execute()
 
-    ctx.ensure_object(dict)
-    project_path: Path = project if project is not None else Path.cwd()
-    logger = create_click_logger(verbose)
+    # Ensure setup exists or perform setup if interactive
+    setup_check = FiveValidator(raises=False, on_errors=None).setup_exists(global_config_path)
+    if not setup_check.execute():
+        if interactive:
+            # Ask for confirmation and run setup
+            if click.confirm('Five is not set up. Would you like to set it up now?', default=True):
+                with handle_cli_errors('set up five'):
+                    setup_handler(global_config_path, logger)
+            else:
+                raise click.ClickException(
+                    f'Five is not set up at {global_config_path}. '
+                    f'Run "five setup" first or use --interactive.'
+                )
+        else:
+            raise click.ClickException(
+                f'Five is not set up at {global_config_path}. '
+                f'Run "five setup" first or use --interactive.'
+            )
 
-    actual_config_path = config if config is not None else get_config_root()
-
-    # Perform validation without raising; print errors via on_errors
-    validator = FiveValidator(
-        raises=False, on_errors=build_validation_on_errors('five init')
-    ) \
-        .project_path_exists(project_path) \
-        .project_not_initialized(project_path, actual_config_path)
-    if not validator.execute():
-        raise click.ClickException('Validation failed. See errors above.')
+    # Ensure project is not already initialized
+    FiveValidator(
+        raises=click.ClickException, on_errors=build_validation_on_errors('five init')
+    ).project_not_initialized(project_path, global_config_path).execute()
 
     with handle_cli_errors('initialize project'):
         project_name = init_handler(
             project_path,
-            actual_config_path,
-            interactive,
+            global_config_path,
             logger,
         )
     click.echo(f'Project "{project_name}" initialized successfully')

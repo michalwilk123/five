@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from pony.orm import db_session
 
 from five_cli.db_models import CompletedTask
@@ -26,6 +24,21 @@ def get_repository_status(git_manager: GitManager, log: LogFunction) -> dict:
 
 def repository_has_changes(status: dict) -> bool:
     return bool(status.get('is_dirty'))
+
+
+def create_user_commit_for_pending_changes(
+    db_manager: DatabaseManager,
+    git_manager: GitManager,
+    log: LogFunction,
+) -> str | None:
+    status = get_repository_status(git_manager, log)
+    if not repository_has_changes(status):
+        return None
+    log('Pending changes detected, creating user commit')
+    commit_id = get_next_commit_id(db_manager, log)
+    commit_hash = create_commit(git_manager, commit_id, log)
+    record_user_commit(db_manager, commit_hash, log)
+    return commit_hash
 
 
 @db_session

@@ -1,19 +1,17 @@
-from __future__ import annotations
-
 from pathlib import Path
 
-from five_cli.managers.common import BaseManager
+from five_cli.managers.base import BaseManager
+from five_cli.utils import LogFunction
 
 
 class StateManager(BaseManager):
     def __init__(
         self,
-        five_dir: Path,
-        state_file: Path | None = None,
-        logger=None,
+        logger: LogFunction,
+        state_file: Path,
     ):
-        super().__init__(five_dir, logger)
-        self.state_file = state_file or (self.five_dir / 'state')
+        super().__init__(logger)
+        self.state_file = state_file
 
     @property
     def state_path(self) -> Path:

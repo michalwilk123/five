@@ -1,17 +1,17 @@
 """Manager package exposing concrete manager implementations."""
 
-from .common import BaseManager
+from .base import BaseManager
 from .db_manager import DatabaseManager
-from .git_manager import GitManager, get_git_config_value, init_git_repo
+from .factory import ManagerFactory
+from .git_manager import GitManager, get_git_config_value, init_git_repo_in_dir
 from .state_manager import StateManager
-from .context_manager import ClickContextManager
 
 __all__ = [
     'BaseManager',
     'DatabaseManager',
     'GitManager',
     'StateManager',
-    'ClickContextManager',
+    'ManagerFactory',
     'get_git_config_value',
-    'init_git_repo',
+    'init_git_repo_in_dir',
 ]

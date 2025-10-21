@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import json
 
 from five_cli.managers.db_manager import DatabaseManager

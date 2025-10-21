@@ -1,22 +1,31 @@
-from __future__ import annotations
-
 import json
 from pathlib import Path
 
 from pony.orm import db_session, flush
 
-from five_cli.cli.main import cli
 from five_cli.core.config import get_db_path
+from five_cli.db_models import CompletedTask, Project
 from five_cli.managers.db_manager import DatabaseManager
-from five_cli.managers.git_manager import GitManager
+from five_cli.managers.git_manager import GitManager, init_git_repo_in_dir
+from five_cli.utils import NOOP_LOG
 
-from five_cli.db_models import CompletedTask
 
+def create_test_git_commits(project_dir: Path, project_config_path: Path):
+    """
+    Create test git commits in the checkpoint repository.
 
-def create_test_git_commits(five_dir: Path):
-    git_manager = GitManager(five_dir)
+    Args:
+        project_dir: The actual project directory (work_tree)
+        project_config_path: The project-specific config directory (contains .git)
+    """
+    project_config_path.mkdir(parents=True, exist_ok=True)
+    git_dir = project_config_path / '.git'
+    init_git_repo_in_dir(project_dir, git_dir)
 
-    test_file = five_dir / 'test1.txt'
+    work_tree = project_dir
+    git_manager = GitManager(NOOP_LOG, git_dir, work_tree)
+
+    test_file = project_dir / 'test1.txt'
     test_file.write_text('First test commit')
 
     result1 = (
@@ -28,7 +37,7 @@ def create_test_git_commits(five_dir: Path):
     )
     hash1 = result1.stdout.strip() if result1 else ''
 
-    test_file2 = five_dir / 'test2.txt'
+    test_file2 = project_dir / 'test2.txt'
     test_file2.write_text('Second test commit')
 
     result2 = (
@@ -44,17 +53,17 @@ def create_test_git_commits(five_dir: Path):
 
 
 def populate_test_data(db_path: Path, hash1: str, hash2: str, project_path: Path):
-    five_dir = db_path.parent
-    db_manager = DatabaseManager(five_dir)
+    db_manager = DatabaseManager(NOOP_LOG, db_path)
     db_manager.connect(create_tables=True)
 
     with db_session:
-        project = db_manager.create_project(
-            name='test_project',
-            path=str(project_path),
-            git_repo_path=None,
-            author='Test Author',
-        )
+        # Query for the existing project instead of creating a new one
+        project_path_str = str(project_path.resolve())
+        project = db_manager.get_project_by_path(project_path_str)
+
+        if not project:
+            raise ValueError(f'Project not found at {project_path_str}')
+
         flush()
 
         task1 = CompletedTask(
@@ -83,13 +92,13 @@ def populate_test_data(db_path: Path, hash1: str, hash2: str, project_path: Path
 
 
 def test_get_completed_tasks_list(initialized_project):
-    project_dir, runner, config_dir, invoker = initialized_project
-    db_path = get_db_path(config_dir)
+    project_dir, runner, global_config_dir, project_config_path, invoker = initialized_project
+    db_path = get_db_path(global_config_dir)
 
-    hash1, hash2 = create_test_git_commits(config_dir)
+    hash1, hash2 = create_test_git_commits(project_dir, project_config_path)
     populate_test_data(db_path, hash1, hash2, project_dir)
 
-    result = invoker.run_without_project(['get', 'completed-tasks'])
+    result = invoker.run(['get', 'completed-tasks'])
 
     tasks = json.loads(result.output)
     assert len(tasks) == 2
@@ -100,13 +109,13 @@ def test_get_completed_tasks_list(initialized_project):
 
 
 def test_get_completed_task_by_id(initialized_project):
-    project_dir, runner, config_dir, invoker = initialized_project
-    db_path = get_db_path(config_dir)
+    project_dir, runner, global_config_dir, project_config_path, invoker = initialized_project
+    db_path = get_db_path(global_config_dir)
 
-    hash1, hash2 = create_test_git_commits(config_dir)
+    hash1, hash2 = create_test_git_commits(project_dir, project_config_path)
     populate_test_data(db_path, hash1, hash2, project_dir)
 
-    result = invoker.run_without_project(['get', 'completed-tasks', '1'])
+    result = invoker.run(['get', 'completed-tasks', '1'])
 
     task = json.loads(result.output)
     assert task['id'] == 1
@@ -117,13 +126,13 @@ def test_get_completed_task_by_id(initialized_project):
 
 
 def test_get_commits_list(initialized_project):
-    project_dir, runner, config_dir, invoker = initialized_project
-    db_path = get_db_path(config_dir)
+    project_dir, runner, global_config_dir, project_config_path, invoker = initialized_project
+    db_path = get_db_path(global_config_dir)
 
-    hash1, hash2 = create_test_git_commits(config_dir)
+    hash1, hash2 = create_test_git_commits(project_dir, project_config_path)
     populate_test_data(db_path, hash1, hash2, project_dir)
 
-    result = invoker.run_without_project(['get', 'commits'])
+    result = invoker.run(['get', 'commits'])
 
     commits = json.loads(result.output)
     assert len(commits) == 2
@@ -132,13 +141,13 @@ def test_get_commits_list(initialized_project):
 
 
 def test_get_commit_by_id(initialized_project):
-    project_dir, runner, config_dir, invoker = initialized_project
-    db_path = get_db_path(config_dir)
+    project_dir, runner, global_config_dir, project_config_path, invoker = initialized_project
+    db_path = get_db_path(global_config_dir)
 
-    hash1, hash2 = create_test_git_commits(config_dir)
+    hash1, hash2 = create_test_git_commits(project_dir, project_config_path)
     populate_test_data(db_path, hash1, hash2, project_dir)
 
-    result = invoker.run_without_project(['get', 'commits', '1'])
+    result = invoker.run(['get', 'commits', '1'])
 
     commit = json.loads(result.output)
     assert commit['id'] == 1
@@ -148,26 +157,59 @@ def test_get_commit_by_id(initialized_project):
 
 
 def test_get_completed_task_nonexistent(initialized_project):
-    project_dir, runner, config_dir, invoker = initialized_project
-    db_path = get_db_path(config_dir)
+    project_dir, runner, global_config_dir, project_config_path, invoker = initialized_project
+    db_path = get_db_path(global_config_dir)
 
-    hash1, hash2 = create_test_git_commits(config_dir)
+    hash1, hash2 = create_test_git_commits(project_dir, project_config_path)
     populate_test_data(db_path, hash1, hash2, project_dir)
 
-    result = invoker.run_without_project(['get', 'completed-tasks', '999'], expect_failure=True)
+    result = invoker.run(['get', 'completed-tasks', '999'], expect_failure=True)
 
     assert result.exit_code != 0
     assert 'Completed task with ID 999 not found' in result.output
 
 
 def test_get_commit_nonexistent(initialized_project):
-    project_dir, runner, config_dir, invoker = initialized_project
-    db_path = get_db_path(config_dir)
+    project_dir, runner, global_config_dir, project_config_path, invoker = initialized_project
+    db_path = get_db_path(global_config_dir)
 
-    hash1, hash2 = create_test_git_commits(config_dir)
+    hash1, hash2 = create_test_git_commits(project_dir, project_config_path)
     populate_test_data(db_path, hash1, hash2, project_dir)
 
-    result = invoker.run_without_project(['get', 'commits', '999'], expect_failure=True)
+    result = invoker.run(['get', 'commits', '999'], expect_failure=True)
 
     assert result.exit_code != 0
     assert 'Commit with ID 999 not found' in result.output
+
+
+def test_get_project_list(initialized_project):
+    project_dir, runner, global_config_dir, project_config_path, invoker = initialized_project
+    db_path = get_db_path(global_config_dir)
+
+    db_manager = DatabaseManager(NOOP_LOG, db_path)
+    db_manager.connect(create_tables=True)
+
+    result = invoker.run(['get', 'project'])
+
+    projects = json.loads(result.output)
+    assert len(projects) == 1
+    assert projects[0]['name'] == project_dir.name
+    assert projects[0]['path'] == str(project_dir.resolve())
+
+
+def test_get_project_detail(initialized_project):
+    project_dir, runner, global_config_dir, project_config_path, invoker = initialized_project
+    db_path = get_db_path(global_config_dir)
+
+    db_manager = DatabaseManager(NOOP_LOG, db_path)
+    db_manager.connect(create_tables=True)
+
+    with db_session:
+        project = Project.get(path=str(project_dir.resolve()))
+        project_id = project.id
+
+    result = invoker.run(['get', 'project', str(project_id)])
+
+    project_data = json.loads(result.output)
+    assert project_data['id'] == project_id
+    assert project_data['name'] == project_dir.name

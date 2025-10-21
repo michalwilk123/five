@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from pony.orm import db_session
 
 from five_cli.db_models import CompletedTask

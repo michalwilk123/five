@@ -3,13 +3,14 @@ from __future__ import annotations
 from pathlib import Path
 import subprocess
 
-from five_cli.managers.common import BaseManager
+from five_cli.managers.base import BaseManager
+from five_cli.utils import LogFunction
 
 
 class GitCommandChain:
     """Fluent interface for sequencing git operations."""
 
-    def __init__(self, manager: 'GitManager'):
+    def __init__(self, manager: GitManager):
         self._manager = manager
         self._last_result: subprocess.CompletedProcess | None = None
 
@@ -17,7 +18,7 @@ class GitCommandChain:
         self._last_result = self._manager.run(args)
         return self
 
-    def stage_all(self) -> 'GitCommandChain':
+    def stage_all(self) -> GitCommandChain:
         self._manager._log('Staging all changes')
         self._run(['add', '-A'])
         self._manager._log('Unstaging state file')
@@ -55,17 +56,16 @@ class GitCommandChain:
 class GitManager(BaseManager):
     def __init__(
         self,
-        five_dir: Path,
-        git_dir: Path | None = None,
-        work_tree: Path | None = None,
-        logger=None,
+        logger: LogFunction,
+        git_path: Path,
+        work_tree: Path,
     ):
-        super().__init__(five_dir, logger)
-        self.git_dir = git_dir or (self.five_dir / '.git')
-        self.work_tree = work_tree or self.five_dir
+        super().__init__(logger)
+        self.git_path = git_path
+        self.work_tree = work_tree
 
     def run(self, args: list[str]) -> subprocess.CompletedProcess:
-        cmd = ['git', f'--git-dir={self.git_dir}', f'--work-tree={self.work_tree}', *args]
+        cmd = ['git', f'--git-dir={self.git_path}', f'--work-tree={self.work_tree}', *args]
         self._log(f'Running git command: {" ".join(cmd)}')
         try:
             return subprocess.run(cmd, capture_output=True, check=True, text=True)
@@ -148,7 +148,7 @@ class GitManager(BaseManager):
             self.run(['revert', commit_hash, '--no-commit'])
         except subprocess.CalledProcessError:
             self._log('Revert failed, likely due to conflicts. Resolving database conflicts.')
-        
+
         # Always reset the database to HEAD to avoid conflicts and maintain metadata integrity
         self._log('Resetting database file to current HEAD')
         try:
@@ -157,7 +157,7 @@ class GitManager(BaseManager):
         except subprocess.CalledProcessError:
             # If reset fails, the database might not be in the index, which is fine
             pass
-        
+
         self._log('Committing revert changes')
         self.run(['commit', '--no-edit', '-m', f'Revert "{commit_hash}"'])
         revert_hash = self.get_current_head()
@@ -165,13 +165,14 @@ class GitManager(BaseManager):
         return revert_hash
 
 
-def init_git_repo(work_tree: Path, git_dir: Path):
-    subprocess.run(['git', 'init', str(work_tree)], check=True, capture_output=True)
+def init_git_repo_in_dir(work_tree: Path, git_path: Path):
+    cmd = ['git', f'--git-dir={git_path}', f'--work-tree={work_tree}', 'init']
+    subprocess.run(cmd, check=True, capture_output=True)
 
 
 def get_git_config_value(key: str) -> str:
     result = subprocess.run(
-        ['git', 'config', '--global', key],
+        ['git', 'config', key],
         capture_output=True,
         text=True,
     )

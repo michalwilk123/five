@@ -1,12 +1,13 @@
 from datetime import datetime
 
-from pony.orm import Database, Optional, PrimaryKey, Required, Set
+from pony.orm import Database, Optional, PrimaryKey, Required, Set, composite_key
 
 db = Database()
 
+
 class CompletedTask(db.Entity):
     id = PrimaryKey(int, auto=True)
-    position = Required(int, unique=True, sql_default='0')
+    position = Required(int, sql_default='0')
     commit_id = Optional(int)
     prompt = Required(str)
     generated_code = Optional(str, default='')
@@ -16,8 +17,10 @@ class CompletedTask(db.Entity):
     timestamp = Required(datetime, default=lambda: datetime.now())
     revert_commit_id = Optional(int)
     project = Required('Project')
+    assistant_commit = Optional('Commit', reverse='completed_task')
     references = Set('Reference', reverse='task')
     referenced_by = Set('Reference', reverse='referenced_task')
+    composite_key(position, project)
 
     def is_deleted(self) -> bool:
         return self.revert_commit_id is not None
@@ -49,7 +52,7 @@ class Commit(db.Entity):
     type = Required(str)
     timestamp = Required(datetime, default=lambda: datetime.now())
     note = Optional(str)
-    completed_task_id = Optional(int)
+    completed_task = Optional('CompletedTask', reverse='assistant_commit')
 
     def to_dict(self):
         return {
@@ -58,14 +61,14 @@ class Commit(db.Entity):
             'type': self.type,
             'timestamp': self.timestamp.isoformat() if self.timestamp else None,
             'note': self.note,
-            'completed_task_id': self.completed_task_id,
+            'completed_task_id': self.completed_task.id if self.completed_task else None,
         }
 
 
 class Project(db.Entity):
     id = PrimaryKey(int, auto=True)
     name = Required(str, unique=True)
-    path = Required(str)
+    path = Required(str, unique=True)
     git_repo_path = Optional(str)
     author = Optional(str)
     timestamp = Required(datetime, default=lambda: datetime.now())

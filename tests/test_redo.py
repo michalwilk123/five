@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from five_cli.core.config import get_db_path
 
 from .helpers import (
@@ -9,25 +7,29 @@ from .helpers import (
 
 
 def test_redo_happy_path(initialized_project):
-    project_dir, runner, config_dir, invoker = initialized_project
-    five_dir = config_dir
-    db_path = get_db_path(five_dir)
+    project_dir, runner, global_config_path, project_config_path, invoker = initialized_project
+    db_path = get_db_path(global_config_path)
+
+    user_file = project_dir / 'user_setup.txt'
+    user_file.write_text('User initial setup')
 
     invoker.run(['track', 'start'])
 
-    test_file = five_dir / 'test_feature.py'
+    test_file = project_dir / 'test_feature.py'
     test_file.write_text('def new_feature():\n    return "feature"\n')
 
-    invoker.run([
-        'track',
-        'stop',
-        '--prompt',
-        'Add new feature',
-        '--model-name',
-        'gpt-4',
-        '--temperature',
-        '0.5',
-    ])
+    invoker.run(
+        [
+            'track',
+            'stop',
+            '--prompt',
+            'Add new feature',
+            '--model-name',
+            'gpt-4',
+            '--temperature',
+            '0.5',
+        ]
+    )
 
     invoker.run(['undo', '1'])
 
@@ -54,7 +56,7 @@ def test_redo_happy_path(initialized_project):
 
 
 def test_redo_nonexistent_task(initialized_project):
-    project_dir, runner, config_dir, invoker = initialized_project
+    project_dir, runner, global_config_path, project_config_path, invoker = initialized_project
 
     result = invoker.run(['redo', '999'], expect_failure=True)
     assert result.exit_code != 0
@@ -62,12 +64,14 @@ def test_redo_nonexistent_task(initialized_project):
 
 
 def test_redo_without_undo_fails(initialized_project):
-    project_dir, runner, config_dir, invoker = initialized_project
-    five_dir = config_dir
+    project_dir, runner, global_config_path, project_config_path, invoker = initialized_project
+
+    user_file = project_dir / 'user_setup.txt'
+    user_file.write_text('User initial setup')
 
     invoker.run(['track', 'start'])
 
-    test_file = five_dir / 'test_code.py'
+    test_file = project_dir / 'test_code.py'
     test_file.write_text('def test():\n    pass\n')
 
     invoker.run(['track', 'stop', '--prompt', 'Create test function'])
@@ -78,13 +82,15 @@ def test_redo_without_undo_fails(initialized_project):
 
 
 def test_redo_with_user_changes(initialized_project):
-    project_dir, runner, config_dir, invoker = initialized_project
-    five_dir = config_dir
-    db_path = get_db_path(five_dir)
+    project_dir, runner, global_config_path, project_config_path, invoker = initialized_project
+    db_path = get_db_path(global_config_path)
+
+    user_file = project_dir / 'user_setup.txt'
+    user_file.write_text('User initial setup')
 
     invoker.run(['track', 'start'])
 
-    ai_file = five_dir / 'ai_code.py'
+    ai_file = project_dir / 'ai_code.py'
     ai_file.write_text('def ai_function():\n    pass\n')
 
     invoker.run(['track', 'stop', '--prompt', 'Create AI function'])
@@ -94,7 +100,7 @@ def test_redo_with_user_changes(initialized_project):
     commits_after_undo = get_commits(db_path)
     undo_commit_count = len(commits_after_undo)
 
-    user_file = five_dir / 'user_changes.txt'
+    user_file = project_dir / 'user_changes.txt'
     user_file.write_text('Some user modifications after undo')
 
     invoker.run(['redo', '1'])
@@ -108,12 +114,14 @@ def test_redo_with_user_changes(initialized_project):
 
 
 def test_redo_multiple_times_fails(initialized_project):
-    project_dir, runner, config_dir, invoker = initialized_project
-    five_dir = config_dir
+    project_dir, runner, global_config_path, project_config_path, invoker = initialized_project
+
+    user_file = project_dir / 'user_setup.txt'
+    user_file.write_text('User initial setup')
 
     invoker.run(['track', 'start'])
 
-    test_file = five_dir / 'code.py'
+    test_file = project_dir / 'code.py'
     test_file.write_text('def function():\n    pass\n')
 
     invoker.run(['track', 'stop', '--prompt', 'Add function'])
@@ -128,13 +136,15 @@ def test_redo_multiple_times_fails(initialized_project):
 
 
 def test_undo_redo_cycle(initialized_project):
-    project_dir, runner, config_dir, invoker = initialized_project
-    five_dir = config_dir
-    db_path = get_db_path(five_dir)
+    project_dir, runner, global_config_path, project_config_path, invoker = initialized_project
+    db_path = get_db_path(global_config_path)
+
+    user_file = project_dir / 'user_setup.txt'
+    user_file.write_text('User initial setup')
 
     invoker.run(['track', 'start'])
 
-    test_file = five_dir / 'cycle.py'
+    test_file = project_dir / 'cycle.py'
     test_file.write_text('def cycle_test():\n    return "test"\n')
 
     invoker.run(['track', 'stop', '--prompt', 'Cycle test'])
@@ -164,14 +174,16 @@ def test_undo_redo_cycle(initialized_project):
 
 
 def test_redo_specific_task_among_multiple(initialized_project):
-    project_dir, runner, config_dir, invoker = initialized_project
-    five_dir = config_dir
-    db_path = get_db_path(five_dir)
+    project_dir, runner, global_config_path, project_config_path, invoker = initialized_project
+    db_path = get_db_path(global_config_path)
 
     for i in range(1, 4):
+        user_file = project_dir / f'user_{i}.txt'
+        user_file.write_text(f'User setup {i}')
+
         invoker.run(['track', 'start'])
 
-        task_file = five_dir / f'task_{i}.py'
+        task_file = project_dir / f'task_{i}.py'
         task_file.write_text(f'def task_{i}():\n    pass\n')
 
         invoker.run(['track', 'stop', '--prompt', f'Task {i}'])

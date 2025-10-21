@@ -1,14 +1,9 @@
 from contextlib import contextmanager
-from functools import wraps
-from pathlib import Path
-from typing import Callable, Iterator, TypeVar
+from typing import Callable, Iterator
 
 import click
 
-from five_cli.validation import FiveValidationError, FiveValidator
 from five_cli.utils import LogFunction
-from five_cli.core.config import get_config_root, get_project_identifier
-from five_cli.managers import ClickContextManager
 
 
 def _extract_exception_messages(exc: BaseException) -> list[str]:
@@ -19,9 +14,6 @@ def _extract_exception_messages(exc: BaseException) -> list[str]:
             messages.extend(_extract_exception_messages(inner))
         return messages
     return [str(exc)]
-
-
-T = TypeVar('T')
 
 
 @contextmanager
@@ -73,44 +65,3 @@ def create_click_logger(verbose: bool) -> LogFunction:
             click.echo(message)
 
     return logger
-
-
-def runtime_command(func: Callable[..., T]) -> Callable[..., T]:
-    """Decorator adding common runtime options and context preparation.
-
-    Applies project/config/verbose options, validates environment, and prepares
-    Click context with `ClickContextManager` before invoking the wrapped function.
-    """
-
-    @click.option('--project', type=click.Path(exists=True, file_okay=False, path_type=Path), default=None, help='Path to the project directory to track (defaults to current directory)')
-    @click.option('--config', type=click.Path(file_okay=False, path_type=Path), default=None, help='Path to the five config directory (defaults to XDG standard path)')
-    @click.option('--verbose', '-v', is_flag=True, default=False, help='Enable verbose logging')
-    @click.pass_context
-    @wraps(func)
-    def wrapper(ctx: click.Context, verbose: bool, project: Path | None, config: Path | None, *args, **kwargs):
-        # Ensure context obj exists
-        ctx.ensure_object(dict)
-
-        # If already prepared (e.g., by a parent group), reuse existing context
-        if isinstance(ctx.obj, dict) and all(k in ctx.obj for k in ('project_path', 'config_path', 'logger')):
-            return func(ctx, *args, **kwargs)
-
-        project_path: Path = project if project is not None else Path.cwd()
-        config_root: Path = get_config_root()
-        default_project_config = config_root / get_project_identifier(project_path)
-        config_path: Path = config if config is not None else default_project_config
-        logger = create_click_logger(verbose)
-
-        # Validate base parameters and setup for runtime commands
-        validator = FiveValidator(raises=False, on_errors=build_validation_on_errors('five')) \
-            .project_path_exists(project_path) \
-            .config_path_exists(config_path) \
-            .setup_exists(config_path)
-        if not validator.execute():
-            # When non-raising, explicitly fail with a ClickException carrying summarised message
-            raise click.ClickException('Validation failed. See errors above.')
-
-        ClickContextManager.prepare(ctx, project_path, config_path, logger)
-        return func(ctx, *args, **kwargs)
-
-    return wrapper  # type: ignore[return-value]

@@ -1,29 +1,43 @@
-# Local Claude Rules
+# Coding Rules
 
-## Coding Style Guidelines
+## Core Principles
 
-- Prefer functional coding style over adding classes
-- Functions should have the most simple input arguments and should return the most simple result
-- Code can be redundant if it improves readability. Do not create code that is preemptively extensible
-- Hard to understand code is the one that has a lot of logical constructs like if/forloops/try-except statements in close proximity to each other. Avoid writing hard to understand code. Try to split this logic into several functions
-- Avoid default arguments for internal use functions. Call of internal functions should be as clear as possible
-- Avoid None arguments. Try to clear out unknown arguments as early as possible
-- Functions should be as pure as possible. Avoid side effects and mutable state if it is achievable
-- Avoid global state
-- Avoid local import statements and function definitions inside not always reachable code like if/def/try statements
-- Avoid comments and docstrings. Code should be documentation itself
-- Avoid issues with relative paths, do not use __file__
+- Design functions with simple input arguments and simple return values.
+- Write redundant code if it improves readability. Do not write preemptively extensible code.
+- Write functional code. Do not create classes when functions suffice.
 
-### Project Specific Rules
-cli -> directory with only CLI - related logic. The command logic should reside in handlers.py file
-core -> small functionality specific functions. Created for readability only. Not meant to be reusable. Common application specific functions should be in core/common.py
-managers -> interfaces for other libraries / applications like git or sqllite. This will talk to external applications directly
-utils.py -> universal logic not connected with the project itself
+## Code Clarity
 
-Only the managers can interface underline applications directly
-The managers are used mainly by the core functions
-cli directory does not contain the application logic
+- Do not use default arguments for internal functions. Make all internal function calls explicit.
+-Do not use None as an argument type. Resolve unknown arguments immediately.
+- Split complex logic into multiple functions. Code becomes hard to understand when if statements, for loops, and try-except blocks appear in close proximity. Break these into separate functions.
 
-### Technical
+## Validation and Safety
 
-Project uses uv to run it, pytest for testing. Other dependancies are click and ponyorm
+- Validate all inputs at the entry point. Fail fast.
+- Write pure functions. Eliminate side effects and mutable state wherever possible.
+- Do not use global state.
+
+## Import and Structure Rules
+
+- Place all imports at the top of the file. Do not use local imports or function definitions inside if statements, function definitions, or try blocks.
+- Do not use relative paths. Do not reference `__file__`.
+- Do not write comments or docstrings. The code is the documentation.
+
+## Project Structure
+
+**cli/** - Contains CLI logic only. Command implementation goes in `handlers.py`.
+**core/** - Contains small, function-specific logic for readability. Not designed for reusability. Application-wide common functions go in `core/common.py`.
+**managers/** - Interfaces for external libraries and applications (git, sqlite, etc.). Only managers communicate with external applications directly.
+**utils.py** - Universal logic unrelated to the project domain.
+**handlers.py** - implementation of the each command logic. Separated with UI
+**validation.py** - validation logic
+
+Managers interface with external applications. Core functions use managers. CLI directory does not contain application logic.
+
+## Technical Stack
+
+- **uv** for running the project
+- **pytest** for testing
+- **click** for CLI
+- **ponyorm** for database

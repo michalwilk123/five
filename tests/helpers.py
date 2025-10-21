@@ -1,93 +1,90 @@
-from __future__ import annotations
-
 from pathlib import Path
 import sqlite3
+import traceback
 from typing import Iterable
 
 from click.testing import CliRunner, Result
 from pony.orm import db_session
 
 from five_cli.cli.main import cli
+from five_cli.core.config import get_db_path
+from five_cli.db_models import Commit, CompletedTask
 from five_cli.managers.db_manager import DatabaseManager
 from five_cli.managers.git_manager import GitManager
+from five_cli.utils import NOOP_LOG
 
 
 class TestInvoker:
-    def __init__(self, runner: CliRunner, project_dir: Path, config_dir: Path):
+    def __init__(
+        self,
+        runner: CliRunner,
+        project_dir: Path,
+        project_config_dir: Path,
+        global_config_dir: Path,
+    ):
         self.runner = runner
         self.project_dir = project_dir
-        self.config_dir = config_dir
-    
-    def run(self, command_parts: list[str], expect_failure: bool = False) -> Result:
-        full_command = [command_parts[0]]
+        self.project_config_dir = project_config_dir
+        self.global_config_dir = global_config_dir
 
-        full_command.extend(['--project', str(self.project_dir)])
-        full_command.extend(['--config', str(self.config_dir)])
-        full_command.extend(command_parts[1:])
-        
+    def _run_command(
+        self, command_parts: list[str], expect_failure: bool = False, include_project: bool = True
+    ) -> Result:
+        full_command = list(command_parts)
+
+        if include_project:
+            full_command.extend(['--project', str(self.project_dir)])
+            full_command.extend(['--global-config', str(self.global_config_dir)])
+            full_command.extend(['--config', str(self.project_config_dir)])
+        else:
+            full_command.extend(['--global-config', str(self.global_config_dir)])
+
         result = self.runner.invoke(cli, full_command)
-        
+
         if not expect_failure:
             if result.exit_code != 0:
-                print(f"\n=== COMMAND FAILED ===")
-                print(f"Command: {' '.join(command_parts)}")
-                print(f"Exit code: {result.exit_code}")
-                print(f"Output: {result.output}")
+                print('\n=== COMMAND FAILED ===')
+                print(f'Command: {" ".join(command_parts)}')
+                print(f'Exit code: {result.exit_code}')
+                print(f'Output: {result.output}')
                 if result.exception:
-                    import traceback
                     traceback.print_exception(
                         type(result.exception),
                         result.exception,
                         result.exception.__traceback__,
                     )
             assert result.exit_code == 0
-        
+
         return result
+
+    def run(self, command_parts: list[str], expect_failure: bool = False) -> Result:
+        return self._run_command(command_parts, expect_failure, include_project=True)
 
     def run_without_project(self, command_parts: list[str], expect_failure: bool = False) -> Result:
-        full_command = [command_parts[0]]
-        
-        full_command.extend(['--config', str(self.config_dir)])
-        full_command.extend(command_parts[1:])
-        
-        result = self.runner.invoke(cli, full_command)
-        
-        if not expect_failure:
-            if result.exit_code != 0:
-                print(f"\n=== COMMAND FAILED ===")
-                print(f"Command: {' '.join(command_parts)}")
-                print(f"Exit code: {result.exit_code}")
-                print(f"Output: {result.output}")
-                if result.exception:
-                    import traceback
-                    traceback.print_exception(
-                        type(result.exception),
-                        result.exception,
-                        result.exception.__traceback__,
-                    )
-            assert result.exit_code == 0
-        
-        return result
+        return self._run_command(command_parts, expect_failure, include_project=False)
 
 
-
-def _git_manager(five_dir: Path) -> GitManager:
-    git_dir = five_dir / '.git'
-    return GitManager(five_dir, git_dir)
-
-
-def _db_manager(five_dir: Path) -> DatabaseManager:
-    return DatabaseManager(five_dir)
+def _git_manager(project_dir: Path, project_config_path: Path) -> GitManager:
+    git_path = project_config_path / '.git'
+    work_tree = project_dir
+    return GitManager(NOOP_LOG, git_path, work_tree)
 
 
-def git_log(five_dir: Path) -> str:
-    git_manager = _git_manager(five_dir)
+def _db_manager(global_config_path: Path) -> DatabaseManager:
+    db_path = get_db_path(global_config_path)
+    return DatabaseManager(NOOP_LOG, db_path)
+
+
+def git_log(project_dir: Path, project_config_path: Path) -> str:
+    git_manager = _git_manager(project_dir, project_config_path)
     result = git_manager.run(['log', '--oneline', '--all'])
     return result.stdout.strip()
 
 
-def verify_git_commit_exists(five_dir: Path, commit_message: str) -> bool:
-    return commit_message in git_log(five_dir)
+def verify_git_commit_exists(
+    project_dir: Path, project_config_path: Path, commit_message: str
+) -> bool:
+    return commit_message in git_log(project_dir, project_config_path)
 
 
 def ensure_tables_exist(db_path: Path, expected_tables: Iterable[str]) -> None:
@@ -101,22 +98,22 @@ def ensure_tables_exist(db_path: Path, expected_tables: Iterable[str]) -> None:
 
 
 def get_commits(db_path: Path):
-    five_dir = db_path.parent
-    db_manager = _db_manager(five_dir)
+    global_config_path = db_path.parent
+    db_manager = _db_manager(global_config_path)
     db_manager.connect(create_tables=False)
 
-    from five_cli.db_models import Commit
     with db_session:
         commits = Commit.select()[:]
         return [(c.id, c.hash, c.type) for c in commits]
 
 
 def get_commit_by_hash(db_path: Path, commit_hash: str):
-    five_dir = db_path.parent
-    db_manager = _db_manager(five_dir)
+    global_config_path = db_path.parent
+    db_manager = _db_manager(global_config_path)
     db_manager.connect(create_tables=False)
 
     from five_cli.db_models import Commit
+
     with db_session:
         commit_entity = Commit.get(hash=commit_hash)
         if not commit_entity:
@@ -125,18 +122,17 @@ def get_commit_by_hash(db_path: Path, commit_hash: str):
             commit_entity.id,
             commit_entity.hash,
             commit_entity.type,
-            commit_entity.completed_task_id,
+            commit_entity.completed_task.id if commit_entity.completed_task else None,
         )
 
 
 def get_task_by_id(db_path: Path, task_id: int | None):
     if task_id is None:
         return None
-    five_dir = db_path.parent
-    db_manager = _db_manager(five_dir)
+    global_config_path = db_path.parent
+    db_manager = _db_manager(global_config_path)
     db_manager.connect(create_tables=False)
 
-    from five_cli.db_models import CompletedTask
     with db_session:
         task_entity = CompletedTask.get(id=task_id)
         if not task_entity:
@@ -147,11 +143,10 @@ def get_task_by_id(db_path: Path, task_id: int | None):
 def get_task_with_revert(db_path: Path, task_id: int | None):
     if task_id is None:
         return None
-    five_dir = db_path.parent
-    db_manager = _db_manager(five_dir)
+    global_config_path = db_path.parent
+    db_manager = _db_manager(global_config_path)
     db_manager.connect(create_tables=False)
 
-    from five_cli.db_models import CompletedTask
     with db_session:
         task_entity = CompletedTask.get(id=task_id)
         if not task_entity:
@@ -166,8 +161,8 @@ def get_task_with_revert(db_path: Path, task_id: int | None):
         )
 
 
-def read_state(five_dir: Path) -> str | None:
-    state_file = five_dir / 'state'
+def read_state(project_config_path: Path) -> str | None:
+    state_file = project_config_path / 'state'
     if not state_file.exists():
         return None
     return state_file.read_text().strip()
